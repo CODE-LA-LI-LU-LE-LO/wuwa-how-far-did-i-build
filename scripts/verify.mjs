@@ -213,8 +213,6 @@ for (const requiredSource of [
   "normalizeEchoSetName",
   "Lingering Tunes",
   "끊임없는 잔향",
-  "Wrath of the Deep",
-  "심해의 재앙",
 ]) {
   if (!appSource.includes(requiredSource)) fail(`app.js missing ${requiredSource}`);
 }

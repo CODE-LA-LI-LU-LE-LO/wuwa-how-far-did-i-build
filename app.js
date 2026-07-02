@@ -2,7 +2,7 @@ const STORAGE_KEY = "ww-farming-tracker-v2";
 const FIREBASE_VERSION = "10.12.5";
 const SHARE_URL_WARN_LENGTH = 6000;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
-const GOAL_DEFAULT_VERSION = "2026-07-echo-layout";
+const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
 
 const elementColors = {
@@ -55,14 +55,20 @@ const statOptions = [
   },
   {
     key: "attack",
-    label: "공격력",
+    label: "공격력%",
     icon: "assets/icons/stats/atk.webp",
     defaultTarget: 2100,
   },
   {
     key: "hp",
-    label: "체력",
+    label: "체력%",
     icon: "assets/icons/stats/hp.webp",
+    defaultTarget: 0,
+  },
+  {
+    key: "healingBonus",
+    label: "치유효과+",
+    icon: "assets/icons/stats/heal.webp",
     defaultTarget: 0,
   },
   {
@@ -71,8 +77,62 @@ const statOptions = [
     icon: "assets/icons/stats/def.webp",
     defaultTarget: 0,
   },
+  {
+    key: "aeroDamage",
+    label: "기류피증",
+    icon: elementIcons.기류,
+    defaultTarget: 0,
+  },
+  {
+    key: "fusionDamage",
+    label: "용융피증",
+    icon: elementIcons.용융,
+    defaultTarget: 0,
+  },
+  {
+    key: "glacioDamage",
+    label: "응결피증",
+    icon: elementIcons.응결,
+    defaultTarget: 0,
+  },
+  {
+    key: "electroDamage",
+    label: "전도피증",
+    icon: elementIcons.전도,
+    defaultTarget: 0,
+  },
+  {
+    key: "havocDamage",
+    label: "인멸피증",
+    icon: elementIcons.인멸,
+    defaultTarget: 0,
+  },
+  {
+    key: "spectroDamage",
+    label: "회절피증",
+    icon: elementIcons.회절,
+    defaultTarget: 0,
+  },
 ];
 
+const valueStatLabels = {
+  attack: "공격력",
+  hp: "체력",
+};
+const valueStatOptions = [
+  "critRate",
+  "critDamage",
+  "energy",
+  "attack",
+  "defense",
+  "hp",
+].map((key) => {
+  const option = statOptions.find((item) => item.key === key);
+  return {
+    ...option,
+    label: valueStatLabels[key] ?? option.label,
+  };
+});
 const statCostOptions = ["COST 4", "COST 3", "COST 1"];
 const statVariantOptions = ["-", "A", "B", "C"];
 const echoSetPieceOptions = ["5 Set", "3 Set", "2 Set", "1 Set"];
@@ -149,7 +209,6 @@ const echoSets = [
     name: "파도에 맞선 용기",
     icon: "assets/icons/echoes/set_14.webp",
   },
-  { en: "Wrath of the Deep", name: "심해의 재앙", icon: "" },
   {
     en: "Gusts of Welkin",
     name: "끝없는 하늘",
@@ -255,37 +314,68 @@ const defaultFarm = {
 const defaultGoal = {
   echoSet: "",
   echoSets: [{ join: "+", name: "", pieces: "5 Set" }],
+  mainEchoes: [{ join: "OR", name: "" }],
   echoBuild: "43311",
   mainEcho: "",
   note: "",
+  echoStats: [
+    {
+      key: "critRate",
+      label: "크리확률",
+      cost: "COST 4",
+      variant: "A",
+      branchChecked: false,
+    },
+    {
+      key: "critDamage",
+      label: "크리피해",
+      cost: "COST 3",
+      variant: "A",
+      branchChecked: false,
+    },
+    {
+      key: "energy",
+      label: "공명효율",
+      cost: "COST 3",
+      variant: "A",
+      branchChecked: false,
+    },
+    {
+      key: "attack",
+      label: "공격력%",
+      cost: "COST 1",
+      variant: "A",
+      branchChecked: false,
+    },
+  ],
   stats: [
     {
       key: "critRate",
       label: "크리확률",
       target: 70,
       cost: "COST 4",
-      variant: "A",
+      variant: "-",
     },
     {
       key: "critDamage",
       label: "크리피해",
-      target: 280,
+      target: 260,
       cost: "COST 3",
-      variant: "A",
+      variant: "-",
     },
     {
       key: "energy",
       label: "공명효율",
-      target: 130,
+      target: 120,
       cost: "COST 3",
-      variant: "A",
+      variant: "-",
     },
     {
       key: "attack",
       label: "공격력",
-      target: 2100,
+      target: 2200,
       cost: "COST 1",
-      variant: "A",
+      variant: "-",
     },
   ],
 };
@@ -300,7 +390,14 @@ const defaultCurrentStats = {
     energy: 0,
     attack: 0,
     hp: 0,
+    healingBonus: 0,
     defense: 0,
+    aeroDamage: 0,
+    fusionDamage: 0,
+    glacioDamage: 0,
+    electroDamage: 0,
+    havocDamage: 0,
+    spectroDamage: 0,
   },
 };
 
@@ -670,34 +767,36 @@ function createCharacter(input = {}) {
   };
 }
 
-function normalizeGoals(goals = {}, resetGoals = false) {
+function normalizeGoals(goals = {}, resetValueStats = false) {
   return {
-    admin: normalizeGoal(resetGoals ? {} : goals.admin),
-    custom: normalizeGoal(resetGoals ? {} : goals.custom),
+    admin: normalizeGoal(goals.admin, resetValueStats),
+    custom: normalizeGoal(goals.custom, resetValueStats),
   };
 }
 
-function normalizeGoal(goal = {}) {
+function normalizeGoal(goal = {}, resetValueStats = false) {
   const rawStats =
-    Array.isArray(goal.stats) && goal.stats.length
+    !resetValueStats && Array.isArray(goal.stats) && goal.stats.length
       ? goal.stats
       : defaultGoal.stats;
-  const stats = rawStats.map(normalizeGoalStat).filter(Boolean).slice(0, 5);
+  const stats = rawStats.map(normalizeGoalStat).filter(Boolean).slice(0, 7);
 
   while (stats.length < 3) {
     const nextOption =
-      statOptions.find(
+      valueStatOptions.find(
         (option) => !stats.some((stat) => stat.key === option.key),
-      ) ?? statOptions[0];
+      ) ?? valueStatOptions[0];
     stats.push(normalizeGoalStat(nextOption));
   }
 
   return {
     echoSet: normalizeEchoSetName(goal.echoSet ?? defaultGoal.echoSet),
     echoSets: normalizeGoalEchoSets(goal),
+    mainEchoes: normalizeGoalMainEchoes(goal),
     echoBuild: goal.echoBuild ?? defaultGoal.echoBuild,
     mainEcho: goal.mainEcho ?? defaultGoal.mainEcho,
     note: goal.note ?? defaultGoal.note,
+    echoStats: normalizeGoalEchoStats(goal, stats),
     stats,
   };
 }
@@ -726,10 +825,45 @@ function normalizeGoalEchoSets(goal = {}) {
         ? echoSet.pieces
         : "5 Set",
     }))
-    .slice(0, 5);
+    .slice(0, 20);
 }
 
-function normalizeGoalStat(stat = {}) {
+function normalizeGoalMainEchoes(goal = {}) {
+  const rawMainEchoes =
+    Array.isArray(goal.mainEchoes) && goal.mainEchoes.length
+      ? goal.mainEchoes
+      : [{ join: "OR", name: goal.mainEcho ?? defaultGoal.mainEcho }];
+
+  return rawMainEchoes
+    .map((mainEcho, index) => ({
+      join: index === 0 ? "기준" : "OR",
+      name: mainEcho.name ?? "",
+    }))
+    .slice(0, 4);
+}
+
+function normalizeGoalEchoStats(goal = {}, fallbackStats = defaultGoal.echoStats) {
+  const rawStats =
+    Array.isArray(goal.echoStats) && goal.echoStats.length
+      ? goal.echoStats
+      : fallbackStats;
+  const stats = rawStats
+    .map((stat) => normalizeGoalEchoStat(stat))
+    .filter(Boolean)
+    .slice(0, 7);
+
+  while (stats.length < 3) {
+    const nextOption =
+      statOptions.find(
+        (option) => !stats.some((stat) => stat.key === option.key),
+      ) ?? statOptions[0];
+    stats.push(normalizeGoalEchoStat(nextOption));
+  }
+
+  return stats;
+}
+
+function normalizeGoalEchoStat(stat = {}) {
   const option =
     statOptions.find((item) => item.key === stat.key) ??
     statOptions.find((item) => item.label === stat.label);
@@ -737,22 +871,45 @@ function normalizeGoalStat(stat = {}) {
   return {
     key: option.key,
     label: option.label,
-    target: Number(stat.target ?? option.defaultTarget),
+    cost: statCostOptions.includes(stat.cost) ? stat.cost : "COST 1",
+    variant: statVariantOptions.includes(stat.variant) ? stat.variant : "-",
+    branchChecked:
+      statVariantOptions.includes(stat.variant) && stat.variant !== "-"
+        ? Boolean(stat.branchChecked)
+        : false,
+  };
+}
+
+function normalizeGoalStat(stat = {}) {
+  const option =
+    valueStatOptions.find((item) => item.key === stat.key) ??
+    valueStatOptions.find((item) => item.label === stat.label);
+  if (!option) return null;
+  return {
+    key: option.key,
+    label: option.label,
+    target: Math.max(0, Number(stat.target ?? option.defaultTarget) || 0),
     cost: statCostOptions.includes(stat.cost) ? stat.cost : "COST 1",
     variant: statVariantOptions.includes(stat.variant) ? stat.variant : "-",
   };
 }
 
 function normalizeCurrentStats(currentStats = {}) {
+  const values = {
+    ...defaultCurrentStats.values,
+    ...(currentStats.values ?? {}),
+  };
   return {
     echoSet: normalizeEchoSetName(currentStats.echoSet ?? ""),
     mainEcho: currentStats.mainEcho ?? "",
     note: currentStats.note ?? "",
     manualComplete: Boolean(currentStats.manualComplete),
-    values: {
-      ...defaultCurrentStats.values,
-      ...(currentStats.values ?? {}),
-    },
+    values: Object.fromEntries(
+      Object.entries(values).map(([key, value]) => [
+        key,
+        Math.max(0, Number(value) || 0),
+      ]),
+    ),
   };
 }
 
@@ -934,9 +1091,21 @@ function renderRoster() {
     button.addEventListener("click", () => addGoalStat(button.dataset.addStat));
   });
 
+  rosterList.querySelectorAll("[data-add-echo-stat]").forEach((button) => {
+    button.addEventListener("click", () =>
+      addGoalEchoStat(button.dataset.addEchoStat),
+    );
+  });
+
   rosterList.querySelectorAll("[data-add-echo-set]").forEach((button) => {
     button.addEventListener("click", () =>
       addGoalEchoSet(button.dataset.addEchoSet),
+    );
+  });
+
+  rosterList.querySelectorAll("[data-add-main-echo]").forEach((button) => {
+    button.addEventListener("click", () =>
+      addGoalMainEcho(button.dataset.addMainEcho),
     );
   });
 
@@ -952,6 +1121,24 @@ function renderRoster() {
     );
   });
 
+  rosterList.querySelectorAll("[data-remove-main-echo]").forEach((button) => {
+    button.addEventListener("click", () =>
+      removeGoalMainEcho(
+        button.dataset.character,
+        button.dataset.removeMainEcho,
+      ),
+    );
+  });
+
+  rosterList.querySelectorAll("[data-remove-echo-stat]").forEach((button) => {
+    button.addEventListener("click", () =>
+      removeGoalEchoStat(
+        button.dataset.character,
+        button.dataset.removeEchoStat,
+      ),
+    );
+  });
+
   rosterList.querySelectorAll("[data-stat-key]").forEach((field) => {
     field.addEventListener("change", () =>
       updateGoalStatKey(
@@ -962,12 +1149,73 @@ function renderRoster() {
     );
   });
 
+  rosterList.querySelectorAll("[data-echo-stat-option]").forEach((button) => {
+    button.addEventListener("click", () =>
+      updateGoalEchoStatKey(
+        button.dataset.character,
+        Number(button.dataset.index),
+        button.dataset.value,
+      ),
+    );
+  });
+
+  rosterList.querySelectorAll("[data-stat-option]").forEach((button) => {
+    button.addEventListener("click", () =>
+      updateGoalStatKey(
+        button.dataset.character,
+        Number(button.dataset.index),
+        button.dataset.value,
+      ),
+    );
+  });
+
+  rosterList.querySelectorAll("[data-echo-stat-field]").forEach((field) => {
+    field.addEventListener("change", () => {
+      updateGoalEchoStatField(
+        field.dataset.character,
+        Number(field.dataset.index),
+        field.dataset.echoStatField,
+        field.type === "checkbox" ? field.checked : field.value,
+      );
+      if (field.dataset.echoStatField === "variant") {
+        updateRenderedBranchCheckState(field);
+      }
+      updateRenderedValueBranchStates(field.dataset.character);
+    });
+  });
+
   rosterList.querySelectorAll("[data-goal-stat-field]").forEach((field) => {
-    field.addEventListener("change", () =>
+    field.addEventListener("change", () => {
+      if (
+        field.dataset.goalStatField === "target" &&
+        Number(field.value) < 0
+      ) {
+        field.value = "0";
+      }
       updateGoalStatField(
         field.dataset.character,
         Number(field.dataset.index),
         field.dataset.goalStatField,
+        field.value,
+      );
+      if (field.dataset.goalStatField === "variant") {
+        updateRenderedValueBranchStates(field.dataset.character);
+      } else {
+        updateRenderedStatRowState(
+          field.dataset.character,
+          Number(field.dataset.index),
+          field.closest(".stat-row"),
+        );
+      }
+    });
+  });
+
+  rosterList.querySelectorAll("[data-main-echo-field]").forEach((field) => {
+    field.addEventListener("change", () =>
+      updateGoalMainEcho(
+        field.dataset.character,
+        Number(field.dataset.index),
+        field.dataset.mainEchoField,
         field.value,
       ),
     );
@@ -1012,13 +1260,19 @@ function renderRoster() {
   });
 
   rosterList.querySelectorAll("[data-current-field]").forEach((field) => {
-    field.addEventListener("change", () =>
+    field.addEventListener("change", () => {
+      if (Number(field.value) < 0) field.value = "0";
       updateCurrentStat(
         field.dataset.character,
         field.dataset.currentField,
         field.value,
-      ),
-    );
+      );
+      updateRenderedStatRowState(
+        field.dataset.character,
+        Number(field.dataset.index),
+        field.closest(".stat-row"),
+      );
+    });
   });
 
   rosterList.querySelectorAll("[data-goal-field]").forEach((field) => {
@@ -1101,9 +1355,19 @@ function renderFarmingCard(character) {
   const rows = goal.stats
     .map((stat, index) => renderStatRow(character, stat, index, canEditGoal))
     .join("");
+  const echoStatRows = goal.echoStats
+    .map((stat, index) =>
+      renderEchoStatRow(character, stat, index, canEditGoal),
+    )
+    .join("");
   const echoSetRows = goal.echoSets
     .map((echoSet, index) =>
       renderGoalEchoSetRow(character, echoSet, index, canEditGoal),
+    )
+    .join("");
+  const mainEchoRows = goal.mainEchoes
+    .map((mainEcho, index) =>
+      renderGoalMainEchoRow(character, mainEcho, index, canEditGoal),
     )
     .join("");
   const shouldShowNote = canEditGoal || goal.note;
@@ -1125,47 +1389,80 @@ function renderFarmingCard(character) {
         <button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>
       </div>
 
-      <div class="echo-grid">
+      <div class="target-grid">
+        <div class="echo-targets">
+          <div class="field-heading">
+            <span>목표 메인에코</span>
+            ${canEditGoal ? `<button class="tiny-button" data-add-main-echo="${character.id}" type="button" ${goal.mainEchoes.length < 4 ? "" : "disabled"}>+</button>` : ""}
+          </div>
+          <div class="echo-set-list">
+            ${mainEchoRows}
+          </div>
+        </div>
         <div class="echo-targets">
           <div class="field-heading">
             <span>목표 에코셋</span>
-            ${canEditGoal ? `<button class="tiny-button" data-add-echo-set="${character.id}" type="button" ${goal.echoSets.length < 5 ? "" : "disabled"}>+</button>` : ""}
+            ${canEditGoal ? `<button class="tiny-button" data-add-echo-set="${character.id}" type="button" ${goal.echoSets.length < 20 ? "" : "disabled"}>+</button>` : ""}
           </div>
           <div class="echo-set-list">
             ${echoSetRows}
           </div>
         </div>
-        <label>
-          에코셋 구성
-          <input data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(goal.echoBuild)}" placeholder="예: 43311" ${canEditGoal ? "" : "disabled"} />
-        </label>
-        <label>
-          목표 메인에코
-          <input data-goal-field="mainEcho" data-character="${character.id}" value="${escapeHtml(goal.mainEcho)}" placeholder="목표 메인에코" ${canEditGoal ? "" : "disabled"} />
-        </label>
       </div>
 
-      <div class="stat-table" role="table" aria-label="${escapeHtml(character.name)} 목표 스테이터스">
-        <div class="stat-row stat-head" role="row">
-          <span>옵션</span>
-          <span>COST</span>
-          <span>주옵</span>
-          <span>권장수치</span>
-          <span>내 캐릭터</span>
-          <span></span>
-        </div>
-        ${rows}
+      <div class="farm-input-grid">
+        <section class="farm-input-panel">
+          <label>
+            에코셋 구성
+            <input data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(goal.echoBuild)}" placeholder="예: 43311" ${canEditGoal ? "" : "disabled"} />
+          </label>
+          <div class="stat-table echo-stat-table ${canEditGoal ? "can-edit" : ""}" role="table" aria-label="${escapeHtml(character.name)} 에코셋 구성">
+            <div class="echo-stat-row stat-head" role="row">
+              <span>분기</span>
+              <span>COST</span>
+              <span>주옵</span>
+              <span></span>
+            </div>
+            ${echoStatRows}
+          </div>
+          ${
+            canEditGoal
+              ? `
+            <div class="stat-actions">
+              <button class="ghost-button" data-add-echo-stat="${character.id}" type="button" ${goal.echoStats.length < 7 ? "" : "disabled"}>에코 구성 추가</button>
+              <small>에코 구성은 3개에서 7개까지 설정할 수 있습니다.</small>
+            </div>
+          `
+              : ""
+          }
+        </section>
+
+        <section class="farm-input-panel">
+          <div class="field-heading table-heading">
+            <span>주옵수치입력</span>
+          </div>
+          <div class="stat-table" role="table" aria-label="${escapeHtml(character.name)} 목표 스테이터스">
+            <div class="stat-row stat-head" role="row">
+              <span>분기</span>
+              <span>주옵</span>
+              <span>권장수치</span>
+              <span>내 캐릭터</span>
+              <span></span>
+            </div>
+            ${rows}
+          </div>
+          ${
+            canEditGoal
+              ? `
+            <div class="stat-actions">
+              <button class="ghost-button" data-add-stat="${character.id}" type="button" ${goal.stats.length < 7 ? "" : "disabled"}>주옵 추가</button>
+              <small>주옵은 3개에서 7개까지 설정할 수 있습니다.</small>
+            </div>
+          `
+              : ""
+          }
+        </section>
       </div>
-      ${
-        canEditGoal
-          ? `
-        <div class="stat-actions">
-          <button class="ghost-button" data-add-stat="${character.id}" type="button" ${goal.stats.length < 7 ? "" : "disabled"}>주옵 추가</button>
-          <small>주옵은 3개에서 7개까지 설정할 수 있습니다.</small>
-        </div>
-      `
-          : ""
-      }
 
       ${
         shouldShowNote
@@ -1205,6 +1502,44 @@ function renderGoalEchoSetRow(character, echoSet, index, canEditGoal) {
   `;
 }
 
+function renderGoalMainEchoRow(character, mainEcho, index, canEditGoal) {
+  return `
+    <div class="main-echo-row">
+      <span class="echo-join-label">${index === 0 ? "기준" : "OR"}</span>
+      <input data-main-echo-field="name" data-character="${character.id}" data-index="${index}" value="${escapeHtml(mainEcho.name)}" placeholder="목표 메인에코" ${canEditGoal ? "" : "disabled"} />
+      ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-main-echo="${index}" type="button" ${index > 0 && getActiveGoal(character).mainEchoes.length > 1 ? "" : "disabled"} title="메인에코 제거">-</button>` : "<span></span>"}
+    </div>
+  `;
+}
+
+function renderEchoStatRow(character, stat, index, canEditGoal) {
+  const option = getStatOption(stat.key, statOptions);
+  const hasBranch = stat.variant !== "-";
+
+  return `
+    <div class="echo-stat-row" role="row">
+      <span class="branch-cell ${hasBranch ? "has-branch" : ""}">
+        <label class="branch-check ${hasBranch ? "" : "hidden"}" title="이 분기 사용">
+          <input data-echo-stat-field="branchChecked" data-character="${character.id}" data-index="${index}" type="checkbox" ${stat.branchChecked ? "checked" : ""} ${character.owned && hasBranch ? "" : "disabled"} />
+        </label>
+        <select data-echo-stat-field="variant" data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
+          ${statVariantOptions.map((option) => `<option value="${option}" ${stat.variant === option ? "selected" : ""}>${option}</option>`).join("")}
+        </select>
+      </span>
+      <select data-echo-stat-field="cost" data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
+        ${statCostOptions.map((option) => `<option value="${option}" ${stat.cost === option ? "selected" : ""}>${option}</option>`).join("")}
+      </select>
+      ${renderStatPicker(character.id, index, option.key, canEditGoal, {
+        options: statOptions,
+        dataAttribute: "data-echo-stat-option",
+      })}
+      <span class="stat-row-actions">
+        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-echo-stat="${index}" type="button" ${getActiveGoal(character).echoStats.length > 3 ? "" : "disabled"} title="에코 구성 제거">-</button>` : ""}
+      </span>
+    </div>
+  `;
+}
+
 function renderAvatar(character, selectAttribute) {
   const content = character.image
     ? `<img src="${escapeHtml(character.image)}" alt="" loading="lazy" />`
@@ -1221,28 +1556,31 @@ function renderAvatar(character, selectAttribute) {
 function renderStatRow(character, stat, index, canEditGoal) {
   const current = Number(character.currentStats.values[stat.key] ?? 0);
   const target = Number(stat.target ?? 0);
-  const met = character.owned && current >= target;
-  const disabled = character.owned ? "" : "disabled";
-  const option = getStatOption(stat.key);
+  const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
+  const hasBranch = stat.variant !== "-";
+  const met = character.owned && branchActive && current >= target;
+  const inputDisabled = character.owned && branchActive ? "" : "disabled";
+  const targetDisabled = canEditGoal && branchActive ? "" : "disabled";
+  const option = getStatOption(stat.key, valueStatOptions);
 
   return `
-    <div class="stat-row ${met ? "met" : ""}" role="row">
-      <select data-goal-stat-field="variant" data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
-        ${statVariantOptions.map((option) => `<option value="${option}" ${stat.variant === option ? "selected" : ""}>${option}</option>`).join("")}
-      </select>
-      <select data-goal-stat-field="cost" data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
-        ${statCostOptions.map((option) => `<option value="${option}" ${stat.cost === option ? "selected" : ""}>${option}</option>`).join("")}
-      </select>
-      <span class="select-with-icon">
-        ${renderInlineIcon(option.icon)}
-        <select data-stat-key data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
-          ${statOptions.map((item) => `<option value="${item.key}" ${item.key === stat.key ? "selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}
+    <div class="stat-row ${met ? "met" : ""} ${branchActive ? "" : "branch-inactive"}" data-stat-row="${character.id}" data-index="${index}" role="row">
+      <span class="branch-cell ${hasBranch ? "has-branch" : ""}">
+        <label class="branch-check readonly ${hasBranch ? "" : "hidden"}" title="에코셋 구성에서 선택된 분기">
+          <input type="checkbox" ${branchActive ? "checked" : ""} disabled />
+        </label>
+        <select data-goal-stat-field="variant" data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
+          ${statVariantOptions.map((option) => `<option value="${option}" ${stat.variant === option ? "selected" : ""}>${option}</option>`).join("")}
         </select>
       </span>
-      <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" value="${target}" ${canEditGoal ? "" : "disabled"} />
-      <input data-current-field="${stat.key}" data-character="${character.id}" type="number" value="${current}" ${disabled} />
+      ${renderStatPicker(character.id, index, option.key, canEditGoal && branchActive, {
+        options: valueStatOptions,
+        dataAttribute: "data-stat-option",
+      })}
+      <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${target}" ${targetDisabled} />
+      <input data-current-field="${stat.key}" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
-        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${stat.key}" type="button" ${character.owned ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
+        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${stat.key}" type="button" ${character.owned && branchActive ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
         ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
@@ -1258,7 +1596,7 @@ function renderCharacterMetaChips(character) {
     <span class="chip rarity-chip">★${escapeHtml(getRarity(character))}</span>
     ${renderIconChip(character.element, elementIcons[character.element])}
     ${renderIconChip(character.weapon, weaponIcons[character.weapon])}
-    <span class="chip">${escapeHtml(character.version)}</span>
+    <span class="chip version-chip">${escapeHtml(character.version)}</span>
   `;
 }
 
@@ -1308,6 +1646,43 @@ function renderEchoSetPicker(characterId, index, value, enabled) {
   `;
 }
 
+function renderStatPicker(
+  characterId,
+  index,
+  value,
+  enabled,
+  { options = statOptions, dataAttribute = "data-stat-option" } = {},
+) {
+  const selectedOption = getStatOption(value, options);
+  const buttonContent = `${renderInlineIcon(selectedOption.icon)}<span>${escapeHtml(selectedOption.label)}</span>`;
+
+  if (!enabled) {
+    return `
+      <div class="echo-picker stat-picker readonly">
+        <span class="echo-picker-button">${buttonContent}</span>
+      </div>
+    `;
+  }
+
+  return `
+    <details class="echo-picker stat-picker">
+      <summary class="echo-picker-button">${buttonContent}</summary>
+      <div class="echo-picker-options">
+        ${options
+          .map(
+            (option) => `
+              <button type="button" ${dataAttribute} data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(option.key)}" class="${option.key === selectedOption.key ? "active" : ""}">
+                ${renderInlineIcon(option.icon)}
+                <span>${escapeHtml(option.label)}</span>
+              </button>
+            `,
+          )
+          .join("")}
+      </div>
+    </details>
+  `;
+}
+
 function getEchoSetIcon(name) {
   return (
     echoSets.find((echoSet) => echoSet.name === normalizeEchoSetName(name))
@@ -1323,8 +1698,15 @@ function normalizeEchoSetName(name) {
   return exact?.name ?? name;
 }
 
-function getStatOption(key) {
-  return statOptions.find((option) => option.key === key) ?? statOptions[0];
+function getStatOption(key, options = statOptions) {
+  return options.find((option) => option.key === key) ?? options[0];
+}
+
+function isGoalBranchActive(goal, variant) {
+  if (variant === "-") return true;
+  return goal.echoStats.some(
+    (stat) => stat.variant === variant && stat.branchChecked,
+  );
 }
 
 function canEditActiveGoal(character) {
@@ -1427,6 +1809,7 @@ function updateCharacterField(id, field, value) {
 function updateCurrentStat(id, field, value) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !character.owned) return;
+  const shouldRerenderRoster = field === "manualComplete";
 
   if (field === "manualComplete") {
     character.currentStats.manualComplete = Boolean(value);
@@ -1436,7 +1819,7 @@ function updateCurrentStat(id, field, value) {
         ? "mid"
         : character.farm.priority;
   } else if (field in character.currentStats.values) {
-    character.currentStats.values[field] = Number(value);
+    character.currentStats.values[field] = Math.max(0, Number(value) || 0);
   } else {
     character.currentStats[field] = value;
   }
@@ -1444,8 +1827,10 @@ function updateCurrentStat(id, field, value) {
   saveState();
   renderStats();
   renderFocusStrip();
-  renderRoster();
-  if (id === selectedId) renderDetail();
+  if (shouldRerenderRoster) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+  }
 }
 
 function updateGoal(id, field, value, statKey) {
@@ -1482,13 +1867,39 @@ function updateGoalEchoSet(id, index, field, value) {
   renderRoster();
 }
 
+function updateGoalMainEcho(id, index, field, value) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character || !canEditActiveGoal(character)) return;
+  const goal = getActiveGoal(character);
+  const targetIndex = Number(index);
+  const mainEcho = goal.mainEchoes[targetIndex];
+  if (!mainEcho) return;
+
+  if (field === "name") mainEcho.name = value;
+  if (targetIndex === 0) goal.mainEcho = mainEcho.name;
+
+  saveState();
+  renderRoster();
+}
+
 function addGoalEchoSet(id) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.echoSets.length >= 5) return;
+  if (goal.echoSets.length >= 20) return;
 
   goal.echoSets.push({ join: "+", name: "", pieces: "2 Set" });
+  saveState();
+  renderRoster();
+}
+
+function addGoalMainEcho(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character || !canEditActiveGoal(character)) return;
+  const goal = getActiveGoal(character);
+  if (goal.mainEchoes.length >= 4) return;
+
+  goal.mainEchoes.push({ join: "OR", name: "" });
   saveState();
   renderRoster();
 }
@@ -1505,13 +1916,118 @@ function removeGoalEchoSet(id, index) {
   renderRoster();
 }
 
+function removeGoalMainEcho(id, index) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character || !canEditActiveGoal(character)) return;
+  const goal = getActiveGoal(character);
+  const targetIndex = Number(index);
+  if (goal.mainEchoes.length <= 1 || targetIndex <= 0) return;
+
+  goal.mainEchoes.splice(targetIndex, 1);
+  saveState();
+  renderRoster();
+}
+
+function updateGoalEchoStatKey(id, index, key) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character || !canEditActiveGoal(character)) return;
+  const option = getStatOption(key, statOptions);
+  const stat = getActiveGoal(character).echoStats[Number(index)];
+  if (!stat) return;
+
+  stat.key = option.key;
+  stat.label = option.label;
+
+  saveState();
+  renderRoster();
+}
+
+function updateGoalEchoStatField(id, index, field, value) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+  const isBranchCheck = field === "branchChecked";
+  if (isBranchCheck && !character.owned) return;
+  if (!isBranchCheck && !canEditActiveGoal(character)) return;
+  const stat = getActiveGoal(character).echoStats[Number(index)];
+  if (!stat) return;
+
+  if (field === "cost")
+    stat.cost = statCostOptions.includes(value) ? value : "COST 1";
+  if (field === "variant") {
+    stat.variant = statVariantOptions.includes(value) ? value : "-";
+    if (stat.variant === "-") stat.branchChecked = false;
+  }
+  if (field === "branchChecked") {
+    stat.branchChecked = stat.variant !== "-" && Boolean(value);
+  }
+
+  saveState();
+}
+
+function updateRenderedBranchCheckState(field) {
+  const row = field.closest(".echo-stat-row");
+  const branchCell = row?.querySelector(".branch-cell");
+  const checkLabel = row?.querySelector(".branch-check");
+  const checkbox = row?.querySelector('[data-echo-stat-field="branchChecked"]');
+  if (!checkLabel || !checkbox) return;
+
+  const hasBranch = field.value !== "-";
+  branchCell?.classList.toggle("has-branch", hasBranch);
+  checkLabel.classList.toggle("hidden", !hasBranch);
+  checkbox.disabled = !hasBranch || field.disabled;
+  if (!hasBranch) checkbox.checked = false;
+}
+
+function updateRenderedValueBranchStates(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+  const goal = getActiveGoal(character);
+
+  document
+    .querySelectorAll(`[data-stat-row="${CSS.escape(id)}"]`)
+    .forEach((row) => {
+      const stat = goal.stats[Number(row.dataset.index)];
+      if (!stat) return;
+      const hasBranch = stat.variant !== "-";
+      const branchActive = isGoalBranchActive(goal, stat.variant);
+      const branchCell = row.querySelector(".branch-cell");
+      const branchCheck = row.querySelector(".branch-check");
+      const branchCheckbox = branchCheck?.querySelector("input");
+      const targetInput = row.querySelector("[data-goal-stat-field='target']");
+      const currentInput = row.querySelector("[data-current-field]");
+      const clearButton = row.querySelector("[data-clear-current]");
+      const canEditGoal = canEditActiveGoal(character);
+
+      branchCell?.classList.toggle("has-branch", hasBranch);
+      branchCheck?.classList.toggle("hidden", !hasBranch);
+      if (branchCheckbox) branchCheckbox.checked = branchActive;
+      row.classList.toggle("branch-inactive", !branchActive);
+      if (targetInput) targetInput.disabled = !canEditGoal || !branchActive;
+      if (currentInput) currentInput.disabled = !character.owned || !branchActive;
+      if (clearButton) clearButton.disabled = !character.owned || !branchActive;
+      updateRenderedStatRowState(id, Number(row.dataset.index), row);
+    });
+}
+
+function removeGoalEchoStat(id, index) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character || !canEditActiveGoal(character)) return;
+  const goal = getActiveGoal(character);
+  if (goal.echoStats.length <= 3) return;
+
+  const targetIndex = Number(index);
+  goal.echoStats.splice(targetIndex, 1);
+  saveState();
+  renderRoster();
+}
+
 function updateGoalStatField(id, index, field, value) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const stat = getActiveGoal(character).stats[Number(index)];
   if (!stat) return;
 
-  if (field === "target") stat.target = Number(value);
+  if (field === "target") stat.target = Math.max(0, Number(value) || 0);
   if (field === "cost")
     stat.cost = statCostOptions.includes(value) ? value : "COST 1";
   if (field === "variant")
@@ -1519,7 +2035,19 @@ function updateGoalStatField(id, index, field, value) {
 
   saveState();
   renderStats();
-  renderRoster();
+  renderFocusStrip();
+}
+
+function updateRenderedStatRowState(id, index, row) {
+  const character = state.characters.find((item) => item.id === id);
+  const stat = character ? getActiveGoal(character).stats[Number(index)] : null;
+  if (!character || !stat || !row) return;
+
+  const current = Number(character.currentStats.values[stat.key] ?? 0);
+  const target = Number(stat.target ?? 0);
+  const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
+  row.classList.toggle("branch-inactive", !branchActive);
+  row.classList.toggle("met", character.owned && branchActive && current >= target);
 }
 
 function clearCurrentStat(id, key) {
@@ -1543,9 +2071,9 @@ function addGoalStat(id) {
   if (goal.stats.length >= 7) return;
 
   const option =
-    statOptions.find(
+    valueStatOptions.find(
       (item) => !goal.stats.some((stat) => stat.key === item.key),
-    ) ?? statOptions[0];
+    ) ?? valueStatOptions[0];
   goal.stats.push({
     key: option.key,
     label: option.label,
@@ -1557,13 +2085,35 @@ function addGoalStat(id) {
   renderRoster();
 }
 
+function addGoalEchoStat(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character || !canEditActiveGoal(character)) return;
+  const goal = getActiveGoal(character);
+  if (goal.echoStats.length >= 7) return;
+
+  const option =
+    statOptions.find(
+      (item) => !goal.echoStats.some((stat) => stat.key === item.key),
+    ) ?? statOptions[0];
+  goal.echoStats.push({
+    key: option.key,
+    label: option.label,
+    cost: "COST 1",
+    variant: "-",
+    branchChecked: false,
+  });
+  saveState();
+  renderRoster();
+}
+
 function removeGoalStat(id, index) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
   if (goal.stats.length <= 3) return;
 
-  goal.stats.splice(Number(index), 1);
+  const targetIndex = Number(index);
+  goal.stats.splice(targetIndex, 1);
   saveState();
   renderStats();
   renderRoster();
@@ -1572,10 +2122,11 @@ function removeGoalStat(id, index) {
 function updateGoalStatKey(id, index, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
-  const option = getStatOption(key);
   const goal = getActiveGoal(character);
   const stat = goal.stats[Number(index)];
   if (!stat) return;
+  if (!isGoalBranchActive(goal, stat.variant)) return;
+  const option = getStatOption(key, valueStatOptions);
 
   stat.key = option.key;
   stat.label = option.label;
@@ -1628,7 +2179,7 @@ function renderFocusStrip() {
         getPriorityScore(b.farm.priority) - getPriorityScore(a.farm.priority);
       return (
         priorityScore ||
-        getProgress(a) - getProgress(b) ||
+        getProgress(b) - getProgress(a) ||
         a.name.localeCompare(b.name, "ko")
       );
     });
