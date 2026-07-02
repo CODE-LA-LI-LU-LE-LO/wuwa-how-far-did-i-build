@@ -1106,7 +1106,7 @@ select option {
 
 .echo-picker-button::after {
   justify-self: end;
-  content: "⌄";
+  content: "v";
   color: var(--muted);
 }
 
