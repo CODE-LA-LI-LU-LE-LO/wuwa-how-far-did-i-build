@@ -6,7 +6,7 @@ const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
 
 const elementColors = {
-  회절: "#f4d98c",
+  회절: "#ffd75a",
   응결: "#88d7ff",
   용융: "#ff8c66",
   전도: "#b58cff",
@@ -417,6 +417,8 @@ const importInput = document.querySelector("#importInput");
 const shareNotice = document.querySelector("#shareNotice");
 const saveSnapshotButton = document.querySelector("#saveSnapshotButton");
 const closeShareButton = document.querySelector("#closeShareButton");
+const toolbar = document.querySelector(".toolbar");
+const focusStripSentinel = document.querySelector("#focusStripSentinel");
 const focusStrip = document.querySelector("#focusStrip");
 const categoryRail = document.querySelector("#categoryRail");
 const listEyebrow = document.querySelector("#listEyebrow");
@@ -426,12 +428,17 @@ const deleteCharacterButton = document.querySelector("#deleteCharacterButton");
 const appTabs = document.querySelectorAll("[data-tab]");
 const sortButtons = document.querySelectorAll("[data-sort]");
 const farmingFilterInputs = document.querySelectorAll("[data-farm-filter]");
+const compactDetailQuery =
+  typeof window.matchMedia === "function"
+    ? window.matchMedia("(max-width: 1320px)")
+    : null;
 
 let cloud = null;
 let cloudSaveTimer = null;
 let sharedSnapshot = readSharedSnapshot();
 let isSnapshotMode = Boolean(sharedSnapshot);
 let state = sharedSnapshot ?? loadState();
+let isDetailPanelCollapsed = Boolean(compactDetailQuery?.matches);
 let selectedId =
   state.characters.find((character) => character.owned)?.id ?? null;
 let currentView = "all";
@@ -491,6 +498,25 @@ farmingFilterInputs.forEach((input) => {
     }
     render();
   });
+});
+
+if (compactDetailQuery?.addEventListener) {
+  compactDetailQuery.addEventListener("change", (event) => {
+    isDetailPanelCollapsed = event.matches;
+    syncDetailPanelMode();
+  });
+} else if (compactDetailQuery?.addListener) {
+  compactDetailQuery.addListener((event) => {
+    isDetailPanelCollapsed = event.matches;
+    syncDetailPanelMode();
+  });
+}
+
+detailPanel.addEventListener("click", (event) => {
+  if (!isCompactDetailPanel() || !isDetailPanelCollapsed) return;
+  event.preventDefault();
+  isDetailPanelCollapsed = false;
+  renderDetail();
 });
 
 window.addEventListener("scroll", updateFocusStripStickiness, {
@@ -1554,7 +1580,8 @@ function renderAvatar(character, selectAttribute) {
 }
 
 function renderStatRow(character, stat, index, canEditGoal) {
-  const current = Number(character.currentStats.values[stat.key] ?? 0);
+  const currentKey = getCurrentStatValueKey(stat);
+  const current = getCurrentStatValue(character, stat);
   const target = Number(stat.target ?? 0);
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
   const hasBranch = stat.variant !== "-";
@@ -1578,9 +1605,9 @@ function renderStatRow(character, stat, index, canEditGoal) {
         dataAttribute: "data-stat-option",
       })}
       <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${target}" ${targetDisabled} />
-      <input data-current-field="${stat.key}" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${current}" ${inputDisabled} />
+      <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
-        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${stat.key}" type="button" ${character.owned && branchActive ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
+        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${character.owned && branchActive ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
         ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
@@ -1709,6 +1736,21 @@ function isGoalBranchActive(goal, variant) {
   );
 }
 
+function getCurrentStatValueKey(stat) {
+  return stat?.variant && stat.variant !== "-"
+    ? `${stat.variant}:${stat.key}`
+    : stat.key;
+}
+
+function getCurrentStatValue(character, stat) {
+  return Number(character.currentStats.values[getCurrentStatValueKey(stat)] ?? 0);
+}
+
+function getActiveGoalStats(character) {
+  const goal = getActiveGoal(character);
+  return goal.stats.filter((stat) => isGoalBranchActive(goal, stat.variant));
+}
+
 function canEditActiveGoal(character) {
   return character.goalMode === "custom" || adminGoalEditing;
 }
@@ -1819,6 +1861,8 @@ function updateCurrentStat(id, field, value) {
         ? "mid"
         : character.farm.priority;
   } else if (field in character.currentStats.values) {
+    character.currentStats.values[field] = Math.max(0, Number(value) || 0);
+  } else if (field.includes(":") || valueStatOptions.some((option) => option.key === field)) {
     character.currentStats.values[field] = Math.max(0, Number(value) || 0);
   } else {
     character.currentStats[field] = value;
@@ -1962,6 +2006,11 @@ function updateGoalEchoStatField(id, index, field, value) {
   }
 
   saveState();
+  if (isBranchCheck) {
+    renderStats();
+    renderFocusStrip();
+    renderRoster();
+  }
 }
 
 function updateRenderedBranchCheckState(field) {
@@ -2043,7 +2092,7 @@ function updateRenderedStatRowState(id, index, row) {
   const stat = character ? getActiveGoal(character).stats[Number(index)] : null;
   if (!character || !stat || !row) return;
 
-  const current = Number(character.currentStats.values[stat.key] ?? 0);
+  const current = getCurrentStatValue(character, stat);
   const target = Number(stat.target ?? 0);
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
   row.classList.toggle("branch-inactive", !branchActive);
@@ -2131,8 +2180,9 @@ function updateGoalStatKey(id, index, key) {
   stat.key = option.key;
   stat.label = option.label;
   stat.target = option.defaultTarget;
-  if (!(option.key in character.currentStats.values)) {
-    character.currentStats.values[option.key] = 0;
+  const currentKey = getCurrentStatValueKey(stat);
+  if (!(currentKey in character.currentStats.values)) {
+    character.currentStats.values[currentKey] = 0;
   }
   saveState();
   renderStats();
@@ -2225,10 +2275,13 @@ function renderFocusStrip() {
 }
 
 function updateFocusStripStickiness() {
-  if (typeof focusStrip.getBoundingClientRect !== "function") return;
-  const isStuck =
-    focusStrip.getBoundingClientRect().top <= 8 && window.scrollY > 120;
-  focusStrip.classList.toggle("is-stuck", isStuck);
+  if (typeof focusStripSentinel.getBoundingClientRect !== "function") return;
+  const sentinelTop = focusStripSentinel.getBoundingClientRect().top;
+  const toolbarBottom =
+    typeof toolbar?.getBoundingClientRect === "function"
+      ? toolbar.getBoundingClientRect().bottom
+      : 0;
+  focusStrip.classList.toggle("is-stuck", sentinelTop <= toolbarBottom);
 }
 
 function openFarmingCard(id) {
@@ -2247,6 +2300,20 @@ function openFarmingCard(id) {
     card.scrollIntoView({ behavior: "smooth", block: "start" });
     window.setTimeout(() => card.classList.remove("spotlight"), 900);
   });
+}
+
+function isCompactDetailPanel() {
+  return Boolean(compactDetailQuery?.matches);
+}
+
+function syncDetailPanelMode() {
+  const isCompact = isCompactDetailPanel();
+  const canCollapse = Boolean(detailPanel.querySelector(".detail-content"));
+  detailPanel.classList.toggle("is-floating", isCompact);
+  detailPanel.classList.toggle(
+    "is-collapsed",
+    isCompact && isDetailPanelCollapsed && canCollapse,
+  );
 }
 
 function toggleOwned(id) {
@@ -2293,6 +2360,7 @@ function renderDetail() {
         <p>체크를 켠 캐릭터만 파밍 상태를 기록할 수 있습니다.</p>
       </div>
     `;
+    syncDetailPanelMode();
     return;
   }
 
@@ -2332,6 +2400,14 @@ function renderDetail() {
 
   detailPanel.innerHTML = "";
   detailPanel.append(fragment);
+  detailPanel
+    .querySelector("[data-detail-panel-toggle]")
+    ?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      isDetailPanelCollapsed = true;
+      syncDetailPanelMode();
+    });
+  syncDetailPanelMode();
 }
 
 function updateFarm(id, key, value) {
@@ -2386,7 +2462,9 @@ function completeFarm(id) {
   };
   character.currentStats.manualComplete = true;
   getActiveGoal(character).stats.forEach((stat) => {
-    character.currentStats.values[stat.key] = Number(stat.target ?? 0);
+    character.currentStats.values[getCurrentStatValueKey(stat)] = Number(
+      stat.target ?? 0,
+    );
   });
   saveState();
   showSessionMessage(
@@ -2447,15 +2525,15 @@ function getProgress(character) {
 }
 
 function getGoalProgress(character) {
-  const goal = getActiveGoal(character);
   if (character.currentStats.manualComplete) return 100;
-  if (!goal.stats.length) return 0;
-  const metCount = goal.stats.filter(
+  const stats = getActiveGoalStats(character);
+  if (!stats.length) return 0;
+  const metCount = stats.filter(
     (stat) =>
-      Number(character.currentStats.values[stat.key] ?? 0) >=
+      getCurrentStatValue(character, stat) >=
       Number(stat.target ?? 0),
   ).length;
-  return Math.round((metCount / goal.stats.length) * 100);
+  return Math.round((metCount / stats.length) * 100);
 }
 
 function isGoalComplete(character) {

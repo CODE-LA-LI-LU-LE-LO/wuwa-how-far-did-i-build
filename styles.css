@@ -334,8 +334,12 @@ h2 {
   scroll-snap-type: x proximity;
   transition:
     background 180ms ease,
-    box-shadow 180ms ease,
-    padding 180ms ease;
+    box-shadow 180ms ease;
+}
+
+.focus-strip-sentinel {
+  height: 0;
+  pointer-events: none;
 }
 
 .focus-strip.is-stuck {
@@ -362,10 +366,6 @@ h2 {
   overflow: hidden;
   scroll-snap-align: start;
   animation: liftEnter 560ms ease both;
-  transition:
-    flex-basis 180ms ease,
-    min-height 180ms ease,
-    padding 180ms ease;
 }
 
 .focus-card.complete,
@@ -662,6 +662,7 @@ select option {
   display: grid;
   flex: 0 0 142px;
   gap: 8px;
+  margin-left: -160px;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -967,9 +968,11 @@ select option {
   border: 1px solid var(--line);
   border-radius: 8px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--element-color), transparent 88%), rgba(255, 255, 255, 0.045)),
+    linear-gradient(135deg, color-mix(in srgb, var(--element-color), transparent 80%), rgba(255, 255, 255, 0.052)),
     rgba(12, 18, 26, 0.74);
-  box-shadow: var(--shadow);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--element-color), transparent 74%),
+    var(--shadow);
   animation: cardEnter 420ms ease both;
 }
 
@@ -1473,9 +1476,14 @@ select:disabled {
 }
 
 .detail-content {
+  position: relative;
   display: grid;
   gap: 18px;
   animation: liftEnter 360ms ease both;
+}
+
+.detail-panel-toggle {
+  display: none;
 }
 
 .detail-hero {
@@ -1686,6 +1694,135 @@ dialog::backdrop {
   }
 }
 
+@media (max-width: 1320px) {
+  .target-grid,
+  .farm-input-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1041px) and (max-width: 1320px) {
+  .toolbar {
+    top: 12px;
+    z-index: 29;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .focus-strip {
+    top: 84px;
+  }
+
+  .toolbar > * {
+    flex: 0 0 auto;
+  }
+
+  .toolbar .search-box {
+    flex-basis: 300px;
+  }
+
+  .toolbar .filter-checks {
+    flex-wrap: nowrap;
+  }
+
+  .workspace {
+    display: block;
+  }
+
+  .category-rail {
+    position: static;
+    display: flex;
+    overflow-x: auto;
+    width: 100%;
+    margin: 0 0 14px;
+    flex: 0 0 auto;
+  }
+
+  .category-rail button {
+    flex: 0 0 auto;
+    padding: 0 14px;
+  }
+
+  .roster-panel {
+    width: 100%;
+  }
+
+  .detail-panel.is-floating {
+    position: fixed;
+    top: auto;
+    right: 22px;
+    bottom: 22px;
+    z-index: 70;
+    width: min(420px, calc(100vw - 44px));
+    max-height: calc(100dvh - 132px);
+    min-height: 0;
+    overflow: auto;
+    box-shadow: 0 22px 62px rgba(0, 0, 0, 0.46);
+  }
+
+  .detail-panel-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    min-height: 34px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    font-weight: 900;
+  }
+
+  .detail-panel.is-collapsed {
+    width: 78px;
+    height: 78px;
+    padding: 0;
+    border-radius: 999px 999px 999px 18px;
+    overflow: visible;
+    cursor: pointer;
+  }
+
+  .detail-panel.is-collapsed::after {
+    position: absolute;
+    right: 8px;
+    bottom: -2px;
+    width: 20px;
+    height: 20px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    border-radius: 0 0 8px;
+    background: inherit;
+    content: "";
+    transform: rotate(28deg);
+  }
+
+  .detail-panel.is-collapsed .detail-content {
+    display: block;
+    height: 100%;
+    animation: none;
+  }
+
+  .detail-panel.is-collapsed .detail-content > :not(.detail-hero),
+  .detail-panel.is-collapsed .detail-hero > :not(.avatar) {
+    display: none;
+  }
+
+  .detail-panel.is-collapsed .detail-hero,
+  .detail-panel.is-collapsed .avatar.large {
+    width: 100%;
+    height: 100%;
+  }
+
+  .detail-panel.is-collapsed .avatar.large {
+    border-radius: inherit;
+    box-shadow: 0 0 0 4px rgba(92, 228, 208, 0.22);
+  }
+}
+
 @media (max-width: 1040px) {
   .hero-panel,
   .workspace {
@@ -1712,6 +1849,7 @@ dialog::backdrop {
     display: flex;
     overflow-x: auto;
     flex: 0 0 auto;
+    margin-left: 0;
   }
 
   .category-rail button {
