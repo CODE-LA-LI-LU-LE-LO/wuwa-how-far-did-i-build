@@ -121,6 +121,7 @@ function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSo
   vm.runInContext(characterSource, sandbox, { filename: "data/characters.js" });
   vm.runInContext(goalDefaultsSource, sandbox, { filename: "data/goal-defaults.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
+  return sandbox;
 }
 
 const requiredRootFiles = [
@@ -233,6 +234,34 @@ for (const field of ["apiKey", "authDomain", "projectId", "appId"]) {
   if (!config.includes(field)) fail(`app-config.js missing ${field}`);
   if (!configExample.includes(field)) fail(`app-config.example.js missing ${field}`);
 }
+for (const [path, source] of [
+  ["app-config.js", config],
+  ["app-config.example.js", configExample],
+]) {
+  if (/\b(adminEmails|adminUids)\b/.test(source)) {
+    fail(`${path} must not include frontend admin identifier lists`);
+  }
+  if (/\b(serviceAccount|privateKey|PRIVATE KEY|Admin SDK)\b/.test(source)) {
+    fail(`${path} must not include private Firebase credentials`);
+  }
+}
+if (/\b(adminEmails|adminUids)\b/.test(appSource)) {
+  fail("app.js must not parse admin email/uid lists from frontend config");
+}
+for (const requiredAdminSource of [
+  "function isAdmin()",
+  "cloud?.auth.currentUser",
+  "state.user?.role === userRoles.admin",
+  "cloud.doc(cloud.db, \"admins\", user.uid)",
+  "adminSnapshot.data()?.enabled === true",
+  "async function saveCloudAdminCharacters()",
+  "async function saveCloudAdminGoalDefaults()",
+  "if (!isAdmin()) return;",
+]) {
+  if (!appSource.includes(requiredAdminSource)) {
+    fail(`app.js missing admin verification guard: ${requiredAdminSource}`);
+  }
+}
 
 const characterSeed = loadCharacterSeed(await readText("data/characters.js"));
 if (!Array.isArray(characterSeed) || characterSeed.length < 60) {
@@ -263,14 +292,32 @@ const rules = await readText("firestore.rules");
 if (!rules.includes("match /profiles/{userId}")) fail("firestore rules must protect profiles/{userId}");
 if (!rules.includes("request.auth.uid == userId")) fail("firestore rules must require owner uid");
 if (!rules.includes("allow read, write: if false")) fail("firestore rules must deny fallback access");
+for (const requiredRuleSource of [
+  "match /admins/{userId}",
+  "allow get: if signedIn() && request.auth.uid == userId;",
+  "allow list: if false;",
+  "allow create, update, delete: if false;",
+  "match /admin/{docId}",
+  "allow write: if isAdmin();",
+]) {
+  if (!rules.includes(requiredRuleSource)) {
+    fail(`firestore rules missing admin protection: ${requiredRuleSource}`);
+  }
+}
 
 try {
-  smokeLoadApp({
+  const sandbox = smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.js"),
     goalDefaultsSource: await readText("data/goal-defaults.js"),
     appSource,
   });
+  if (sandbox.isAdmin() !== false) {
+    fail("isAdmin() must default to false without a signed-in Firebase user");
+  }
+  if (sandbox.hasFirebaseConfig() !== false) {
+    fail("missing Firebase config should keep hasFirebaseConfig() false");
+  }
 } catch (error) {
   fail(`app smoke load failed: ${error.message}`);
 }

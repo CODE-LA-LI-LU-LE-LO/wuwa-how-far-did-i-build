@@ -2,8 +2,43 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function adminDocPath() {
+      return /databases/$(database)/documents/admins/$(request.auth.uid);
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(adminDocPath())
+        && get(adminDocPath()).data.enabled == true;
+    }
+
+    match /admins/{userId} {
+      allow get: if signedIn() && request.auth.uid == userId;
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
+    match /admin/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /profiles/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /publicCharacters/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /publicGoals/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /{document=**} {

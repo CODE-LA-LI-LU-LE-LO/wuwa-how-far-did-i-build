@@ -119,7 +119,39 @@ window.WW_TRACKER_CONFIG = {
 
 Firebase 웹앱 설정값은 브라우저 앱에서 쓰는 공개 식별자입니다. 단, 서비스 계정 키나 비공개 관리자 키는 절대 `app-config.js`에 넣지 마세요.
 
-개인별 저장을 위한 Firestore 규칙은 `firestore.rules`에 포함되어 있습니다.
+### 관리자 권한 등록
+
+GitHub Pages 배포 환경에서는 별도 서버 없이 Firestore의 `admins/{uid}` 문서 존재 여부로 관리자 여부를 판정합니다. `app-config.example.js`와 실제 `app-config.js`에는 Firebase 공개 설정값만 두고, 관리자 이메일이나 UID 목록은 추가하지 않습니다.
+
+최초 관리자는 앱에서 직접 등록하지 않고 Firebase Console에서 수동으로 등록합니다.
+
+1. 관리자로 사용할 Google 계정으로 앱에 한 번 로그인합니다.
+2. Firebase Console > Authentication > Users에서 해당 사용자의 UID를 확인합니다.
+3. Firebase Console > Firestore Database에서 `admins` 컬렉션을 생성합니다.
+4. `admins` 컬렉션 안에 문서 ID가 해당 UID인 `admins/{uid}` 문서를 생성합니다.
+5. 문서에 최소한 아래 필드를 추가합니다.
+
+```js
+{
+  enabled: true
+}
+```
+
+6. 앱에 다시 접속하거나 새로고침한 뒤 우측 상단 상태가 `관리자 로그인됨`으로 바뀌고 관리자 UI가 표시되는지 확인합니다.
+
+관리자 판정은 로그인 시 `admins/{uid}` 문서를 단건 조회해 앱 상태에 캐시합니다. Firestore는 읽기 횟수가 과금/한도에 영향을 주므로 화면을 열 때마다 전체 관리자 데이터를 반복 조회하지 않습니다.
+
+관리자 설정 시 보안 주의사항은 다음과 같습니다.
+
+- 관리자 이메일 또는 UID 목록을 프론트엔드 설정 파일에 넣지 않습니다.
+- `app-config.js`는 브라우저에서 내려받는 파일이므로 숨겨야 할 정보를 넣지 않습니다.
+- Firebase 공개 설정값(`apiKey`, `authDomain`, `projectId`, `appId` 등)은 `app-config.js`에 포함할 수 있습니다.
+- 서비스 계정 키, private key, Admin SDK 인증 정보는 절대 저장소나 프론트엔드 설정 파일에 넣지 않습니다.
+- 관리자 권한의 실제 보안은 Firestore Security Rules에서 `admins/{uid}` 문서 기준으로 보호합니다.
+
+개인별 기록과 관리자 공용 데이터는 Firestore 저장 경로를 분리합니다. 일반 사용자의 보유 여부, 파밍 상태, 개인 목표, 현재 스테이터스는 `profiles/{uid}`에 저장합니다. 관리자가 관리하는 캐릭터 기본 데이터는 `admin/characters`, 관리자 목표 스테이터스 기본값은 `admin/goalDefaults`에 저장합니다. 이 공용 데이터는 비로그인 사용자도 볼 수 있도록 읽기만 공개하고, 쓰기는 `admins/{uid}` 문서의 `enabled` 값이 `true`인 관리자만 허용합니다. 이렇게 분리하면 개인 기록 저장 시 캐릭터 기본 데이터나 관리자 목표 기본값을 함께 덮어쓰지 않습니다.
+
+개인별 저장, 관리자 판정, 관리자 공용 데이터 저장을 위한 Firestore 규칙은 `firestore.rules`에 포함되어 있습니다.
 
 Firebase CLI를 쓴다면 `firebase.json`이 `firestore.rules`를 가리키므로 아래 명령으로 규칙만 배포할 수 있습니다.
 
@@ -132,8 +164,39 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.enabled == true;
+    }
+
+    match /admins/{userId} {
+      allow get: if signedIn() && request.auth.uid == userId;
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
+    match /admin/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /profiles/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /publicCharacters/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /publicGoals/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /{document=**} {
@@ -142,3 +205,40 @@ service cloud.firestore {
   }
 }
 ```
+## 권한별 화면 회귀 테스트
+
+관리자 UI와 저장 경로를 변경한 뒤에는 아래 세 가지 상태를 나눠 확인합니다. Google/Firebase 실계정 확인이 필요한 항목은 배포된 GitHub Pages 주소가 Firebase Authentication 승인 도메인에 등록된 상태에서 진행합니다.
+
+정적 검증은 아래 명령으로 실행합니다.
+
+```bash
+node scripts/verify.mjs
+```
+
+이 검증은 필수 정적 파일, 로컬 참조, Firebase 공개 설정 예시, 관리자 이메일/UID 목록 미사용, `isAdmin()`의 비로그인 기본값, Firebase 설정 누락 시 안전한 로드, 관리자 저장 함수의 `isAdmin()` 가드, Firestore Rules의 `admins/{uid}` 보호 규칙을 확인합니다.
+
+### 1. 비로그인 사용자
+
+- 우측 상단 세션 상태가 `로컬 저장 중`으로 표시됩니다.
+- 보유 관리에서 캐릭터 보유 여부를 변경할 수 있습니다.
+- 파밍 관리에서 현재 스테이터스, 진행도, 우선순위, 다음 할 일, 메모를 입력할 수 있습니다.
+- `수동 입력` 목표 모드에서 내 목표 스테이터스를 편집할 수 있습니다.
+- 변경사항이 브라우저 `localStorage`에 저장되고 새로고침 후에도 유지됩니다.
+- 캐릭터 추가 버튼, 캐릭터 편집 버튼, 캐릭터 삭제 버튼, 공개/비공개 변경 UI, 관리자 목표 편집 버튼이 보이지 않습니다.
+
+### 2. 일반 Google 로그인 사용자
+
+- 우측 상단 세션 상태가 `일반 사용자 로그인됨`으로 표시됩니다.
+- 보유 여부, 개인 파밍 상태, 내 목표 스테이터스를 수정하면 `profiles/{uid}`에 개인 데이터가 저장됩니다.
+- 공개된 관리자 캐릭터 데이터와 관리자 목표 기본값을 볼 수 있고, `목표`/`수동 입력` 전환으로 관리자 목표와 내 목표를 비교할 수 있습니다.
+- 캐릭터 추가 버튼, 캐릭터 편집 버튼, 캐릭터 삭제 버튼, 공개/비공개 변경 UI, 관리자 목표 편집 버튼이 보이지 않습니다.
+- 개발자 도구로 숨겨진 관리자 버튼을 강제로 노출하거나 이벤트를 호출해도 관리자 전용 데이터가 저장되지 않습니다.
+
+### 3. 관리자 Google 로그인 사용자
+
+- Firebase Console에서 해당 사용자의 `admins/{uid}` 문서에 `enabled: true`가 설정되어 있어야 합니다.
+- 우측 상단 세션 상태가 `관리자 로그인됨`으로 표시됩니다.
+- 일반 사용자와 동일하게 보유 여부, 개인 파밍 상태, 내 목표 스테이터스를 수정할 수 있습니다.
+- 캐릭터 추가, 편집, 삭제, 공개/비공개 변경 UI가 표시되고 변경 시 `admin/characters`에 관리자 캐릭터 데이터가 저장됩니다.
+- 관리자 목표 편집 버튼이 표시되고 관리자 목표 기본값 변경 시 `admin/goalDefaults`에 저장됩니다.
+- 로그아웃하면 세션 상태가 `로컬 저장 중`으로 돌아가고 관리자 전용 버튼과 폼이 다시 숨겨집니다.

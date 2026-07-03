@@ -439,6 +439,67 @@ const compactDetailQuery =
 
 let cloud = null;
 let cloudSaveTimer = null;
+
+const userRoles = {
+  user: "user",
+  admin: "admin",
+};
+
+function createDefaultUser() {
+  return {
+    role: userRoles.user,
+  };
+}
+
+function createGoogleUser(user) {
+  return {
+    ...createDefaultUser(),
+    provider: "google",
+    uid: user.uid,
+    name: user.displayName,
+    email: user.email,
+  };
+}
+
+function normalizeUser(user) {
+  if (!user || typeof user !== "object") return createDefaultUser();
+  const role = user.role === userRoles.admin ? userRoles.admin : userRoles.user;
+
+  return {
+    ...user,
+    role,
+  };
+}
+
+function isAdmin() {
+  return Boolean(
+    cloud?.auth.currentUser && state.user?.role === userRoles.admin,
+  );
+}
+
+async function refreshAdminRole(user) {
+  if (!user || !cloud) {
+    state.user = createDefaultUser();
+    return false;
+  }
+
+  let adminEnabled = false;
+  try {
+    const adminRef = cloud.doc(cloud.db, "admins", user.uid);
+    const adminSnapshot = await cloud.getDoc(adminRef);
+    adminEnabled =
+      adminSnapshot.exists() && adminSnapshot.data()?.enabled === true;
+  } catch {
+    adminEnabled = false;
+  }
+
+  state.user = {
+    ...createGoogleUser(user),
+    role: adminEnabled ? userRoles.admin : userRoles.user,
+  };
+  return adminEnabled;
+}
+
 let sharedSnapshot = readSharedSnapshot();
 let isSnapshotMode = Boolean(sharedSnapshot);
 let state = sharedSnapshot ?? loadState();
@@ -539,6 +600,13 @@ document.querySelector("#addCharacterButton").addEventListener("click", () => {
 
 characterForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!isAdmin()) {
+    showSessionMessage(
+      "관리자 권한 필요",
+      "캐릭터 기본 정보는 관리자만 저장할 수 있습니다",
+    );
+    return;
+  }
   const name = document.querySelector("#newName").value.trim();
   if (!name) return;
   const id = editCharacterId.value;
@@ -573,6 +641,7 @@ characterForm.addEventListener("submit", async (event) => {
     showSessionMessage(`${name} 추가됨`, "새 캐릭터를 목록에 추가했습니다");
   }
   saveState();
+  saveCloudAdminCharacters();
   characterForm.reset();
   dialog.close();
   render();
@@ -598,6 +667,13 @@ document
   });
 
 deleteCharacterButton.addEventListener("click", () => {
+  if (!isAdmin()) {
+    showSessionMessage(
+      "관리자 권한 필요",
+      "캐릭터 제거는 관리자만 사용할 수 있습니다",
+    );
+    return;
+  }
   const id = editCharacterId.value;
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
@@ -607,6 +683,7 @@ deleteCharacterButton.addEventListener("click", () => {
   if (selectedId === id)
     selectedId = state.characters.find((item) => item.owned)?.id ?? null;
   saveState();
+  saveCloudAdminCharacters();
   characterForm.reset();
   dialog.close();
   showSessionMessage(
@@ -707,7 +784,7 @@ function loadState() {
 
 function createDefaultState() {
   return {
-    user: null,
+    user: createDefaultUser(),
     goalDefaultsVersion: GOAL_DEFAULT_VERSION,
     characters: createSeedCharacters(),
   };
@@ -722,7 +799,7 @@ function normalizeState(nextState) {
     : createSeedCharacters();
 
   return {
-    user: nextState.user ?? null,
+    user: normalizeUser(nextState.user),
     updatedAt: nextState.updatedAt ?? null,
     goalDefaultsVersion: GOAL_DEFAULT_VERSION,
     characters: mergeSeedCharacters(characters),
@@ -967,6 +1044,7 @@ function loadAdminGoalDefaults() {
 
 function saveAdminGoalDefaults() {
   localStorage.setItem(ADMIN_GOALS_KEY, JSON.stringify(adminGoalDefaults));
+  saveCloudAdminGoalDefaults();
 }
 
 function getCharacterGoalKey(character = {}) {
@@ -992,6 +1070,78 @@ function persistAdminGoal(character) {
 function saveGoalState(character) {
   persistAdminGoal(character);
   saveState();
+}
+
+function getAdminCharacterData(character) {
+  return {
+    id: character.id,
+    name: character.name,
+    en: character.en,
+    element: character.element,
+    weapon: character.weapon,
+    rarity: character.rarity,
+    image: character.image,
+    isPublic: character.isPublic,
+    goals: {
+      admin: character.goals.admin,
+    },
+  };
+}
+
+function getUserCharacterData(character) {
+  return {
+    id: character.id,
+    name: character.name,
+    owned: character.owned,
+    farm: character.farm,
+    goalMode: character.goalMode,
+    goals: {
+      custom: character.goals.custom,
+    },
+    currentStats: character.currentStats,
+  };
+}
+
+function getUserProfileState() {
+  return {
+    user: createDefaultUser(),
+    updatedAt: new Date().toISOString(),
+    goalDefaultsVersion: GOAL_DEFAULT_VERSION,
+    characters: state.characters.map(getUserCharacterData),
+  };
+}
+
+function getAdminCharactersState() {
+  return {
+    updatedAt: new Date().toISOString(),
+    characters: state.characters.map(getAdminCharacterData),
+  };
+}
+
+function mergeAdminCharacters(adminCharacters = []) {
+  const personalById = new Map(state.characters.map((character) => [character.id, character]));
+  const personalByName = new Map(state.characters.map((character) => [character.name, character]));
+  const merged = adminCharacters.map((adminCharacter) => {
+    const personal =
+      personalById.get(adminCharacter.id) ?? personalByName.get(adminCharacter.name);
+    return normalizeCharacter({
+      ...adminCharacter,
+      owned: personal?.owned ?? false,
+      farm: personal?.farm,
+      goalMode: personal?.goalMode,
+      goals: {
+        admin: adminCharacter.goals?.admin,
+        custom: personal?.goals?.custom,
+      },
+      currentStats: personal?.currentStats,
+    });
+  });
+
+  const adminKeys = new Set(merged.map((character) => character.id));
+  state.characters
+    .filter((character) => !adminKeys.has(character.id) && character.owned)
+    .forEach((character) => merged.push(character));
+  state.characters = mergeSeedCharacters(merged);
 }
 
 function findSeedCharacter(name) {
@@ -1024,7 +1174,7 @@ function saveState(options = {}) {
 function getPortableState(options = {}) {
   const portableState = normalizeState({
     ...state,
-    user: null,
+    user: createDefaultUser(),
     updatedAt: new Date().toISOString(),
   });
 
@@ -1076,7 +1226,7 @@ function renderToolbarMode() {
     .classList.toggle("hidden", activeTab !== "farming");
   document
     .querySelector("#addCharacterButton")
-    .classList.toggle("hidden", activeTab === "farming");
+    .classList.toggle("hidden", activeTab === "farming" || !isAdmin());
   listEyebrow.textContent = activeTab === "ownership" ? "Ownership" : "Farming";
   listTitle.textContent =
     activeTab === "ownership" ? "캐릭터 보유 현황" : "캐릭터 파밍 상태";
@@ -1164,6 +1314,13 @@ function renderRoster() {
 
   rosterList.querySelectorAll("[data-toggle-admin-goals]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (!isAdmin()) {
+        showSessionMessage(
+          "관리자 권한 필요",
+          "관리자 목표 편집은 관리자만 사용할 수 있습니다",
+        );
+        return;
+      }
       adminGoalEditing = !adminGoalEditing;
       renderRoster();
     });
@@ -1425,7 +1582,7 @@ function renderOwnershipCard(character) {
         </div>
       </button>
       <div class="card-actions">
-        <button class="icon-action" data-edit="${character.id}" type="button" title="캐릭터 편집">편집</button>
+        ${isAdmin() ? `<button class="icon-action" data-edit="${character.id}" type="button" title="캐릭터 편집">편집</button>` : ""}
         <button class="owned-toggle" aria-label="${escapeHtml(character.name)} 보유 여부" aria-pressed="${character.owned}" data-owned="${character.id}" type="button"></button>
       </div>
     </article>
@@ -1463,7 +1620,7 @@ function renderFarmingCard(character) {
         ${renderAvatar(character, "data-select")}
         <div>
           <h3>${escapeHtml(character.name)}</h3>
-          <div class="card-meta-chips">${renderCharacterMetaChips(character, { showVisibility: adminGoalEditing })}</div>
+          <div class="card-meta-chips">${renderCharacterMetaChips(character, { showVisibility: isAdmin() && adminGoalEditing })}</div>
         </div>
         <span class="status-pill">${character.owned ? "" : "미보유 · "}${complete ? "목표달성" : "미달성"}</span>
       </div>
@@ -1471,7 +1628,7 @@ function renderFarmingCard(character) {
       <div class="goal-switch" role="group" aria-label="목표 기준">
         <button class="${character.goalMode !== "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="admin" type="button">목표</button>
         <button class="${character.goalMode === "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="custom" type="button">수동 입력</button>
-        <button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>
+        ${isAdmin() ? `<button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>` : ""}
       </div>
 
       <div class="target-grid">
@@ -1815,7 +1972,7 @@ function getActiveGoalStats(character) {
 }
 
 function canEditActiveGoal(character) {
-  return character.goalMode === "custom" || adminGoalEditing;
+  return character.goalMode === "custom" || (isAdmin() && adminGoalEditing);
 }
 
 function sortCharacters(a, b) {
@@ -2390,6 +2547,13 @@ function toggleOwned(id) {
 }
 
 function openCharacterDialog(id = "") {
+  if (!isAdmin()) {
+    showSessionMessage(
+      "관리자 권한 필요",
+      "캐릭터 기본 정보 관리는 관리자만 사용할 수 있습니다",
+    );
+    return;
+  }
   const character = state.characters.find((item) => item.id === id);
   editCharacterId.value = character?.id ?? "";
   document.querySelector("#newName").value = character?.name ?? "";
@@ -2809,6 +2973,10 @@ function showSessionMessage(title, hint) {
   sessionHint.textContent = hint;
 }
 
+function getSignedInSessionTitle(adminEnabled = isAdmin()) {
+  return adminEnabled ? "관리자 로그인됨" : "일반 사용자 로그인됨";
+}
+
 function updateGoogleButton(mode) {
   const labels = {
     setup: { text: "!", title: "Firebase 설정 필요" },
@@ -2866,20 +3034,17 @@ async function ensureCloud() {
 
   authModule.onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      state.user = null;
+      state.user = createDefaultUser();
+      adminGoalEditing = false;
       showSessionMessage("로컬 저장 중", "이 브라우저에 자동 저장됩니다");
       updateGoogleButton("signedOut");
+      render();
       return;
     }
 
-    state.user = {
-      provider: "google",
-      uid: user.uid,
-      name: user.displayName,
-      email: user.email,
-    };
+    state.user = createGoogleUser(user);
     showSessionMessage(
-      user.displayName ?? "Google 로그인됨",
+      getSignedInSessionTitle(false),
       "클라우드 기록을 확인하고 있습니다",
     );
 
@@ -2889,6 +3054,7 @@ async function ensureCloud() {
       if (snapshot.exists() && !isSnapshotMode) {
         const remoteState = normalizeState(snapshot.data());
         state = chooseNewerState(state, remoteState);
+        state.user = createGoogleUser(user);
         selectedId =
           state.characters.find(
             (character) => character.id === selectedId && character.owned,
@@ -2907,9 +3073,15 @@ async function ensureCloud() {
       return;
     }
 
+    const adminEnabled = await refreshAdminRole(user);
+    await loadCloudAdminData();
+    render();
+
     showSessionMessage(
-      user.displayName ?? "Google 로그인됨",
-      "변경사항을 클라우드에 동기화합니다",
+      getSignedInSessionTitle(adminEnabled),
+      adminEnabled
+        ? "관리자 권한으로 클라우드에 동기화합니다"
+        : "변경사항을 클라우드에 동기화합니다",
     );
     updateGoogleButton("signedIn");
     scheduleCloudSave();
@@ -2928,13 +3100,77 @@ async function saveCloudState() {
   if (!cloud?.auth.currentUser || isSnapshotMode) return;
   try {
     const ref = cloud.doc(cloud.db, "profiles", cloud.auth.currentUser.uid);
-    await cloud.setDoc(ref, getPortableState(), { merge: true });
+    await cloud.setDoc(ref, getUserProfileState(), { merge: true });
     showSessionMessage(
-      cloud.auth.currentUser.displayName ?? "Google 로그인됨",
+      getSignedInSessionTitle(),
       "클라우드 저장 완료",
     );
   } catch (error) {
     showSessionMessage("클라우드 저장 실패", getReadableCloudError(error));
+  }
+}
+
+async function loadCloudAdminData() {
+  if (!cloud?.auth.currentUser) return;
+  try {
+    const [charactersSnapshot, goalDefaultsSnapshot] = await Promise.all([
+      cloud.getDoc(cloud.doc(cloud.db, "admin", "characters")),
+      cloud.getDoc(cloud.doc(cloud.db, "admin", "goalDefaults")),
+    ]);
+
+    if (goalDefaultsSnapshot.exists()) {
+      const defaults = goalDefaultsSnapshot.data()?.defaults;
+      if (defaults && typeof defaults === "object") {
+        adminGoalDefaults = {
+          ...goalDefaultSeed,
+          ...defaults,
+        };
+        localStorage.setItem(
+          ADMIN_GOALS_KEY,
+          JSON.stringify(adminGoalDefaults),
+        );
+      }
+    }
+
+    if (charactersSnapshot.exists()) {
+      const adminCharacters = charactersSnapshot.data()?.characters;
+      if (Array.isArray(adminCharacters)) mergeAdminCharacters(adminCharacters);
+    }
+  } catch (error) {
+    showSessionMessage(
+      "관리자 데이터 불러오기 실패",
+      getReadableCloudError(error),
+    );
+  }
+}
+
+async function saveCloudAdminCharacters() {
+  if (!isAdmin()) return;
+  try {
+    const ref = cloud.doc(cloud.db, "admin", "characters");
+    await cloud.setDoc(ref, getAdminCharactersState(), { merge: true });
+  } catch (error) {
+    showSessionMessage(
+      "관리자 캐릭터 저장 실패",
+      getReadableCloudError(error),
+    );
+  }
+}
+
+async function saveCloudAdminGoalDefaults() {
+  if (!isAdmin()) return;
+  try {
+    const ref = cloud.doc(cloud.db, "admin", "goalDefaults");
+    await cloud.setDoc(
+      ref,
+      {
+        updatedAt: new Date().toISOString(),
+        defaults: adminGoalDefaults,
+      },
+      { merge: true },
+    );
+  } catch (error) {
+    showSessionMessage("관리자 목표 저장 실패", getReadableCloudError(error));
   }
 }
 
