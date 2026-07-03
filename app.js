@@ -645,6 +645,10 @@ characterForm.addEventListener("submit", async (event) => {
     image,
   };
 
+  let targetCharacter = null;
+  const previousCharacter = existing ? structuredClone(existing) : null;
+  const previousSelectedId = selectedId;
+
   if (existing) {
     Object.assign(existing, payload);
     selectedId = existing.owned ? existing.id : selectedId;
