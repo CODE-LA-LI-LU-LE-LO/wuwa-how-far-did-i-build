@@ -268,6 +268,9 @@ for (const requiredAdminSource of [
   "async function loadGoalDefaultsData()",
   `fetch("data/goal-defaults.json"`,
   "function getGoalDefaultsExportData()",
+  "function offerCharactersJsonDownload()",
+  "function downloadCharactersJson()",
+  "downloadCharactersJson();",
   "if (!isAdmin()) return;",
 ]) {
   if (!appSource.includes(requiredAdminSource)) {
@@ -355,6 +358,47 @@ try {
   }
 } catch (error) {
   fail(`app missing-config smoke load failed: ${error.message}`);
+}
+
+try {
+  const syncSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const [seedCharacter] = JSON.parse(await readText("data/characters.json"));
+  const normalizedState = syncSandbox.normalizeState({
+    user: { role: "user" },
+    updatedAt: "2026-01-01T00:00:00.000Z",
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "saved-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        element: "저장된 속성",
+        weapon: "저장된 무기",
+        rarity: "1",
+        image: "saved.webp",
+        isPublic: seedCharacter.isPublic === false,
+        owned: true,
+      },
+    ],
+  });
+  const [normalizedCharacter] = normalizedState.characters;
+  if (
+    normalizedCharacter?.element !== seedCharacter.element ||
+    normalizedCharacter?.weapon !== seedCharacter.weapon ||
+    normalizedCharacter?.rarity !== String(seedCharacter.rarity) ||
+    normalizedCharacter?.image !== seedCharacter.image ||
+    normalizedCharacter?.isPublic !== (seedCharacter.isPublic !== false) ||
+    normalizedCharacter?.owned !== true
+  ) {
+    fail("seed character data must override saved character metadata while preserving user state");
+  }
+} catch (error) {
+  fail(`app seed priority verification failed: ${error.message}`);
 }
 
 if (failures.length > 0) {

@@ -669,6 +669,7 @@ characterForm.addEventListener("submit", async (event) => {
   characterForm.reset();
   dialog.close();
   render();
+  offerCharactersJsonDownload();
 });
 
 document.querySelector("[data-close-dialog]").addEventListener("click", () => {
@@ -714,6 +715,7 @@ deleteCharacterButton.addEventListener("click", () => {
     "캐릭터 목록에서 제거했습니다",
   );
   render();
+  offerCharactersJsonDownload();
 });
 
 document.querySelector("#exportButton").addEventListener("click", () => {
@@ -731,18 +733,7 @@ document.querySelector("#exportButton").addEventListener("click", () => {
 
 exportCharactersButton.addEventListener("click", () => {
   if (!isAdmin()) return;
-  const data = JSON.stringify(getCharactersExportData(), null, 2);
-  const blob = new Blob([`${data}\n`], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "characters.json";
-  link.click();
-  URL.revokeObjectURL(url);
-  showSessionMessage(
-    "목록 JSON 생성",
-    "다운로드한 파일을 data/characters.json으로 반영하세요",
-  );
+  downloadCharactersJson();
 });
 
 exportGoalDefaultsButton.addEventListener("click", () => {
@@ -904,9 +895,21 @@ function mergeSeedCharacters(characters) {
 function normalizeCharacter(character, resetGoals = false) {
   const seed =
     findSeedCharacter(character.name) ?? findSeedCharacter(character.en);
+  const seedCharacter = seed
+    ? {
+        name: seed.name,
+        en: seed.en ?? "",
+        element: seed.element ?? "회절",
+        weapon: seed.weapon ?? "직검",
+        rarity: String(seed.rarity ?? "5"),
+        image: seed.image ?? "",
+        isPublic: seed.isPublic ?? true,
+      }
+    : {};
   const merged = {
     ...createCharacter(seed ?? character),
     ...character,
+    ...seedCharacter,
   };
 
   delete merged.version;
@@ -1174,6 +1177,35 @@ function saveState(options = {}) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
   if (!options.skipCloud) scheduleCloudSave();
+}
+
+function offerCharactersJsonDownload() {
+  const shouldDownload = confirm(
+    "캐릭터 기본 정보 변경사항을 data/characters.json에 반영할 characters.json 파일로 다운로드할까요?",
+  );
+  if (shouldDownload) {
+    downloadCharactersJson();
+    return;
+  }
+  showSessionMessage(
+    "JSON 반영 필요",
+    "변경사항을 배포하려면 캐릭터 JSON 다운로드 후 data/characters.json에 반영하세요",
+  );
+}
+
+function downloadCharactersJson() {
+  const data = JSON.stringify(getCharactersExportData(), null, 2);
+  const blob = new Blob([`${data}\n`], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "characters.json";
+  link.click();
+  URL.revokeObjectURL(url);
+  showSessionMessage(
+    "목록 JSON 생성",
+    "다운로드한 파일을 data/characters.json으로 반영하세요",
+  );
 }
 
 function getCharactersExportData() {
