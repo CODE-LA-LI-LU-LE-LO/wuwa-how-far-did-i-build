@@ -24,9 +24,9 @@
 | --- | --- | --- | --- |
 | 캐릭터 보유 여부 변경 | 캐릭터 카드의 `[data-owned]` 버튼 | `app.js`의 `[data-owned]` 클릭 핸들러가 `toggleOwned(id)` 호출 | `character.owned`, 선택된 캐릭터 |
 | 개인 파밍 상태 입력 | 상세 패널과 파밍 카드의 현재 수치/진행도/메모 입력 | `app.js`의 현재 스탯 및 파밍 필드 핸들러가 `updateCurrentStat()` 등 개인 상태 수정 함수 호출 | `character.currentStats`, `character.farm` |
-| 개인 목표 입력 | 파밍 카드의 `수동 입력` 목표 모드와 목표 입력 UI | `[data-goal-mode]` 클릭 핸들러가 `goalMode`를 `custom`으로 바꾸고, `canEditActiveGoal()`이 custom 목표 편집을 허용 | `character.goals.custom` |
+| 개인 목표 입력 | 파밍 카드의 `수동 입력` 목표 모드와 목표 입력 UI | `[data-goal-mode]` 클릭 핸들러가 `goalMode`를 `custom`으로 바꾸고, `[data-toggle-custom-goal]` 편집 버튼이 켜진 카드에 한해 `canEditActiveGoal()`이 custom 목표 편집을 허용 | `character.goals.custom` |
 | 관리자 목표/내 목표 전환 | 파밍 카드의 `목표`/`수동 입력` 버튼 | `[data-goal-mode]` 클릭 핸들러가 `updateCharacterField(id, "goalMode", mode)` 호출 | `character.goalMode` |
-| 내 목표 스테이터스 기본값 편집 | `수동 입력` 목표 모드에서 활성화되는 목표 입력 UI | `canEditActiveGoal()`이 `character.goalMode === "custom"`일 때 편집 허용 | `character.goals.custom` |
+| 내 목표 스테이터스 기본값 편집 | `수동 입력` 목표 모드에서 `[data-toggle-custom-goal]` 편집 버튼으로 활성화되는 목표 입력 UI | `canEditActiveGoal()`이 `character.goalMode === "custom"`이고 `customGoalEditingId`가 해당 캐릭터일 때 편집 허용 | `character.goals.custom` |
 | 백업/불러오기 | `#exportButton`, `#importInput`, `#exportGoalDefaultsButton` | 백업 버튼은 `getPortableState()`를 JSON으로 내보내고, 불러오기는 JSON을 개인 상태로 병합/적용합니다. 관리자 로그인 시 목표 JSON 다운로드 버튼은 현재 관리자 목표 편집 결과를 `goal-defaults.json`으로 내려받습니다. | 개인 기록 JSON, `data/goal-defaults.json` |
 | Google 로그인 저장 | `#googleButton` | Firebase Auth 로그인 후 `profiles/{uid}` 문서를 읽고 쓰는 클라우드 저장 흐름 | 사용자별 `profiles/{uid}` |
 
