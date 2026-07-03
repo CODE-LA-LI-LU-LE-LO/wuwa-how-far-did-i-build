@@ -414,6 +414,7 @@ const googleButton = document.querySelector("#googleButton");
 const dialog = document.querySelector("#characterDialog");
 const characterForm = document.querySelector("#characterForm");
 const importInput = document.querySelector("#importInput");
+const exportCharactersButton = document.querySelector("#exportCharactersButton");
 const exportGoalDefaultsButton = document.querySelector("#exportGoalDefaultsButton");
 const shareNotice = document.querySelector("#shareNotice");
 const saveSnapshotButton = document.querySelector("#saveSnapshotButton");
@@ -728,6 +729,22 @@ document.querySelector("#exportButton").addEventListener("click", () => {
 });
 
 
+exportCharactersButton.addEventListener("click", () => {
+  if (!isAdmin()) return;
+  const data = JSON.stringify(getCharactersExportData(), null, 2);
+  const blob = new Blob([`${data}\n`], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "characters.json";
+  link.click();
+  URL.revokeObjectURL(url);
+  showSessionMessage(
+    "목록 JSON 생성",
+    "다운로드한 파일을 data/characters.json으로 반영하세요",
+  );
+});
+
 exportGoalDefaultsButton.addEventListener("click", () => {
   if (!isAdmin()) return;
   const data = JSON.stringify(getGoalDefaultsExportData(), null, 2);
@@ -870,14 +887,17 @@ function createSeedCharacters() {
 }
 
 function mergeSeedCharacters(characters) {
-  const existingNames = new Set(
-    characters.map(
-      (character) => findSeedCharacter(character.name)?.name ?? character.name,
-    ),
+  const existingKeys = new Set(
+    characters.map((character) => {
+      const seed =
+        findSeedCharacter(character.name) ?? findSeedCharacter(character.en);
+      return seed?.en ?? seed?.name ?? character.en ?? character.name;
+    }),
   );
-  const missingSeedCharacters = createSeedCharacters().filter(
-    (character) => !existingNames.has(character.name),
-  );
+  const missingSeedCharacters = createSeedCharacters().filter((character) => {
+    const key = character.en || character.name;
+    return !existingKeys.has(key);
+  });
   return [...characters, ...missingSeedCharacters];
 }
 
@@ -889,15 +909,6 @@ function normalizeCharacter(character, resetGoals = false) {
     ...character,
   };
 
-  if (seed) {
-    merged.name = seed.name;
-    merged.element = seed.element;
-    merged.weapon = seed.weapon;
-    merged.rarity = String(seed.rarity ?? merged.rarity);
-    merged.en = seed.en ?? merged.en;
-    merged.image = seed.image || "";
-    merged.isPublic = seed.isPublic ?? merged.isPublic;
-  }
   delete merged.version;
 
   return {
@@ -1165,6 +1176,18 @@ function saveState(options = {}) {
   if (!options.skipCloud) scheduleCloudSave();
 }
 
+function getCharactersExportData() {
+  return state.characters.map((character) => ({
+    name: character.name,
+    en: character.en ?? "",
+    element: character.element,
+    weapon: character.weapon,
+    rarity: String(character.rarity ?? "5"),
+    image: character.image ?? "",
+    isPublic: character.isPublic !== false,
+  }));
+}
+
 function getGoalDefaultsExportData() {
   const defaults = {};
   state.characters.forEach((character) => {
@@ -1210,6 +1233,7 @@ function getPortableState(options = {}) {
 }
 
 function render() {
+  exportCharactersButton.classList.toggle("hidden", !isAdmin());
   exportGoalDefaultsButton.classList.toggle("hidden", !isAdmin());
   renderFocusStrip();
   renderToolbarMode();
