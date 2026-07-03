@@ -6,7 +6,7 @@
 
 ### 관리자 전용 기능
 
-관리자 전용 기능은 캐릭터 기본 데이터 또는 모든 사용자가 참고하는 관리자 목표 기본값을 바꾸는 동작입니다. 관리자 목표 기본값은 Firestore나 로컬 캐시가 아니라 정적 JSON 파일 `data/goal-defaults.json`에서 앱 시작 시 한 번 공개 로드합니다.
+관리자 전용 기능은 캐릭터 기본 데이터 또는 모든 사용자가 참고하는 관리자 목표 기본값을 바꾸는 동작입니다. 캐릭터 기본 데이터는 Firestore가 아니라 `data/characters.json`에서 관리하고, 관리자 목표 기본값도 정적 JSON 파일 `data/goal-defaults.json`에서 앱 시작 시 한 번 공개 로드합니다.
 
 | 기능 | UI 진입점 | 이벤트 핸들러/저장 위치 | 보호해야 할 데이터 |
 | --- | --- | --- | --- |
@@ -32,7 +32,7 @@
 
 ## 겹치지 않도록 유지할 규칙
 
-- 캐릭터 기본 정보(`name`, `image`, `element`, `weapon`, `rarity`, `isPublic`)를 바꾸는 모든 진입점은 관리자 전용입니다.
+- 캐릭터 기본 정보(`name`, `image`, `element`, `weapon`, `rarity`, `isPublic`)를 바꾸는 모든 진입점은 관리자 전용이며, 배포용 기본 데이터는 `data/characters.json`에 반영해야 합니다.
 - `character.goals.admin`, `adminGoalDefaults`를 바꾸고 `data/goal-defaults.json` 다운로드 파일을 생성하는 모든 진입점은 관리자 전용입니다.
 - `character.owned`, `character.farm`, `character.currentStats`, `character.goalMode`, `character.goals.custom`은 일반 사용자 기능으로 유지합니다.
 - 관리자는 일반 사용자 기능도 사용할 수 있으므로, 관리자 권한 검사는 일반 사용자 기능을 막지 않아야 합니다.
@@ -42,5 +42,5 @@
 
 - 공개 목표 데이터는 `loadGoalDefaultsData()`가 `data/goal-defaults.json`을 앱 시작 시 한 번 조회해 적용합니다.
 - signed-out, signed-in, 관리자 흐름 모두 같은 정적 JSON 기본값을 사용하며, 페이지/탭 전환마다 다시 조회하지 않습니다.
-- `loadCloudAdminData()`는 로그인 흐름에서 관리자 캐릭터 데이터(`admin/characters`)만 조회해 목표 기본값 로딩과 분리합니다.
+- 캐릭터 기본 데이터는 로그인 흐름에서 Firestore로 조회하지 않고 `data/characters.json` 정적 파일만 사용합니다.
 - Firestore Rules에는 목표 데이터용 `goal/{docId}` 규칙을 두지 않습니다.
