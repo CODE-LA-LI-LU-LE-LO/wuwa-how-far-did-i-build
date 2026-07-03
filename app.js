@@ -3065,6 +3065,10 @@ async function ensureCloud() {
         render();
       }
     } catch (error) {
+      logCloudError(error, {
+        action: "load-profile",
+        path: `profiles/${user.uid}`,
+      });
       showSessionMessage(
         "클라우드 불러오기 실패",
         getReadableCloudError(error),
@@ -3106,6 +3110,10 @@ async function saveCloudState() {
       "클라우드 저장 완료",
     );
   } catch (error) {
+    logCloudError(error, {
+      action: "save-profile",
+      path: `profiles/${cloud.auth.currentUser.uid}`,
+    });
     showSessionMessage("클라우드 저장 실패", getReadableCloudError(error));
   }
 }
@@ -3190,9 +3198,18 @@ function getReadableAuthError(error) {
   return "Firebase 설정과 브라우저 팝업 허용 상태를 확인해주세요";
 }
 
+function logCloudError(error, context) {
+  console.error("Firebase cloud operation failed", {
+    action: context.action,
+    path: context.path,
+    code: error?.code ?? "unknown",
+    message: error?.message ?? String(error),
+  });
+}
+
 function getReadableCloudError(error) {
   if (error?.code === "permission-denied")
-    return "Firestore 규칙과 로그인 계정을 확인해주세요";
+    return "Firestore 규칙 배포 상태와 로그인 계정을 확인해주세요";
   if (error?.code === "unavailable") return "네트워크 연결 후 다시 시도됩니다";
   return "Firebase 설정, 규칙, 네트워크 상태를 확인해주세요";
 }
