@@ -47,9 +47,9 @@
 
 GitHub Pages에 배포할 때는 이 폴더의 `index.html`, `styles.css`, `app.js`, `assets/`를 그대로 올리면 됩니다.
 
-`manifest.webmanifest`, `sw.js`, `.nojekyll`, `app-config.js`, `data/characters.js`, `data/goal-defaults.js`, `data/goal-defaults.json`도 같은 루트에 함께 올려야 설치형 웹앱과 오프라인 캐시가 정상 동작합니다.
+`manifest.webmanifest`, `sw.js`, `.nojekyll`, `app-config.js`, `data/characters.js`도 같은 루트에 함께 올려야 설치형 웹앱과 오프라인 캐시가 정상 동작합니다.
 
-`app-config.js`, `data/characters.js`, `data/goal-defaults.js`, `data/goal-defaults.json`는 배포 후 갱신이 잦은 파일이라 서비스워커가 네트워크 우선으로 확인합니다.
+`app-config.js`, `data/characters.js`는 배포 후 갱신이 잦은 파일이라 서비스워커가 네트워크 우선으로 확인합니다. 관리자 목표 기본값은 런타임 파일이 아니라 Firestore `goal/data` 문서에서 읽습니다.
 
 ## GitHub Pages 배포
 
@@ -71,7 +71,7 @@ node scripts/verify.mjs
 
 ## 캐릭터 목록 갱신
 
-기본 캐릭터 목록은 `data/characters.js`에서, 관리자 목표 기본값은 `data/goal-defaults.json`에서 관리합니다.
+기본 캐릭터 목록은 `data/characters.js`에서 관리하고, 관리자 목표 기본값은 Firestore `goal/data` 문서에서 관리합니다.
 
 새 캐릭터가 추가되면 아래 형식으로 항목을 더하면 됩니다.
 
@@ -149,7 +149,7 @@ GitHub Pages 배포 환경에서는 별도 서버 없이 Firestore의 `admins/{u
 - 서비스 계정 키, private key, Admin SDK 인증 정보는 절대 저장소나 프론트엔드 설정 파일에 넣지 않습니다.
 - 관리자 권한의 실제 보안은 Firestore Security Rules에서 `admins/{uid}` 문서 기준으로 보호합니다.
 
-개인별 기록과 관리자 공용 데이터는 Firestore 저장 경로를 분리합니다. 일반 사용자의 보유 여부, 파밍 상태, 개인 목표, 현재 스테이터스는 `profiles/{uid}`에 저장합니다. 관리자가 관리하는 캐릭터 기본 데이터는 `admin/characters`, 관리자 목표 스테이터스 기본값은 `admin/goalDefaults`에 저장합니다. 이 공용 데이터는 비로그인 사용자도 볼 수 있도록 읽기만 공개하고, 쓰기는 `admins/{uid}` 문서의 `enabled` 값이 `true`인 관리자만 허용합니다. 이렇게 분리하면 개인 기록 저장 시 캐릭터 기본 데이터나 관리자 목표 기본값을 함께 덮어쓰지 않습니다.
+개인별 기록과 관리자 공용 데이터는 Firestore 저장 경로를 분리합니다. 일반 사용자의 보유 여부, 파밍 상태, 개인 목표, 현재 스테이터스는 `profiles/{uid}`에 저장합니다. 관리자가 관리하는 캐릭터 기본 데이터는 `admin/characters`, 관리자 목표 스테이터스 기본값은 `goal/data`에 저장합니다. `goal/{docId}`는 비로그인 사용자도 최초 접속 시 공개 목표 데이터를 볼 수 있도록 읽기를 공개하고, 생성/수정/삭제는 `admins/{uid}` 문서의 `enabled` 값이 `true`인 관리자만 허용합니다. 이렇게 분리하면 개인 기록 저장 시 캐릭터 기본 데이터나 관리자 목표 기본값을 함께 덮어쓰지 않습니다.
 
 개인별 저장, 관리자 판정, 관리자 공용 데이터 저장을 위한 Firestore 규칙은 `firestore.rules`에 포함되어 있습니다.
 
@@ -194,9 +194,9 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    match /publicGoals/{docId} {
+    match /goal/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     match /{document=**} {
@@ -253,5 +253,5 @@ node scripts/verify.mjs
 - 우측 상단 세션 상태가 `관리자 로그인됨`으로 표시됩니다.
 - 일반 사용자와 동일하게 보유 여부, 개인 파밍 상태, 내 목표 스테이터스를 수정할 수 있습니다.
 - 캐릭터 추가, 편집, 삭제, 공개/비공개 변경 UI가 표시되고 변경 시 `admin/characters`에 관리자 캐릭터 데이터가 저장됩니다.
-- 관리자 목표 편집 버튼이 표시되고 관리자 목표 기본값 변경 시 `admin/goalDefaults`에 저장됩니다.
+- 관리자 목표 편집 버튼이 표시되고 관리자 목표 기본값 변경 시 `goal/data`에 저장됩니다.
 - 로그아웃하면 세션 상태가 `로컬 저장 중`으로 돌아가고 관리자 전용 버튼과 폼이 다시 숨겨집니다.

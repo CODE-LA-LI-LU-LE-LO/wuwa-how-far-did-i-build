@@ -1,11 +1,9 @@
 const STORAGE_KEY = "ww-farming-tracker-v2";
-const ADMIN_GOALS_KEY = "ww-admin-goal-defaults-v1";
 const FIREBASE_VERSION = "10.12.5";
 const SHARE_URL_WARN_LENGTH = 6000;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
-const goalDefaultSeed = window.WW_GOAL_DEFAULTS ?? {};
 
 const elementColors = {
   회절: "#ffd75a",
@@ -403,7 +401,7 @@ const defaultCurrentStats = {
   },
 };
 
-let adminGoalDefaults = loadAdminGoalDefaults();
+let adminGoalDefaults = {};
 
 const rosterList = document.querySelector("#rosterList");
 const detailPanel = document.querySelector("#detailPanel");
@@ -1031,21 +1029,7 @@ function getSeedRarity(name) {
   return findSeedCharacter(name)?.rarity;
 }
 
-function loadAdminGoalDefaults() {
-  let savedDefaults = {};
-  try {
-    savedDefaults = JSON.parse(localStorage.getItem(ADMIN_GOALS_KEY) ?? "{}");
-  } catch {
-    localStorage.removeItem(ADMIN_GOALS_KEY);
-  }
-  return {
-    ...goalDefaultSeed,
-    ...savedDefaults,
-  };
-}
-
 function saveAdminGoalDefaults() {
-  localStorage.setItem(ADMIN_GOALS_KEY, JSON.stringify(adminGoalDefaults));
   saveCloudAdminGoalDefaults();
 }
 
@@ -3064,6 +3048,7 @@ async function ensureCloud() {
       adminGoalEditing = false;
       showSessionMessage("로컬 저장 중", "이 브라우저에 자동 저장됩니다");
       updateGoogleButton("signedOut");
+      await loadCloudGoalData();
       render();
       return;
     }
@@ -3088,7 +3073,6 @@ async function ensureCloud() {
           state.characters.find((character) => character.owned)?.id ??
           null;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        render();
       }
     } catch (error) {
       logCloudError(error, {
@@ -3103,6 +3087,7 @@ async function ensureCloud() {
       return;
     }
 
+    await loadCloudGoalData();
     const adminEnabled = await refreshAdminRole(user);
     await loadCloudAdminData();
     render();
@@ -3144,27 +3129,36 @@ async function saveCloudState() {
   }
 }
 
+async function loadCloudGoalData() {
+  if (!cloud) return;
+  try {
+    const snapshot = await cloud.getDoc(cloud.doc(cloud.db, "goal", "data"));
+    const defaults = snapshot.exists() ? snapshot.data()?.defaults : null;
+    adminGoalDefaults = defaults && typeof defaults === "object" ? defaults : {};
+    applyAdminGoalDefaults();
+  } catch (error) {
+    showSessionMessage("공개 목표 불러오기 실패", getReadableCloudError(error));
+  }
+}
+
+function applyAdminGoalDefaults() {
+  state.characters = state.characters.map((character) =>
+    normalizeCharacter({
+      ...character,
+      goals: {
+        ...character.goals,
+        admin: getAdminGoalDefault(character),
+      },
+    }),
+  );
+}
+
 async function loadCloudAdminData() {
   if (!cloud?.auth.currentUser) return;
   try {
-    const [charactersSnapshot, goalDefaultsSnapshot] = await Promise.all([
-      cloud.getDoc(cloud.doc(cloud.db, "admin", "characters")),
-      cloud.getDoc(cloud.doc(cloud.db, "admin", "goalDefaults")),
-    ]);
-
-    if (goalDefaultsSnapshot.exists()) {
-      const defaults = goalDefaultsSnapshot.data()?.defaults;
-      if (defaults && typeof defaults === "object") {
-        adminGoalDefaults = {
-          ...goalDefaultSeed,
-          ...defaults,
-        };
-        localStorage.setItem(
-          ADMIN_GOALS_KEY,
-          JSON.stringify(adminGoalDefaults),
-        );
-      }
-    }
+    const charactersSnapshot = await cloud.getDoc(
+      cloud.doc(cloud.db, "admin", "characters"),
+    );
 
     if (charactersSnapshot.exists()) {
       const adminCharacters = charactersSnapshot.data()?.characters;
@@ -3172,7 +3166,7 @@ async function loadCloudAdminData() {
     }
   } catch (error) {
     showSessionMessage(
-      "관리자 데이터 불러오기 실패",
+      "관리자 캐릭터 데이터 불러오기 실패",
       getReadableCloudError(error),
     );
   }
@@ -3194,7 +3188,7 @@ async function saveCloudAdminCharacters() {
 async function saveCloudAdminGoalDefaults() {
   if (!isAdmin()) return;
   try {
-    const ref = cloud.doc(cloud.db, "admin", "goalDefaults");
+    const ref = cloud.doc(cloud.db, "goal", "data");
     await cloud.setDoc(
       ref,
       {
@@ -3254,25 +3248,29 @@ function escapeHtml(value) {
   );
 }
 
+let shouldRenderImmediately = true;
+
 if (isSnapshotMode) {
   showSessionMessage(
     "공유 기록 보기",
     "내 기록으로 저장하기 전까지 기존 저장소는 유지됩니다",
   );
 } else if (hasFirebaseConfig()) {
+  shouldRenderImmediately = false;
   ensureCloud().catch(() => {
     showSessionMessage(
       "로컬 저장 중",
       "Google 버튼으로 다시 연결할 수 있습니다",
     );
     updateGoogleButton("signedOut");
+    render();
   });
 } else {
   updateGoogleButton("setup");
 }
 
 registerServiceWorker();
-render();
+if (shouldRenderImmediately) render();
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || window.location.protocol === "file:")
