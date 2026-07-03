@@ -22,19 +22,11 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
-    match /admin/{docId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
 
     match /profiles/{userId} {
       allow read, write: if signedIn() && request.auth.uid == userId;
     }
 
-    match /publicCharacters/{docId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
 
     match /{document=**} {
       allow read, write: if false;

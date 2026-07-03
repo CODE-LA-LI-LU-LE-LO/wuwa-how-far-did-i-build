@@ -10,7 +10,7 @@ const APP_SHELL = [
 ];
 const NETWORK_FIRST_PATHS = [
   "/app-config.js",
-  "/data/characters.js",
+  "/data/characters.json",
   "/data/goal-defaults.json",
 ];
 

@@ -296,9 +296,7 @@ const echoSets = [
   },
 ];
 
-const characterSeed = Array.isArray(window.WW_CHARACTER_SEED)
-  ? window.WW_CHARACTER_SEED
-  : [];
+let characterSeed = [];
 
 const defaultFarm = {
   level: 0,
@@ -500,12 +498,15 @@ async function refreshAdminRole(user) {
   return adminEnabled;
 }
 
-let sharedSnapshot = readSharedSnapshot();
-let isSnapshotMode = Boolean(sharedSnapshot);
-let state = sharedSnapshot ?? loadState();
+let sharedSnapshot = null;
+let isSnapshotMode = false;
+let state = {
+  user: createDefaultUser(),
+  goalDefaultsVersion: GOAL_DEFAULT_VERSION,
+  characters: [],
+};
 let isDetailPanelCollapsed = Boolean(compactDetailQuery?.matches);
-let selectedId =
-  state.characters.find((character) => character.owned)?.id ?? null;
+let selectedId = null;
 let currentView = "all";
 let searchTerm = "";
 let activeTab = "ownership";
@@ -636,6 +637,7 @@ characterForm.addEventListener("submit", async (event) => {
   }
   const payload = {
     name,
+    en: document.querySelector("#newEn").value.trim(),
     element: document.querySelector("#newElement").value,
     weapon: document.querySelector("#newWeapon").value,
     rarity: document.querySelector("#newRarity").value,
@@ -720,8 +722,7 @@ deleteCharacterButton.addEventListener("click", () => {
   state.characters = state.characters.filter((item) => item.id !== id);
   if (selectedId === id)
     selectedId = state.characters.find((item) => item.owned)?.id ?? null;
-  saveState();
-  saveCloudAdminCharacters();
+  saveState({ skipCloud: true });
   characterForm.reset();
   dialog.close();
   showSessionMessage(
@@ -823,6 +824,26 @@ googleButton.addEventListener("click", async () => {
   }
 });
 
+
+async function loadCharacterSeedData() {
+  try {
+    const response = await fetch("data/characters.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const characters = await response.json();
+    characterSeed = Array.isArray(characters) ? characters : [];
+  } catch {
+    characterSeed = [];
+    showSessionMessage("캐릭터 목록 불러오기 실패", "data/characters.json을 확인해주세요");
+  }
+}
+
+function initializeState() {
+  sharedSnapshot = readSharedSnapshot();
+  isSnapshotMode = Boolean(sharedSnapshot);
+  state = sharedSnapshot ?? loadState();
+  selectedId = state.characters.find((character) => character.owned)?.id ?? null;
+}
+
 function loadState() {
   const saved =
     localStorage.getItem(STORAGE_KEY) ??
@@ -890,9 +911,9 @@ function normalizeCharacter(character, resetGoals = false) {
     merged.element = seed.element;
     merged.weapon = seed.weapon;
     merged.rarity = String(seed.rarity ?? merged.rarity);
-    if (!merged.image || isLegacyPrydwenCharacterImage(merged.image)) {
-      merged.image = seed.image || "";
-    }
+    merged.en = seed.en ?? merged.en;
+    merged.image = seed.image || "";
+    merged.isPublic = seed.isPublic ?? merged.isPublic;
   }
   delete merged.version;
 
@@ -902,7 +923,7 @@ function normalizeCharacter(character, resetGoals = false) {
     goalMode: character.goalMode === "custom" ? "custom" : "admin",
     goals: normalizeGoals(character.goals, resetGoals, merged),
     currentStats: normalizeCurrentStats(character.currentStats),
-    isPublic: character.isPublic !== false,
+    isPublic: merged.isPublic !== false,
   };
 }
 
@@ -916,6 +937,7 @@ function createCharacter(input = {}) {
   return {
     id: createId(),
     name: character.name ?? seed?.name ?? "새 캐릭터",
+    en: character.en ?? seed?.en ?? "",
     element: character.element ?? seed?.element ?? "회절",
     weapon: character.weapon ?? seed?.weapon ?? "직검",
     rarity: String(character.rarity ?? seed?.rarity ?? "5"),
@@ -1118,22 +1140,6 @@ function saveGoalState(character) {
   saveState();
 }
 
-function getAdminCharacterData(character) {
-  return {
-    id: character.id,
-    name: character.name,
-    en: character.en,
-    element: character.element,
-    weapon: character.weapon,
-    rarity: character.rarity,
-    image: character.image,
-    isPublic: character.isPublic,
-    goals: {
-      admin: character.goals.admin,
-    },
-  };
-}
-
 function getUserCharacterData(character) {
   return {
     id: character.id,
@@ -1157,39 +1163,6 @@ function getUserProfileState() {
   };
 }
 
-function getAdminCharactersState() {
-  return {
-    updatedAt: new Date().toISOString(),
-    characters: state.characters.map(getAdminCharacterData),
-  };
-}
-
-function mergeAdminCharacters(adminCharacters = []) {
-  const personalById = new Map(state.characters.map((character) => [character.id, character]));
-  const personalByName = new Map(state.characters.map((character) => [character.name, character]));
-  const merged = adminCharacters.map((adminCharacter) => {
-    const personal =
-      personalById.get(adminCharacter.id) ?? personalByName.get(adminCharacter.name);
-    return normalizeCharacter({
-      ...adminCharacter,
-      owned: personal?.owned ?? false,
-      farm: personal?.farm,
-      goalMode: personal?.goalMode,
-      goals: {
-        admin: adminCharacter.goals?.admin,
-        custom: personal?.goals?.custom,
-      },
-      currentStats: personal?.currentStats,
-    });
-  });
-
-  const adminKeys = new Set(merged.map((character) => character.id));
-  state.characters
-    .filter((character) => !adminKeys.has(character.id) && character.owned)
-    .forEach((character) => merged.push(character));
-  state.characters = mergeSeedCharacters(merged);
-}
-
 function findSeedCharacter(name) {
   if (!name) return null;
   return (
@@ -1200,21 +1173,13 @@ function findSeedCharacter(name) {
   );
 }
 
-function isLegacyPrydwenCharacterImage(image) {
-  return (
-    typeof image === "string" &&
-    /^https:\/\/cdn\.prydwen\.gg\/images\/(?:ww|wuthering-waves)\/characters\/.+\.(?:webp|png)$/i.test(
-      image,
-    )
-  );
-}
 
 function saveState(options = {}) {
   state.updatedAt = new Date().toISOString();
   if (!isSnapshotMode || options.force) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
-  scheduleCloudSave();
+  if (!options.skipCloud) scheduleCloudSave();
 }
 
 function getGoalDefaultsExportData() {
@@ -2664,6 +2629,7 @@ function openCharacterDialog(id = "") {
   const character = state.characters.find((item) => item.id === id);
   editCharacterId.value = character?.id ?? "";
   document.querySelector("#newName").value = character?.name ?? "";
+  document.querySelector("#newEn").value = character?.en ?? "";
   document.querySelector("#newImage").value = character?.image ?? "";
   document.querySelector("#newImageFile").value = "";
   document.querySelector("#newElement").value = character?.element ?? "회절";
@@ -3184,7 +3150,6 @@ async function ensureCloud() {
     }
 
     const adminEnabled = await refreshAdminRole(user);
-    await loadCloudAdminData();
     render();
 
     showSessionMessage(
@@ -3336,31 +3301,35 @@ function escapeHtml(value) {
 
 let shouldRenderImmediately = true;
 
-loadGoalDefaultsData()
-  .catch(() => {})
-  .finally(() => {
-    if (isSnapshotMode) {
-      showSessionMessage(
-        "공유 기록 보기",
-        "내 기록으로 저장하기 전까지 기존 저장소는 유지됩니다",
-      );
-    } else if (hasFirebaseConfig()) {
-      shouldRenderImmediately = false;
-      ensureCloud().catch(() => {
-        showSessionMessage(
-          "로컬 저장 중",
-          "Google 버튼으로 다시 연결할 수 있습니다",
-        );
-        updateGoogleButton("signedOut");
-        render();
-      });
-    } else {
-      updateGoogleButton("setup");
-    }
+initializeApp();
 
-    registerServiceWorker();
-    if (shouldRenderImmediately) render();
-  });
+async function initializeApp() {
+  await loadCharacterSeedData();
+  initializeState();
+  await loadGoalDefaultsData().catch(() => {});
+
+  if (isSnapshotMode) {
+    showSessionMessage(
+      "공유 기록 보기",
+      "내 기록으로 저장하기 전까지 기존 저장소는 유지됩니다",
+    );
+  } else if (hasFirebaseConfig()) {
+    shouldRenderImmediately = false;
+    ensureCloud().catch(() => {
+      showSessionMessage(
+        "로컬 저장 중",
+        "Google 버튼으로 다시 연결할 수 있습니다",
+      );
+      updateGoogleButton("signedOut");
+      render();
+    });
+  } else {
+    updateGoogleButton("setup");
+  }
+
+  registerServiceWorker();
+  if (shouldRenderImmediately) render();
+}
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || window.location.protocol === "file:")
