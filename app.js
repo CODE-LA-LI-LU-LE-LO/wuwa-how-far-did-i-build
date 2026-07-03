@@ -1855,11 +1855,12 @@ function renderStatRow(character, stat, index, canEditGoal) {
   const hasBranch = stat.variant !== "-";
   const met = branchActive && current >= target;
   const inputDisabled = branchActive ? "" : "disabled";
-  const targetDisabled = canEditGoal && branchActive ? "" : "disabled";
+  const targetDisabled = canEditGoal ? "" : "disabled";
+  const rowInactive = !branchActive && !canEditGoal;
   const option = getStatOption(stat.key, valueStatOptions);
 
   return `
-    <div class="stat-row ${met ? "met" : ""} ${branchActive ? "" : "branch-inactive"}" data-stat-row="${character.id}" data-index="${index}" role="row">
+    <div class="stat-row ${met ? "met" : ""} ${rowInactive ? "branch-inactive" : ""}" data-stat-row="${character.id}" data-index="${index}" role="row">
       <span class="branch-cell ${hasBranch ? "has-branch" : ""}">
         <label class="branch-check readonly ${hasBranch ? "" : "hidden"}" title="에코셋 구성에서 선택된 분기">
           <input type="checkbox" ${branchActive ? "checked" : ""} disabled />
@@ -1868,7 +1869,7 @@ function renderStatRow(character, stat, index, canEditGoal) {
           ${statVariantOptions.map((option) => `<option value="${option}" ${stat.variant === option ? "selected" : ""}>${option}</option>`).join("")}
         </select>
       </span>
-      ${renderStatPicker(character.id, index, option.key, canEditGoal && branchActive, {
+      ${renderStatPicker(character.id, index, option.key, canEditGoal, {
         options: valueStatOptions,
         dataAttribute: "data-stat-option",
       })}
@@ -2329,8 +2330,8 @@ function updateRenderedValueBranchStates(id) {
       branchCell?.classList.toggle("has-branch", hasBranch);
       branchCheck?.classList.toggle("hidden", !hasBranch);
       if (branchCheckbox) branchCheckbox.checked = branchActive;
-      row.classList.toggle("branch-inactive", !branchActive);
-      if (targetInput) targetInput.disabled = !canEditGoal || !branchActive;
+      row.classList.toggle("branch-inactive", !branchActive && !canEditGoal);
+      if (targetInput) targetInput.disabled = !canEditGoal;
       if (currentInput) currentInput.disabled = !branchActive;
       if (clearButton) clearButton.disabled = !branchActive;
       updateRenderedStatRowState(id, Number(row.dataset.index), row);
@@ -2376,7 +2377,7 @@ function updateRenderedStatRowState(id, index, row) {
   const current = getCurrentStatValue(character, stat);
   const target = Number(stat.target ?? 0);
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
-  row.classList.toggle("branch-inactive", !branchActive);
+  row.classList.toggle("branch-inactive", !branchActive && !canEditActiveGoal(character));
   row.classList.toggle("met", branchActive && current >= target);
 }
 

@@ -153,7 +153,10 @@ h2 {
 
 .session-copy {
   display: grid;
-  justify-items: end;
+  align-content: center;
+  justify-items: center;
+  width: 330px;
+  text-align: center;
 }
 
 .session-copy span {
@@ -2012,7 +2015,9 @@ dialog::backdrop {
   }
 
   .session-copy {
+    width: auto;
     justify-items: start;
+    text-align: left;
   }
 
   .hero-panel {
