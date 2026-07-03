@@ -82,7 +82,7 @@ function createDomStub() {
   };
 }
 
-function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSource }) {
+function smokeLoadApp({ configSource, characterSource, appSource }) {
   const storage = new Map();
   const sandbox = {
     Blob: class {},
@@ -119,7 +119,6 @@ function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSo
   vm.createContext(sandbox);
   vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
   vm.runInContext(characterSource, sandbox, { filename: "data/characters.js" });
-  vm.runInContext(goalDefaultsSource, sandbox, { filename: "data/goal-defaults.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
   return sandbox;
 }
@@ -133,8 +132,6 @@ const requiredRootFiles = [
   "firestore.rules",
   "index.html",
   "manifest.webmanifest",
-  "data/goal-defaults.json",
-  "data/goal-defaults.js",
   "styles.css",
   "sw.js",
 ];
@@ -255,6 +252,8 @@ for (const requiredAdminSource of [
   "cloud.doc(cloud.db, \"admins\", user.uid)",
   "adminSnapshot.data()?.enabled === true",
   "async function saveCloudAdminCharacters()",
+  "async function loadCloudGoalData()",
+  "cloud.doc(cloud.db, \"goal\", \"data\")",
   "async function saveCloudAdminGoalDefaults()",
   "if (!isAdmin()) return;",
 ]) {
@@ -299,6 +298,9 @@ for (const requiredRuleSource of [
   "allow create, update, delete: if false;",
   "match /admin/{docId}",
   "allow write: if isAdmin();",
+  "match /goal/{docId}",
+  "allow read: if true;",
+  "allow create, update, delete: if isAdmin();",
 ]) {
   if (!rules.includes(requiredRuleSource)) {
     fail(`firestore rules missing admin protection: ${requiredRuleSource}`);
@@ -309,7 +311,6 @@ try {
   smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.js"),
-    goalDefaultsSource: await readText("data/goal-defaults.js"),
     appSource,
   });
 } catch (error) {
@@ -329,7 +330,6 @@ try {
       };
     `,
     characterSource: await readText("data/characters.js"),
-    goalDefaultsSource: await readText("data/goal-defaults.js"),
     appSource,
   });
   if (missingConfigSandbox.isAdmin() !== false) {

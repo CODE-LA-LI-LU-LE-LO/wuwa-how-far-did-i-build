@@ -11,8 +11,6 @@ const APP_SHELL = [
 const NETWORK_FIRST_PATHS = [
   "/app-config.js",
   "/data/characters.js",
-  "/data/goal-defaults.js",
-  "/data/goal-defaults.json",
 ];
 
 self.addEventListener("install", (event) => {
