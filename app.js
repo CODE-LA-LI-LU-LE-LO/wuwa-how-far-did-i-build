@@ -977,7 +977,7 @@ function normalizeGoalMainEchoes(goal = {}) {
   return rawMainEchoes
     .map((mainEcho, index) => ({
       join: index === 0 ? "기준" : "OR",
-      name: mainEcho.name ?? "",
+      name: String(mainEcho.name ?? "").trim(),
     }))
     .slice(0, 4);
 }
@@ -2213,7 +2213,7 @@ function updateGoalMainEcho(id, index, field, value) {
   const mainEcho = goal.mainEchoes[targetIndex];
   if (!mainEcho) return;
 
-  if (field === "name") mainEcho.name = value;
+  if (field === "name") mainEcho.name = String(value ?? "").trim();
   if (targetIndex === 0) goal.mainEcho = mainEcho.name;
 
   saveGoalState(character);
