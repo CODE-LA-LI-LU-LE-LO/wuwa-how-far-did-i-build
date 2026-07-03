@@ -22,28 +22,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -101,28 +101,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -180,28 +180,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -259,28 +259,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -338,28 +338,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -417,28 +417,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -496,28 +496,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -575,28 +575,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -654,28 +654,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -733,28 +733,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -812,28 +812,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -891,28 +891,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -970,28 +970,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1049,28 +1049,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1128,28 +1128,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1207,28 +1207,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1286,28 +1286,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1365,28 +1365,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1444,28 +1444,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1523,28 +1523,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1602,28 +1602,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1681,28 +1681,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1760,28 +1760,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1839,28 +1839,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1918,28 +1918,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -1997,28 +1997,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2076,28 +2076,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2155,28 +2155,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2234,28 +2234,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2313,28 +2313,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2392,28 +2392,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2471,28 +2471,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2550,28 +2550,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2629,28 +2629,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2708,28 +2708,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2787,28 +2787,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2866,28 +2866,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -2945,28 +2945,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3024,28 +3024,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3103,28 +3103,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3182,28 +3182,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3261,28 +3261,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3340,28 +3340,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3419,28 +3419,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3498,28 +3498,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3577,28 +3577,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3656,28 +3656,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3735,28 +3735,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3814,28 +3814,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3893,28 +3893,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -3972,28 +3972,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4051,28 +4051,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4130,28 +4130,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4209,28 +4209,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4288,28 +4288,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4367,28 +4367,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4446,28 +4446,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4525,28 +4525,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4604,28 +4604,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
@@ -4683,28 +4683,28 @@
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 1",
-        "variant": "A",
+        "variant": "-",
         "branchChecked": false
       }
     ],
