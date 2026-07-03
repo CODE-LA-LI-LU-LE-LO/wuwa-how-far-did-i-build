@@ -322,6 +322,32 @@ try {
   fail(`app smoke load failed: ${error.message}`);
 }
 
+try {
+  const missingConfigSandbox = smokeLoadApp({
+    configSource: `
+      window.WW_TRACKER_CONFIG = {
+        firebase: {
+          apiKey: "",
+          authDomain: "",
+          projectId: "",
+          appId: "",
+        },
+      };
+    `,
+    characterSource: await readText("data/characters.js"),
+    goalDefaultsSource: await readText("data/goal-defaults.js"),
+    appSource,
+  });
+  if (missingConfigSandbox.isAdmin() !== false) {
+    fail("isAdmin() must default to false without a signed-in Firebase user");
+  }
+  if (missingConfigSandbox.hasFirebaseConfig() !== false) {
+    fail("missing Firebase config should keep hasFirebaseConfig() false");
+  }
+} catch (error) {
+  fail(`app missing-config smoke load failed: ${error.message}`);
+}
+
 if (failures.length > 0) {
   throw new Error(`Static verification failed:\n- ${failures.join("\n- ")}`);
 }
