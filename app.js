@@ -1751,7 +1751,7 @@ function renderFarmingCard(character) {
         <section class="farm-input-panel">
           <label>
             에코셋 구성
-            <input class="echo-build-input" data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(goal.echoBuild)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="에코셋 구성" ${canEditGoal ? "" : "disabled"} />
+            ${renderEchoBuildInput(character, goal, canEditGoal)}
           </label>
           <div class="stat-table echo-stat-table ${canEditGoal ? "can-edit" : ""}" role="table" aria-label="${escapeHtml(character.name)} 에코셋 구성">
             <div class="echo-stat-row stat-head" role="row">
@@ -1817,6 +1817,24 @@ function renderFarmingCard(character) {
         목표 달성 처리
       </label>
     </article>
+  `;
+}
+
+function renderEchoBuildInput(character, goal, canEditGoal) {
+  const value = String(goal.echoBuild ?? "").replace(/\D/g, "").slice(0, 5);
+  const displayValue = value || "43311";
+  const digits = Array.from(displayValue.slice(0, 5));
+  const digitCells = digits
+    .map((digit, index) =>
+      `<span class="${index === 0 ? "main-echo-cost" : ""}">${escapeHtml(digit)}</span>`,
+    )
+    .join("");
+
+  return `
+    <span class="echo-build-field ${value ? "" : "is-placeholder"}">
+      <span class="echo-build-highlight" aria-hidden="true">${digitCells}</span>
+      <input class="echo-build-input" data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(value)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="에코셋 구성" ${canEditGoal ? "" : "disabled"} />
+    </span>
   `;
 }
 

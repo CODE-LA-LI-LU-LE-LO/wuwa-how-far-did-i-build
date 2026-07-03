@@ -1418,9 +1418,44 @@ select option {
   text-align: right;
 }
 
-.echo-build-input {
+.echo-build-field {
   --echo-build-cell-width: 46px;
+  position: relative;
+  display: inline-block;
   max-width: calc(var(--echo-build-cell-width) * 5 + 2px);
+}
+
+.echo-build-highlight {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, var(--echo-build-cell-width));
+  align-items: center;
+  pointer-events: none;
+  color: var(--text);
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+
+.echo-build-highlight .main-echo-cost {
+  color: var(--accent);
+}
+
+.echo-build-field.is-placeholder .echo-build-highlight {
+  color: rgba(247, 251, 255, 0.32);
+}
+
+.echo-build-field.is-placeholder .echo-build-highlight .main-echo-cost {
+  color: color-mix(in srgb, var(--accent) 50%, rgba(247, 251, 255, 0.32));
+}
+
+.echo-build-input {
+  width: calc(var(--echo-build-cell-width) * 5 + 2px);
+  max-width: 100%;
   min-height: 52px !important;
   padding: 0 !important;
   border-radius: 8px !important;
@@ -1433,7 +1468,7 @@ select option {
       rgba(255, 255, 255, 0.12) var(--echo-build-cell-width)
     ),
     rgba(255, 255, 255, 0.08) !important;
-  color: var(--text);
+  color: transparent;
   font-size: 1.75rem;
   font-weight: 900;
   letter-spacing: 28px;
@@ -1442,6 +1477,12 @@ select option {
   text-indent: 13px;
   caret-color: var(--accent);
   font-variant-numeric: tabular-nums;
+  position: relative;
+  z-index: 2;
+}
+
+.echo-build-input:focus {
+  color: transparent;
 }
 
 .echo-build-input::placeholder {
