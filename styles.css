@@ -1402,6 +1402,22 @@ select option {
   justify-self: center;
 }
 
+.target-grid .echo-set-picker .echo-picker-button,
+.target-grid .echo-set-picker .echo-picker-options button {
+  text-align: left;
+  text-align-last: left;
+}
+
+.target-grid .echo-set-picker .echo-picker-options button .inline-icon,
+.target-grid .echo-set-picker .echo-picker-options button .empty-icon {
+  justify-self: start;
+}
+
+.stat-row input[data-goal-stat-field="target"],
+.stat-row input[data-current-field] {
+  text-align: right;
+}
+
 .echo-build-input {
   --echo-build-cell-width: 46px;
   max-width: calc(var(--echo-build-cell-width) * 5 + 2px);
@@ -1420,10 +1436,10 @@ select option {
   color: var(--text);
   font-size: 1.75rem;
   font-weight: 900;
-  letter-spacing: 29px;
+  letter-spacing: 28px;
   line-height: 1;
   text-align: left;
-  text-indent: 17px;
+  text-indent: 13px;
   caret-color: var(--accent);
   font-variant-numeric: tabular-nums;
 }

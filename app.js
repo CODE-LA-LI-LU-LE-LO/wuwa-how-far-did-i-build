@@ -643,19 +643,43 @@ characterForm.addEventListener("submit", async (event) => {
     image,
   };
 
+  let targetCharacter = null;
+  const previousCharacter = existing ? structuredClone(existing) : null;
+  const previousSelectedId = selectedId;
+
   if (existing) {
     Object.assign(existing, payload);
     selectedId = existing.owned ? existing.id : selectedId;
+    targetCharacter = existing;
+  } else {
+    targetCharacter = createCharacter(payload);
+    state.characters.push(targetCharacter);
+  }
+
+  try {
+    await saveCloudAdminCharacters();
+  } catch {
+    if (existing && previousCharacter) {
+      Object.assign(existing, previousCharacter);
+    } else if (targetCharacter) {
+      state.characters = state.characters.filter(
+        (character) => character.id !== targetCharacter.id,
+      );
+    }
+    selectedId = previousSelectedId;
+    render();
+    return;
+  }
+
+  saveState();
+  if (existing) {
     showSessionMessage(
       `${existing.name} 수정됨`,
       "캐릭터 기본 정보를 저장했습니다",
     );
   } else {
-    state.characters.push(createCharacter(payload));
     showSessionMessage(`${name} 추가됨`, "새 캐릭터를 목록에 추가했습니다");
   }
-  saveState();
-  saveCloudAdminCharacters();
   characterForm.reset();
   dialog.close();
   render();
@@ -1932,14 +1956,14 @@ function renderEchoSetPicker(characterId, index, value, enabled) {
 
   if (!enabled) {
     return `
-      <div class="echo-picker readonly">
+      <div class="echo-picker echo-set-picker readonly">
         <span class="echo-picker-button">${buttonContent}</span>
       </div>
     `;
   }
 
   return `
-    <details class="echo-picker">
+    <details class="echo-picker echo-set-picker">
       <summary class="echo-picker-button">${buttonContent}</summary>
       <div class="echo-picker-options">
         <button type="button" data-echo-set-option data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="" class="${selectedValue ? "" : "active"}">
@@ -3245,15 +3269,22 @@ async function loadCloudAdminData() {
 }
 
 async function saveCloudAdminCharacters() {
-  if (!isAdmin()) return;
+  if (!isAdmin()) {
+    throw new Error("admin-auth-required");
+  }
   try {
     const ref = cloud.doc(cloud.db, "admin", "characters");
     await cloud.setDoc(ref, getAdminCharactersState(), { merge: true });
   } catch (error) {
+    logCloudError(error, {
+      action: "save-admin-characters",
+      path: "admin/characters",
+    });
     showSessionMessage(
       "관리자 캐릭터 저장 실패",
       getReadableCloudError(error),
     );
+    throw error;
   }
 }
 
