@@ -186,7 +186,7 @@
     "weapon": "미정",
     "rarity": "5",
     "image": "assets/characters/hsin.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "유노",
@@ -213,7 +213,7 @@
     "weapon": "미정",
     "rarity": "5",
     "image": "assets/characters/jingran.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "금희",
@@ -339,7 +339,7 @@
     "weapon": "미정",
     "rarity": "5",
     "image": "assets/characters/qingxiao.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "구원",
@@ -384,7 +384,7 @@
     "weapon": "직검",
     "rarity": "5",
     "image": "assets/characters/rover-electro.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "방랑자 · 인멸",
@@ -438,7 +438,7 @@
     "weapon": "미정",
     "rarity": "5",
     "image": "assets/characters/suoming.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "도기",
