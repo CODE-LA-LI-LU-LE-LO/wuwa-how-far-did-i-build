@@ -1277,6 +1277,28 @@ function render() {
   updateFocusStripStickiness();
 }
 
+function keepFarmCardScrollStable(id, renderCallback) {
+  const selector = `[data-farm-card="${CSS.escape(id)}"]`;
+  const card = rosterList.querySelector(selector);
+  if (!card || typeof card.getBoundingClientRect !== "function") {
+    renderCallback();
+    return;
+  }
+
+  const previousTop = card.getBoundingClientRect().top;
+  renderCallback();
+
+  const updatedCard = rosterList.querySelector(selector);
+  if (!updatedCard || typeof updatedCard.getBoundingClientRect !== "function")
+    return;
+
+  const nextTop = updatedCard.getBoundingClientRect().top;
+  const delta = nextTop - previousTop;
+  if (Math.abs(delta) > 0.5) {
+    window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+  }
+}
+
 function renderToolbarMode() {
   document
     .querySelector(".ownership-filter")
@@ -1387,11 +1409,12 @@ function renderRoster() {
 
   rosterList.querySelectorAll("[data-toggle-custom-goal]").forEach((button) => {
     button.addEventListener("click", () => {
+      const characterId = button.dataset.toggleCustomGoal;
       customGoalEditingId =
-        customGoalEditingId === button.dataset.toggleCustomGoal
+        customGoalEditingId === characterId
           ? null
-          : button.dataset.toggleCustomGoal;
-      renderRoster();
+          : characterId;
+      keepFarmCardScrollStable(characterId, renderRoster);
     });
   });
 
@@ -1404,7 +1427,12 @@ function renderRoster() {
         );
         return;
       }
+      const card = button.closest("[data-farm-card]");
       adminGoalEditing = !adminGoalEditing;
+      if (card?.dataset.farmCard) {
+        keepFarmCardScrollStable(card.dataset.farmCard, renderRoster);
+        return;
+      }
       renderRoster();
     });
   });
