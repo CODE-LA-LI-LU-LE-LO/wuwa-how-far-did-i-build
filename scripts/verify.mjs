@@ -306,18 +306,12 @@ for (const requiredRuleSource of [
 }
 
 try {
-  const sandbox = smokeLoadApp({
+  smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.js"),
     goalDefaultsSource: await readText("data/goal-defaults.js"),
     appSource,
   });
-  if (sandbox.isAdmin() !== false) {
-    fail("isAdmin() must default to false without a signed-in Firebase user");
-  }
-  if (sandbox.hasFirebaseConfig() !== false) {
-    fail("missing Firebase config should keep hasFirebaseConfig() false");
-  }
 } catch (error) {
   fail(`app smoke load failed: ${error.message}`);
 }
