@@ -205,6 +205,19 @@ service cloud.firestore {
   }
 }
 ```
+
+### `클라우드 불러오기 실패` 확인 순서
+
+로그인 직후 `클라우드 불러오기 실패`와 `Firestore 규칙 배포 상태와 로그인 계정을 확인해주세요`가 표시되면 아래 순서로 확인합니다.
+
+1. 브라우저 개발자 도구 Console에서 `Firebase cloud operation failed` 로그의 `action`, `path`, `code`를 확인합니다.
+2. `action`이 `load-profile`이고 `path`가 `profiles/{로그인한 UID}`인지 확인합니다. 이 앱은 로그인 직후 `profiles/{uid}` 문서를 먼저 읽습니다.
+3. 저장소의 `firestore.rules`가 Firebase Console 또는 Firebase CLI로 실제 프로젝트에 배포되어 있는지 확인합니다. 로컬 파일만 수정되어 있고 배포되지 않으면 배포된 규칙은 바뀌지 않습니다.
+4. Firebase Console > Authentication > Users의 UID와 Console 로그의 `profiles/{uid}` UID가 같은지 확인합니다.
+5. `app-config.js`의 `projectId`가 규칙을 배포한 Firebase 프로젝트와 같은지 확인합니다.
+
+현재 저장소 규칙 기준으로는 로그인한 사용자가 자기 `profiles/{uid}` 문서를 읽고 쓸 수 있어야 합니다. 따라서 Console 로그가 `permission-denied`이고 경로가 자기 UID의 `profiles/{uid}`라면, 먼저 실제 Firebase 프로젝트에 최신 `firestore.rules`가 배포되었는지 확인하세요.
+
 ## 권한별 화면 회귀 테스트
 
 관리자 UI와 저장 경로를 변경한 뒤에는 아래 세 가지 상태를 나눠 확인합니다. Google/Firebase 실계정 확인이 필요한 항목은 배포된 GitHub Pages 주소가 Firebase Authentication 승인 도메인에 등록된 상태에서 진행합니다.
