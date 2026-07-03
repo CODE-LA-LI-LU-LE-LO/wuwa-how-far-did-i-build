@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>명조 육성 기록장</title>
+    <title>내가 어디까지 잘 키웠더라</title>
     <meta
       name="description"
       content="명조 캐릭터 보유 여부와 파밍 상태를 관리하는 반응형 웹앱"
@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#080b10" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="명조 기록장" />
-    <meta property="og:title" content="명조 육성 기록장" />
+    <meta property="og:title" content="내가 어디까지 잘 키웠더라" />
     <meta
       property="og:description"
       content="캐릭터 보유 여부와 파밍 진행률을 깔끔하게 기록하세요."
@@ -34,7 +34,8 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Wuthering Waves Tracker</p>
-          <h1>명조 육성 기록장</h1>
+          <h1>내가 어디까지 잘 키웠더라</h1>
+          <p class="app-version">ver.20260703_01</p>
         </div>
         <div class="session">
           <div class="session-copy">
@@ -50,12 +51,12 @@
       <main>
         <section class="hero-panel">
           <div class="hero-copy">
-            <p class="eyebrow">보유 캐릭터만 선명하게</p>
-            <h2>체크하고, 남은 파밍을 한눈에 정리하세요.</h2>
-            <p>
-              보유 여부를 켜면 파밍 카드가 열립니다. 레벨, 무기, 스킬, 에코,
-              재료 준비도를 기록하고 우선순위로 오늘 할 일을 고를 수 있어요.
-            </p>
+            <p class="eyebrow">참조자료</p>
+            <div class="reference-links">
+              <a href="https://arca.live/w/wutheringwaves/%EC%9D%B4%EC%A0%95%EB%8F%84%EB%A9%B4%20%EC%9E%98%ED%82%A4%EC%9B%A0%EB%8B%A4%ED%91%9C" target="_blank" rel="noopener noreferrer">명조 채널_이정도면 잘키웠다표</a>
+              <a href="https://arca.live/b/wutheringwaves/107387981" target="_blank" rel="noopener noreferrer">명조 채널_명조 캐릭터별 에코 정리표 2.4</a>
+              <a href="https://wuwaguide.kurogames.com/" target="_blank" rel="noopener noreferrer">명조 공식 공략 사이트</a>
+            </div>
           </div>
           <div class="stat-grid" aria-label="요약 통계">
             <article>
@@ -88,7 +89,6 @@
             <button data-sort="rarity" type="button">등급</button>
             <button data-sort="element" type="button">속성</button>
             <button data-sort="weapon" type="button">무기</button>
-            <button data-sort="version" type="button">버전</button>
           </div>
           <div class="segmented ownership-filter" role="group" aria-label="보유 필터">
             <button class="active" data-view="all" type="button">전체</button>
@@ -195,18 +195,17 @@
           </select>
         </label>
         <label>
-          출시 버전
-          <select id="newVersion">
-            <option>Ver1.x</option>
-            <option>Ver2.x</option>
-            <option>Ver3.x</option>
-          </select>
-        </label>
-        <label>
           등급
           <select id="newRarity">
             <option value="5">★5</option>
             <option value="4">★4</option>
+          </select>
+        </label>
+        <label>
+          공개 여부
+          <select id="newVisibility">
+            <option value="public">공개</option>
+            <option value="private">비공개</option>
           </select>
         </label>
         <div class="dialog-actions">
@@ -218,7 +217,7 @@
 
     <template id="detailTemplate">
       <div class="detail-content">
-        <button class="detail-panel-toggle" data-detail-panel-toggle type="button" aria-label="보유 캐릭터 상세 접기">×</button>
+        <button class="detail-panel-toggle" data-detail-panel-toggle type="button" aria-label="캐릭터 상세 접기">×</button>
         <div class="detail-hero">
           <div class="avatar large"></div>
           <div>
@@ -254,6 +253,7 @@
 
     <script src="app-config.js"></script>
     <script src="data/characters.js"></script>
+    <script src="data/goal-defaults.js"></script>
     <script src="app.js" defer></script>
   </body>
 </html>

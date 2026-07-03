@@ -1,9 +1,11 @@
 const STORAGE_KEY = "ww-farming-tracker-v2";
+const ADMIN_GOALS_KEY = "ww-admin-goal-defaults-v1";
 const FIREBASE_VERSION = "10.12.5";
 const SHARE_URL_WARN_LENGTH = 6000;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
+const goalDefaultSeed = window.WW_GOAL_DEFAULTS ?? {};
 
 const elementColors = {
   회절: "#ffd75a",
@@ -401,6 +403,8 @@ const defaultCurrentStats = {
   },
 };
 
+let adminGoalDefaults = loadAdminGoalDefaults();
+
 const rosterList = document.querySelector("#rosterList");
 const detailPanel = document.querySelector("#detailPanel");
 const detailTemplate = document.querySelector("#detailTemplate");
@@ -552,8 +556,8 @@ characterForm.addEventListener("submit", async (event) => {
     name,
     element: document.querySelector("#newElement").value,
     weapon: document.querySelector("#newWeapon").value,
-    version: document.querySelector("#newVersion").value,
     rarity: document.querySelector("#newRarity").value,
+    isPublic: document.querySelector("#newVisibility").value === "public",
     image,
   };
 
@@ -566,7 +570,6 @@ characterForm.addEventListener("submit", async (event) => {
     );
   } else {
     state.characters.push(createCharacter(payload));
-    selectedId = state.characters.at(-1).id;
     showSessionMessage(`${name} 추가됨`, "새 캐릭터를 목록에 추가했습니다");
   }
   saveState();
@@ -754,19 +757,20 @@ function normalizeCharacter(character, resetGoals = false) {
     merged.name = seed.name;
     merged.element = seed.element;
     merged.weapon = seed.weapon;
-    merged.version = seed.version ?? merged.version;
     merged.rarity = String(seed.rarity ?? merged.rarity);
     if (!merged.image || isLegacyPrydwenCharacterImage(merged.image)) {
       merged.image = seed.image || "";
     }
   }
+  delete merged.version;
 
   return {
     ...merged,
     farm: { ...defaultFarm, ...character.farm },
     goalMode: character.goalMode === "custom" ? "custom" : "admin",
-    goals: normalizeGoals(character.goals, resetGoals),
+    goals: normalizeGoals(character.goals, resetGoals, merged),
     currentStats: normalizeCurrentStats(character.currentStats),
+    isPublic: character.isPublic !== false,
   };
 }
 
@@ -782,20 +786,20 @@ function createCharacter(input = {}) {
     name: character.name ?? seed?.name ?? "새 캐릭터",
     element: character.element ?? seed?.element ?? "회절",
     weapon: character.weapon ?? seed?.weapon ?? "직검",
-    version: character.version ?? seed?.version ?? "Ver1.x",
     rarity: String(character.rarity ?? seed?.rarity ?? "5"),
     image: character.image ?? seed?.image ?? "",
+    isPublic: character.isPublic ?? seed?.isPublic ?? true,
     owned: false,
     farm: { ...defaultFarm },
     goalMode: "admin",
-    goals: normalizeGoals(character.goals),
+    goals: normalizeGoals(character.goals, false, character),
     currentStats: normalizeCurrentStats(character.currentStats),
   };
 }
 
-function normalizeGoals(goals = {}, resetValueStats = false) {
+function normalizeGoals(goals = {}, resetValueStats = false, character = {}) {
   return {
-    admin: normalizeGoal(goals.admin, resetValueStats),
+    admin: normalizeGoal(getAdminGoalDefault(character), false),
     custom: normalizeGoal(goals.custom, resetValueStats),
   };
 }
@@ -948,6 +952,48 @@ function getSeedRarity(name) {
   return findSeedCharacter(name)?.rarity;
 }
 
+function loadAdminGoalDefaults() {
+  let savedDefaults = {};
+  try {
+    savedDefaults = JSON.parse(localStorage.getItem(ADMIN_GOALS_KEY) ?? "{}");
+  } catch {
+    localStorage.removeItem(ADMIN_GOALS_KEY);
+  }
+  return {
+    ...goalDefaultSeed,
+    ...savedDefaults,
+  };
+}
+
+function saveAdminGoalDefaults() {
+  localStorage.setItem(ADMIN_GOALS_KEY, JSON.stringify(adminGoalDefaults));
+}
+
+function getCharacterGoalKey(character = {}) {
+  const seed =
+    findSeedCharacter(character.en) ??
+    findSeedCharacter(character.name);
+  return seed?.en ?? character.en ?? character.name ?? "";
+}
+
+function getAdminGoalDefault(character = {}) {
+  const key = getCharacterGoalKey(character);
+  return adminGoalDefaults[key] ?? defaultGoal;
+}
+
+function persistAdminGoal(character) {
+  if (!character || character.goalMode === "custom") return;
+  const key = getCharacterGoalKey(character);
+  if (!key) return;
+  adminGoalDefaults[key] = normalizeGoal(character.goals.admin);
+  saveAdminGoalDefaults();
+}
+
+function saveGoalState(character) {
+  persistAdminGoal(character);
+  saveState();
+}
+
 function findSeedCharacter(name) {
   if (!name) return null;
   return (
@@ -980,6 +1026,16 @@ function getPortableState(options = {}) {
     ...state,
     user: null,
     updatedAt: new Date().toISOString(),
+  });
+
+  portableState.characters = portableState.characters.map((character) => {
+    const { version, ...characterData } = character;
+    return {
+      ...characterData,
+      goals: {
+        custom: character.goals.custom,
+      },
+    };
   });
 
   if (options.includePrivateText === false) {
@@ -1037,7 +1093,7 @@ function getVisibleCharacters() {
         if (currentView === "unowned" && character.owned) return false;
         if (
           currentView === "farming" &&
-          (!character.owned || isGoalComplete(character))
+          isGoalComplete(character)
         )
           return false;
       }
@@ -1287,11 +1343,12 @@ function renderRoster() {
 
   rosterList.querySelectorAll("[data-current-field]").forEach((field) => {
     field.addEventListener("change", () => {
-      if (Number(field.value) < 0) field.value = "0";
+      const normalizedValue = Math.max(0, Number(field.value) || 0);
+      field.value = String(normalizedValue);
       updateCurrentStat(
         field.dataset.character,
         field.dataset.currentField,
-        field.value,
+        normalizedValue,
       );
       updateRenderedStatRowState(
         field.dataset.character,
@@ -1314,6 +1371,8 @@ function renderRoster() {
 }
 
 function renderCategoryRail() {
+  focusStrip.classList.toggle("has-category-filter", sortMode !== "name");
+
   if (sortMode === "name") {
     categoryRail.classList.add("hidden");
     categoryRail.innerHTML = "";
@@ -1404,9 +1463,9 @@ function renderFarmingCard(character) {
         ${renderAvatar(character, "data-select")}
         <div>
           <h3>${escapeHtml(character.name)}</h3>
-          <div class="card-meta-chips">${renderCharacterMetaChips(character)}</div>
+          <div class="card-meta-chips">${renderCharacterMetaChips(character, { showVisibility: adminGoalEditing })}</div>
         </div>
-        <span class="status-pill">${character.owned ? (complete ? "목표달성" : "미달성") : "미보유"}</span>
+        <span class="status-pill">${character.owned ? "" : "미보유 · "}${complete ? "목표달성" : "미달성"}</span>
       </div>
 
       <div class="goal-switch" role="group" aria-label="목표 기준">
@@ -1502,7 +1561,7 @@ function renderFarmingCard(character) {
       }
 
       <label class="complete-check">
-        <input data-manual-complete="${character.id}" type="checkbox" ${character.currentStats.manualComplete ? "checked" : ""} ${character.owned ? "" : "disabled"} />
+        <input data-manual-complete="${character.id}" type="checkbox" ${character.currentStats.manualComplete ? "checked" : ""} />
         목표 달성 처리
       </label>
     </article>
@@ -1546,7 +1605,7 @@ function renderEchoStatRow(character, stat, index, canEditGoal) {
     <div class="echo-stat-row" role="row">
       <span class="branch-cell ${hasBranch ? "has-branch" : ""}">
         <label class="branch-check ${hasBranch ? "" : "hidden"}" title="이 분기 사용">
-          <input data-echo-stat-field="branchChecked" data-character="${character.id}" data-index="${index}" type="checkbox" ${stat.branchChecked ? "checked" : ""} ${character.owned && hasBranch ? "" : "disabled"} />
+          <input data-echo-stat-field="branchChecked" data-character="${character.id}" data-index="${index}" type="checkbox" ${stat.branchChecked ? "checked" : ""} ${hasBranch ? "" : "disabled"} />
         </label>
         <select data-echo-stat-field="variant" data-character="${character.id}" data-index="${index}" ${canEditGoal ? "" : "disabled"}>
           ${statVariantOptions.map((option) => `<option value="${option}" ${stat.variant === option ? "selected" : ""}>${option}</option>`).join("")}
@@ -1573,9 +1632,7 @@ function renderAvatar(character, selectAttribute) {
   const attribute = selectAttribute
     ? ` ${selectAttribute}="${character.id}"`
     : "";
-  const label = character.owned
-    ? `${character.name} 파밍 기록 열기`
-    : `${character.name} 보유 체크 후 기록 가능`;
+  const label = `${character.name} 파밍 기록 열기`;
   return `<button class="avatar" type="button"${attribute} aria-label="${escapeHtml(label)}">${content}</button>`;
 }
 
@@ -1585,8 +1642,8 @@ function renderStatRow(character, stat, index, canEditGoal) {
   const target = Number(stat.target ?? 0);
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
   const hasBranch = stat.variant !== "-";
-  const met = character.owned && branchActive && current >= target;
-  const inputDisabled = character.owned && branchActive ? "" : "disabled";
+  const met = branchActive && current >= target;
+  const inputDisabled = branchActive ? "" : "disabled";
   const targetDisabled = canEditGoal && branchActive ? "" : "disabled";
   const option = getStatOption(stat.key, valueStatOptions);
 
@@ -1607,7 +1664,7 @@ function renderStatRow(character, stat, index, canEditGoal) {
       <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${target}" ${targetDisabled} />
       <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
-        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${character.owned && branchActive ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
+        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${branchActive ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
         ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
@@ -1615,15 +1672,21 @@ function renderStatRow(character, stat, index, canEditGoal) {
 }
 
 function renderIconChip(label, icon) {
-  return `<span class="chip icon-chip">${renderInlineIcon(icon)}${escapeHtml(label)}</span>`;
+  return `<span class="chip icon-chip">${renderInlineIcon(icon)}<span class="chip-label">${escapeHtml(label)}</span></span>`;
 }
 
-function renderCharacterMetaChips(character) {
+function renderVisibilityChip(character) {
+  return character.isPublic === false
+    ? `<span class="chip visibility-chip private">비공개</span>`
+    : `<span class="chip visibility-chip">공개</span>`;
+}
+
+function renderCharacterMetaChips(character, { showVisibility = false } = {}) {
   return `
     <span class="chip rarity-chip">★${escapeHtml(getRarity(character))}</span>
+    ${showVisibility ? renderVisibilityChip(character) : ""}
     ${renderIconChip(character.element, elementIcons[character.element])}
     ${renderIconChip(character.weapon, weaponIcons[character.weapon])}
-    <span class="chip version-chip">${escapeHtml(character.version)}</span>
   `;
 }
 
@@ -1769,12 +1832,6 @@ function sortCharacters(a, b) {
       a.name.localeCompare(b.name, "ko")
     );
   }
-  if (sortMode === "version") {
-    return (
-      a.version.localeCompare(b.version, "ko") ||
-      a.name.localeCompare(b.name, "ko")
-    );
-  }
   if (sortMode === "rarity") {
     return (
       Number(getRarity(b)) - Number(getRarity(a)) ||
@@ -1785,7 +1842,6 @@ function sortCharacters(a, b) {
 }
 
 function getCategoryValue(character) {
-  if (sortMode === "version") return character.version;
   if (sortMode === "rarity") return `★${getRarity(character)}`;
   if (sortMode === "weapon") return character.weapon;
   return character.element;
@@ -1850,7 +1906,7 @@ function updateCharacterField(id, field, value) {
 
 function updateCurrentStat(id, field, value) {
   const character = state.characters.find((item) => item.id === id);
-  if (!character || !character.owned) return;
+  if (!character) return;
   const shouldRerenderRoster = field === "manualComplete";
 
   if (field === "manualComplete") {
@@ -1871,7 +1927,7 @@ function updateCurrentStat(id, field, value) {
   saveState();
   renderStats();
   renderFocusStrip();
-  if (shouldRerenderRoster) {
+  if (shouldRerenderRoster || field in character.currentStats.values || field.includes(":")) {
     renderRoster();
     if (id === selectedId) renderDetail();
   }
@@ -1890,7 +1946,7 @@ function updateGoal(id, field, value, statKey) {
     goal[field] = value;
   }
 
-  saveState();
+  saveGoalState(character);
   renderStats();
   renderRoster();
 }
@@ -1907,7 +1963,7 @@ function updateGoalEchoSet(id, index, field, value) {
   if (field === "join")
     echoSet.join = echoSetJoinOptions.includes(value) ? value : "+";
 
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1922,7 +1978,7 @@ function updateGoalMainEcho(id, index, field, value) {
   if (field === "name") mainEcho.name = value;
   if (targetIndex === 0) goal.mainEcho = mainEcho.name;
 
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1933,7 +1989,7 @@ function addGoalEchoSet(id) {
   if (goal.echoSets.length >= 20) return;
 
   goal.echoSets.push({ join: "+", name: "", pieces: "2 Set" });
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1944,7 +2000,7 @@ function addGoalMainEcho(id) {
   if (goal.mainEchoes.length >= 4) return;
 
   goal.mainEchoes.push({ join: "OR", name: "" });
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1956,7 +2012,7 @@ function removeGoalEchoSet(id, index) {
   if (goal.echoSets.length <= 1 || targetIndex <= 0) return;
 
   goal.echoSets.splice(targetIndex, 1);
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1968,7 +2024,7 @@ function removeGoalMainEcho(id, index) {
   if (goal.mainEchoes.length <= 1 || targetIndex <= 0) return;
 
   goal.mainEchoes.splice(targetIndex, 1);
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1982,7 +2038,7 @@ function updateGoalEchoStatKey(id, index, key) {
   stat.key = option.key;
   stat.label = option.label;
 
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -1990,7 +2046,6 @@ function updateGoalEchoStatField(id, index, field, value) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
   const isBranchCheck = field === "branchChecked";
-  if (isBranchCheck && !character.owned) return;
   if (!isBranchCheck && !canEditActiveGoal(character)) return;
   const stat = getActiveGoal(character).echoStats[Number(index)];
   if (!stat) return;
@@ -2005,7 +2060,7 @@ function updateGoalEchoStatField(id, index, field, value) {
     stat.branchChecked = stat.variant !== "-" && Boolean(value);
   }
 
-  saveState();
+  saveGoalState(character);
   if (isBranchCheck) {
     renderStats();
     renderFocusStrip();
@@ -2052,8 +2107,8 @@ function updateRenderedValueBranchStates(id) {
       if (branchCheckbox) branchCheckbox.checked = branchActive;
       row.classList.toggle("branch-inactive", !branchActive);
       if (targetInput) targetInput.disabled = !canEditGoal || !branchActive;
-      if (currentInput) currentInput.disabled = !character.owned || !branchActive;
-      if (clearButton) clearButton.disabled = !character.owned || !branchActive;
+      if (currentInput) currentInput.disabled = !branchActive;
+      if (clearButton) clearButton.disabled = !branchActive;
       updateRenderedStatRowState(id, Number(row.dataset.index), row);
     });
 }
@@ -2066,7 +2121,7 @@ function removeGoalEchoStat(id, index) {
 
   const targetIndex = Number(index);
   goal.echoStats.splice(targetIndex, 1);
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -2082,7 +2137,7 @@ function updateGoalStatField(id, index, field, value) {
   if (field === "variant")
     stat.variant = statVariantOptions.includes(value) ? value : "-";
 
-  saveState();
+  saveGoalState(character);
   renderStats();
   renderFocusStrip();
 }
@@ -2096,12 +2151,12 @@ function updateRenderedStatRowState(id, index, row) {
   const target = Number(stat.target ?? 0);
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
   row.classList.toggle("branch-inactive", !branchActive);
-  row.classList.toggle("met", character.owned && branchActive && current >= target);
+  row.classList.toggle("met", branchActive && current >= target);
 }
 
 function clearCurrentStat(id, key) {
   const character = state.characters.find((item) => item.id === id);
-  if (!character || !character.owned) return;
+  if (!character) return;
   character.currentStats.values[key] = 0;
   character.currentStats.manualComplete = false;
   if (character.farm.priority === "done") character.farm.priority = "mid";
@@ -2130,7 +2185,7 @@ function addGoalStat(id) {
     cost: "COST 1",
     variant: "-",
   });
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -2151,7 +2206,7 @@ function addGoalEchoStat(id) {
     variant: "-",
     branchChecked: false,
   });
-  saveState();
+  saveGoalState(character);
   renderRoster();
 }
 
@@ -2163,7 +2218,7 @@ function removeGoalStat(id, index) {
 
   const targetIndex = Number(index);
   goal.stats.splice(targetIndex, 1);
-  saveState();
+  saveGoalState(character);
   renderStats();
   renderRoster();
 }
@@ -2184,7 +2239,7 @@ function updateGoalStatKey(id, index, key) {
   if (!(currentKey in character.currentStats.values)) {
     character.currentStats.values[currentKey] = 0;
   }
-  saveState();
+  saveGoalState(character);
   renderStats();
   renderRoster();
 }
@@ -2225,6 +2280,8 @@ function renderFocusStrip() {
   const focusItems = state.characters
     .filter((character) => character.owned)
     .sort((a, b) => {
+      const completeScore = Number(isGoalComplete(a)) - Number(isGoalComplete(b));
+      if (completeScore) return completeScore;
       const priorityScore =
         getPriorityScore(b.farm.priority) - getPriorityScore(a.farm.priority);
       return (
@@ -2238,7 +2295,7 @@ function renderFocusStrip() {
     focusStrip.innerHTML = `
       <article class="focus-card empty-focus">
         <p class="eyebrow">Focus</p>
-        <h2>오늘의 파밍 대기열이 비어 있습니다</h2>
+        <h2>보유 처리된 캐릭터가 없습니다</h2>
       </article>
     `;
     return;
@@ -2277,7 +2334,9 @@ function renderFocusStrip() {
 function updateFocusStripStickiness() {
   if (typeof focusStripSentinel.getBoundingClientRect !== "function") return;
   const sentinelTop = focusStripSentinel.getBoundingClientRect().top;
+  const toolbarStyle = toolbar ? getComputedStyle(toolbar) : null;
   const toolbarBottom =
+    toolbarStyle?.position === "sticky" &&
     typeof toolbar?.getBoundingClientRect === "function"
       ? toolbar.getBoundingClientRect().bottom
       : 0;
@@ -2338,8 +2397,9 @@ function openCharacterDialog(id = "") {
   document.querySelector("#newImageFile").value = "";
   document.querySelector("#newElement").value = character?.element ?? "회절";
   document.querySelector("#newWeapon").value = character?.weapon ?? "직검";
-  document.querySelector("#newVersion").value = character?.version ?? "Ver1.x";
   document.querySelector("#newRarity").value = getRarity(character ?? {});
+  document.querySelector("#newVisibility").value =
+    character?.isPublic === false ? "private" : "public";
   deleteCharacterButton.classList.toggle("hidden", !character);
   dialog.querySelector("h2").textContent = character
     ? "캐릭터 편집"
@@ -2352,6 +2412,7 @@ function renderDetail() {
   const character = state.characters.find(
     (item) => item.id === selectedId && item.owned,
   );
+  detailPanel.classList.toggle("is-empty", !character);
   if (!character) {
     detailPanel.innerHTML = `
       <div class="empty-state">
@@ -2370,7 +2431,9 @@ function renderDetail() {
   fragment.querySelector(".avatar").innerHTML = character.image
     ? `<img src="${escapeHtml(character.image)}" alt="" loading="lazy" />`
     : escapeHtml(getInitial(character.name));
-  fragment.querySelector(".detail-element").textContent = "보유 캐릭터";
+  fragment.querySelector(".detail-element").textContent = character.owned
+    ? "보유 캐릭터"
+    : "미보유 캐릭터";
   fragment.querySelector(".detail-name").textContent = character.name;
   fragment.querySelector(".detail-meta").innerHTML =
     renderCharacterMetaChips(character);
@@ -2537,7 +2600,6 @@ function getGoalProgress(character) {
 }
 
 function isGoalComplete(character) {
-  if (!character.owned) return false;
   if (character.currentStats.manualComplete) return true;
   return getGoalProgress(character) >= 100;
 }
@@ -2828,8 +2890,11 @@ async function ensureCloud() {
         const remoteState = normalizeState(snapshot.data());
         state = chooseNewerState(state, remoteState);
         selectedId =
+          state.characters.find(
+            (character) => character.id === selectedId && character.owned,
+          )?.id ??
           state.characters.find((character) => character.owned)?.id ??
-          selectedId;
+          null;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         render();
       }

@@ -1,4 +1,4 @@
-# 명조 육성 기록장
+# 내가 어디까지 잘 키웠더라
 
 명조 캐릭터 보유 여부를 체크하고, 보유 캐릭터에 한해 파밍 상태를 기록하는 정적 웹앱입니다.
 
@@ -8,9 +8,9 @@
 
 - 캐릭터 보유 여부 체크
 - 보유 관리/파밍 관리 탭 전환
-- 이름/등급/속성/무기/출시 버전 정렬과 정렬 기준별 카테고리 필터
+- 이름/등급/속성/무기 정렬과 정렬 기준별 카테고리 필터
 - 관리자용 캐릭터 추가/편집/제거
-- 캐릭터 이미지 URL/파일, 무기, 속성, 출시 버전, 등급 관리
+- 캐릭터 이미지 URL/파일, 무기, 속성, 등급, 공개 여부 관리
 - 이미지 URL 입력 시 유효 이미지와 2MB 이하 용량 검증 후 저장
 - Prydwen 기반 속성, 무기, 스테이터스, 에코셋 아이콘 표시
 - 보유 관리 카드의 자물쇠 아이콘, 등급/속성/보유 상태, 캐릭터 배경 이미지 표시
@@ -24,7 +24,7 @@
 - 사용자 수동 목표 달성 체크
 - 파밍 관리 탭의 전체/보유/미보유/목표달성/미달성 다중 필터
 - 진행률, 보유 수, 파밍 중 캐릭터 수 요약
-- 검색, 보유/파밍 중 필터, 이름/등급/속성/무기/출시 버전 정렬
+- 검색, 보유/파밍 중 필터, 이름/등급/속성/무기 정렬
 - 캐릭터 직접 추가
 - `data/characters.js` 기반 기본 캐릭터 목록
 - 브라우저 `localStorage` 자동 저장
@@ -47,9 +47,9 @@
 
 GitHub Pages에 배포할 때는 이 폴더의 `index.html`, `styles.css`, `app.js`, `assets/`를 그대로 올리면 됩니다.
 
-`manifest.webmanifest`, `sw.js`, `.nojekyll`, `app-config.js`, `data/characters.js`도 같은 루트에 함께 올려야 설치형 웹앱과 오프라인 캐시가 정상 동작합니다.
+`manifest.webmanifest`, `sw.js`, `.nojekyll`, `app-config.js`, `data/characters.js`, `data/goal-defaults.js`, `data/goal-defaults.json`도 같은 루트에 함께 올려야 설치형 웹앱과 오프라인 캐시가 정상 동작합니다.
 
-`app-config.js`와 `data/characters.js`는 배포 후 갱신이 잦은 파일이라 서비스워커가 네트워크 우선으로 확인합니다.
+`app-config.js`, `data/characters.js`, `data/goal-defaults.js`, `data/goal-defaults.json`는 배포 후 갱신이 잦은 파일이라 서비스워커가 네트워크 우선으로 확인합니다.
 
 ## GitHub Pages 배포
 
@@ -71,7 +71,7 @@ node scripts/verify.mjs
 
 ## 캐릭터 목록 갱신
 
-기본 캐릭터 목록은 `data/characters.js`에서 관리합니다.
+기본 캐릭터 목록은 `data/characters.js`에서, 관리자 목표 기본값은 `data/goal-defaults.json`에서 관리합니다.
 
 새 캐릭터가 추가되면 아래 형식으로 항목을 더하면 됩니다.
 

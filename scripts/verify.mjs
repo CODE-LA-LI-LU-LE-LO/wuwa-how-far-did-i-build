@@ -82,7 +82,7 @@ function createDomStub() {
   };
 }
 
-function smokeLoadApp({ configSource, characterSource, appSource }) {
+function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSource }) {
   const storage = new Map();
   const sandbox = {
     Blob: class {},
@@ -119,6 +119,7 @@ function smokeLoadApp({ configSource, characterSource, appSource }) {
   vm.createContext(sandbox);
   vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
   vm.runInContext(characterSource, sandbox, { filename: "data/characters.js" });
+  vm.runInContext(goalDefaultsSource, sandbox, { filename: "data/goal-defaults.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
 }
 
@@ -131,6 +132,8 @@ const requiredRootFiles = [
   "firestore.rules",
   "index.html",
   "manifest.webmanifest",
+  "data/goal-defaults.json",
+  "data/goal-defaults.js",
   "styles.css",
   "sw.js",
 ];
@@ -265,6 +268,7 @@ try {
   smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.js"),
+    goalDefaultsSource: await readText("data/goal-defaults.js"),
     appSource,
   });
 } catch (error) {

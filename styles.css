@@ -128,6 +128,13 @@ h1 {
   line-height: 1;
 }
 
+.app-version {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 h2 {
   margin-bottom: 0;
   font-size: 1.28rem;
@@ -229,6 +236,23 @@ h2 {
   margin-bottom: 0;
   font-size: 1rem;
   line-height: 1.8;
+}
+
+.reference-links {
+  display: grid;
+  gap: 8px;
+}
+
+.reference-links a {
+  color: var(--soft);
+  font-weight: 800;
+  line-height: 1.45;
+  text-decoration-color: rgba(92, 228, 208, 0.5);
+  text-underline-offset: 4px;
+}
+
+.reference-links a:hover {
+  color: var(--accent);
 }
 
 .stat-grid {
@@ -343,8 +367,8 @@ h2 {
 }
 
 .focus-strip.is-stuck {
-  margin-inline: -12px;
-  padding: 6px 12px;
+  margin-inline: 0;
+  padding: 16px 12px 8px;
   background: rgba(8, 11, 16, 0.88);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(18px) saturate(130%);
@@ -454,13 +478,29 @@ h2 {
   font-weight: 800;
 }
 
-.focus-meta span,
+.focus-meta > span,
 .focus-meta strong,
-.card-meta-chips span,
-.detail-meta span {
+.card-meta-chips > span,
+.detail-meta > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 8px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 999px;
+  line-height: 1;
+}
+
+.visibility-chip {
+  border-color: rgba(92, 228, 208, 0.34) !important;
+  background: rgba(92, 228, 208, 0.1);
+  color: #c8fff6;
+}
+
+.visibility-chip.private {
+  border-color: rgba(255, 184, 122, 0.42) !important;
+  background: rgba(255, 184, 122, 0.12);
+  color: #ffd9b8;
 }
 
 .focus-action {
@@ -478,7 +518,7 @@ h2 {
 
 .focus-strip.is-stuck .focus-open {
   position: absolute;
-  right: 10px;
+  right: 2px;
   bottom: 10px;
   width: 32px;
   min-width: 32px;
@@ -493,15 +533,23 @@ h2 {
 }
 
 .focus-strip.is-stuck .focus-meta {
-  padding-right: 38px;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 5px;
+  padding-right: 36px;
 }
 
 .focus-strip.is-stuck .focus-meta .chip {
   width: 30px;
   height: 30px;
   justify-content: center;
+  gap: 0;
   padding: 0;
   font-size: 0;
+}
+
+.focus-strip.is-stuck .focus-meta .chip-label {
+  display: none;
 }
 
 .focus-strip.is-stuck .focus-meta .rarity-chip {
@@ -509,10 +557,6 @@ h2 {
   min-width: 30px;
   padding: 0 8px;
   font-size: 0.72rem;
-}
-
-.focus-strip.is-stuck .focus-meta .version-chip {
-  display: none;
 }
 
 .focus-strip.is-stuck .focus-meta .inline-icon {
@@ -526,7 +570,7 @@ h2 {
   min-width: 38px;
   height: 30px;
   justify-content: center;
-  padding: 0 8px;
+  padding: 0 6px;
   font-size: 0.72rem;
 }
 
@@ -1704,14 +1748,31 @@ dialog::backdrop {
 @media (min-width: 1041px) and (max-width: 1320px) {
   .toolbar {
     top: 12px;
-    z-index: 29;
+    z-index: 31;
     flex-wrap: nowrap;
     overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 16px;
+    scrollbar-gutter: stable;
     scrollbar-width: thin;
   }
 
+  .toolbar::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .toolbar::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(9, 13, 19, 0.78);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.34);
+  }
+
   .focus-strip {
-    top: 84px;
+    top: 96px;
+  }
+
+  .focus-strip.has-category-filter {
+    top: 166px;
   }
 
   .toolbar > * {
@@ -1731,12 +1792,15 @@ dialog::backdrop {
   }
 
   .category-rail {
-    position: static;
+    position: sticky;
+    top: 104px;
+    z-index: 30;
     display: flex;
     overflow-x: auto;
     width: 100%;
-    margin: 0 0 14px;
+    margin: 8px 0 14px;
     flex: 0 0 auto;
+    scrollbar-width: thin;
   }
 
   .category-rail button {
@@ -1759,6 +1823,10 @@ dialog::backdrop {
     min-height: 0;
     overflow: auto;
     box-shadow: 0 22px 62px rgba(0, 0, 0, 0.46);
+  }
+
+  .detail-panel.is-floating.is-empty {
+    display: none;
   }
 
   .detail-panel-toggle {
@@ -1901,6 +1969,26 @@ dialog::backdrop {
   .toolbar {
     position: static;
     flex-wrap: wrap;
+  }
+
+  .focus-strip.is-stuck .focus-card {
+    flex: 0 0 204px;
+    min-height: 68px;
+    padding: 8px;
+  }
+
+  .focus-strip.is-stuck .focus-card h2 {
+    font-size: 0.92rem;
+  }
+
+  .focus-strip.is-stuck .focus-meta .chip {
+    width: 28px;
+    height: 28px;
+  }
+
+  .focus-strip.is-stuck .focus-open {
+    right: 2px;
+    bottom: 8px;
   }
 
   .search-box,
