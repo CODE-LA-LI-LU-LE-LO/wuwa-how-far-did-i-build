@@ -1485,7 +1485,7 @@ select option {
 }
 
 .table-heading {
-  margin-top: 12px;
+  margin-top: 0px;
   color: var(--soft);
   font-size: 0.86rem;
   font-weight: 900;
