@@ -1750,8 +1750,8 @@ function renderFarmingCard(character) {
       <div class="goal-switch" role="group" aria-label="목표 기준">
         <button class="${character.goalMode !== "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="admin" type="button">목표</button>
         <button class="${character.goalMode === "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="custom" type="button">수동 입력</button>
-        ${isAdmin() ? `<button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>` : ""}
-        ${!isAdmin() && character.goalMode === "custom" ? `<button class="${isCustomGoalEditing ? "active" : ""}" data-toggle-custom-goal="${character.id}" type="button">편집</button>` : ""}
+        ${isAdmin() && character.goalMode !== "custom" ? `<button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>` : ""}
+        ${character.goalMode === "custom" ? `<button class="${isCustomGoalEditing ? "active" : ""}" data-toggle-custom-goal="${character.id}" type="button">편집</button>` : ""}
       </div>
 
       <div class="target-grid">
@@ -2114,14 +2114,14 @@ function getActiveGoalStats(character) {
 }
 
 function isCustomGoalEditEnabled(character) {
-  return (
-    character.goalMode === "custom" &&
-    (isAdmin() || customGoalEditingId === character.id)
-  );
+  return character.goalMode === "custom" && customGoalEditingId === character.id;
 }
 
 function canEditActiveGoal(character) {
-  return isCustomGoalEditEnabled(character) || (isAdmin() && adminGoalEditing);
+  return (
+    isCustomGoalEditEnabled(character) ||
+    (character.goalMode !== "custom" && isAdmin() && adminGoalEditing)
+  );
 }
 
 function sortCharacters(a, b) {
