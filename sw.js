@@ -1,4 +1,4 @@
-const CACHE_NAME = "ww-farming-tracker-v2";
+const CACHE_NAME = "ww-farming-tracker-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,6 +9,9 @@ const APP_SHELL = [
   "./assets/app-backdrop.png",
 ];
 const NETWORK_FIRST_PATHS = [
+  "/index.html",
+  "/app.js",
+  "/styles.css",
   "/app-config.js",
   "/data/characters.json",
   "/data/goal-defaults.json",

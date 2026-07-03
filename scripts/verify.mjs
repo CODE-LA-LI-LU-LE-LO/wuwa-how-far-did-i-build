@@ -294,6 +294,9 @@ for (const [index, character] of (characterSeed ?? []).entries()) {
 
 const sw = await readText("sw.js");
 if (!sw.includes("NETWORK_FIRST_PATHS")) fail("service worker missing network-first list");
+for (const networkFirstPath of ["/index.html", "/app.js", "/styles.css"]) {
+  if (!sw.includes(networkFirstPath)) fail(`service worker should network-first ${networkFirstPath}`);
+}
 if (!sw.includes("/app-config.js")) fail("service worker should network-first app-config.js");
 if (!sw.includes("/data/characters.json")) fail("service worker should network-first data/characters.json");
 if (!sw.includes("/data/goal-defaults.json")) fail("service worker should network-first data/goal-defaults.json");

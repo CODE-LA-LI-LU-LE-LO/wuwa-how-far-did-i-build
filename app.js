@@ -652,28 +652,11 @@ characterForm.addEventListener("submit", async (event) => {
   if (existing) {
     Object.assign(existing, payload);
     selectedId = existing.owned ? existing.id : selectedId;
-    targetCharacter = existing;
   } else {
-    targetCharacter = createCharacter(payload);
-    state.characters.push(targetCharacter);
+    state.characters.push(createCharacter(payload));
   }
 
-  try {
-    await saveCloudAdminCharacters();
-  } catch {
-    if (existing && previousCharacter) {
-      Object.assign(existing, previousCharacter);
-    } else if (targetCharacter) {
-      state.characters = state.characters.filter(
-        (character) => character.id !== targetCharacter.id,
-      );
-    }
-    selectedId = previousSelectedId;
-    render();
-    return;
-  }
-
-  saveState();
+  saveState({ skipCloud: true });
   if (existing) {
     showSessionMessage(
       `${existing.name} 수정됨`,
@@ -3212,45 +3195,6 @@ function applyAdminGoalDefaults() {
       },
     }),
   );
-}
-
-async function loadCloudAdminData() {
-  if (!cloud?.auth.currentUser) return;
-  try {
-    const charactersSnapshot = await cloud.getDoc(
-      cloud.doc(cloud.db, "admin", "characters"),
-    );
-
-    if (charactersSnapshot.exists()) {
-      const adminCharacters = charactersSnapshot.data()?.characters;
-      if (Array.isArray(adminCharacters)) mergeAdminCharacters(adminCharacters);
-    }
-  } catch (error) {
-    showSessionMessage(
-      "관리자 캐릭터 데이터 불러오기 실패",
-      getReadableCloudError(error),
-    );
-  }
-}
-
-async function saveCloudAdminCharacters() {
-  if (!isAdmin()) {
-    throw new Error("admin-auth-required");
-  }
-  try {
-    const ref = cloud.doc(cloud.db, "admin", "characters");
-    await cloud.setDoc(ref, getAdminCharactersState(), { merge: true });
-  } catch (error) {
-    logCloudError(error, {
-      action: "save-admin-characters",
-      path: "admin/characters",
-    });
-    showSessionMessage(
-      "관리자 캐릭터 저장 실패",
-      getReadableCloudError(error),
-    );
-    throw error;
-  }
 }
 
 function chooseNewerState(localState, remoteState) {
