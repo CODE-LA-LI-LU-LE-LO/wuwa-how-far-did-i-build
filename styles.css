@@ -369,6 +369,16 @@ h2 {
   color: #061417;
 }
 
+.segmented-label {
+  display: inline-grid;
+  place-items: center;
+  min-height: 38px;
+  padding: 0 8px;
+  color: var(--soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
 .share-notice h2 {
   font-size: 1rem;
 }
@@ -401,7 +411,7 @@ h2 {
 .focus-strip.is-stuck {
   margin-inline: 0;
   padding: 16px 12px 8px;
-  background: rgba(8, 11, 16, 0.88);
+  background: linear-gradient(180deg, rgba(8, 11, 16, 0.9) 0%, rgba(8, 11, 16, 0.66) 58%, rgba(8, 11, 16, 0.24) 100%);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(18px) saturate(130%);
 }
@@ -445,6 +455,10 @@ h2 {
   flex-basis: 226px;
   min-height: 72px;
   padding: 10px;
+  background:
+    linear-gradient(180deg, rgba(8, 11, 16, 0.82) 0%, rgba(8, 11, 16, 0.58) 54%, rgba(8, 11, 16, 0.18) 100%),
+    linear-gradient(135deg, color-mix(in srgb, var(--element-color, var(--accent)), transparent 82%), rgba(255, 255, 255, 0.06)),
+    rgba(12, 18, 26, 0.5);
 }
 
 .focus-card > :not(.card-backdrop-image) {
@@ -533,6 +547,18 @@ h2 {
   border-color: rgba(255, 184, 122, 0.42) !important;
   background: rgba(255, 184, 122, 0.12);
   color: #ffd9b8;
+}
+
+.priority-label {
+  color: var(--muted);
+}
+
+.priority-label.priority-mid {
+  color: #ffbd7a;
+}
+
+.priority-label.priority-high {
+  color: #ff8f9f;
 }
 
 .focus-action {
@@ -1485,7 +1511,7 @@ select option {
 }
 
 .table-heading {
-  margin-top: 0px;
+  margin-top: 0;
   color: var(--soft);
   font-size: 0.86rem;
   font-weight: 900;

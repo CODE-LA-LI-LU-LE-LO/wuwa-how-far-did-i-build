@@ -430,6 +430,7 @@ const deleteCharacterButton = document.querySelector("#deleteCharacterButton");
 const appTabs = document.querySelectorAll("[data-tab]");
 const sortButtons = document.querySelectorAll("[data-sort]");
 const farmingFilterInputs = document.querySelectorAll("[data-farm-filter]");
+const visibilityFilterButtons = document.querySelectorAll("[data-visibility-filter]");
 const compactDetailQuery =
   typeof window.matchMedia === "function"
     ? window.matchMedia("(max-width: 1440px)")
@@ -509,6 +510,7 @@ let searchTerm = "";
 let activeTab = "ownership";
 let sortMode = "name";
 let activeCategory = "all";
+let visibilityFilter = "all";
 let farmingFilters = new Set(["owned"]);
 let adminGoalEditing = false;
 let customGoalEditingId = null;
@@ -547,6 +549,17 @@ document.querySelectorAll("[data-view]").forEach((button) => {
       .querySelectorAll("[data-view]")
       .forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
+    render();
+  });
+});
+
+
+visibilityFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    visibilityFilter = button.dataset.visibilityFilter;
+    visibilityFilterButtons.forEach((item) =>
+      item.classList.toggle("active", item === button),
+    );
     render();
   });
 });
@@ -1211,6 +1224,15 @@ function renderToolbarMode() {
     .querySelector(".farming-filter")
     .classList.toggle("hidden", activeTab !== "farming");
   document
+    .querySelector(".visibility-filter")
+    .classList.toggle("hidden", !isAdmin());
+  if (!isAdmin() && visibilityFilter !== "public") {
+    visibilityFilter = "public";
+    visibilityFilterButtons.forEach((button) =>
+      button.classList.toggle("active", button.dataset.visibilityFilter === "public"),
+    );
+  }
+  document
     .querySelector("#addCharacterButton")
     .classList.toggle("hidden", activeTab === "farming" || !isAdmin());
   listEyebrow.textContent = activeTab === "ownership" ? "Ownership" : "Farming";
@@ -1235,6 +1257,7 @@ function getVisibleCharacters() {
       }
       if (activeTab === "farming" && !matchesFarmingFilters(character))
         return false;
+      if (!matchesVisibilityFilter(character)) return false;
       if (
         activeCategory !== "all" &&
         getCategoryValue(character) !== activeCategory
@@ -1572,8 +1595,7 @@ function renderOwnershipCard(character) {
       <button class="card-body card-select-surface" data-select="${character.id}" type="button">
         <h3>${escapeHtml(character.name)}</h3>
         <div class="chips">
-          <span class="chip rarity-chip">★${escapeHtml(getRarity(character))}</span>
-          ${renderIconChip(character.element, elementIcons[character.element])}
+          ${renderCharacterMetaChips(character, { showVisibility: isAdmin() })}
           ${character.owned ? `<span class="chip">${progress}%</span>` : `<span class="chip">미보유</span>`}
         </div>
         <div class="mini-progress" aria-hidden="true">
@@ -1620,7 +1642,7 @@ function renderFarmingCard(character) {
         ${renderAvatar(character, "data-select")}
         <div>
           <h3>${escapeHtml(character.name)}</h3>
-          <div class="card-meta-chips">${renderCharacterMetaChips(character, { showVisibility: isAdmin() && adminGoalEditing })}</div>
+          <div class="card-meta-chips">${renderCharacterMetaChips(character, { showVisibility: isAdmin() })}</div>
         </div>
         <span class="status-pill">${character.owned ? "" : "미보유 · "}${complete ? "목표달성" : "미달성"}</span>
       </div>
@@ -2044,6 +2066,12 @@ function getWeaponSortScore(weapon) {
 
 function getElementSortScore(element) {
   return element === "미정" ? 1 : 0;
+}
+
+function matchesVisibilityFilter(character) {
+  if (visibilityFilter === "public") return character.isPublic !== false;
+  if (visibilityFilter === "private") return character.isPublic === false;
+  return true;
 }
 
 function matchesFarmingFilters(character) {
@@ -2477,7 +2505,7 @@ function renderFocusStrip() {
         <article class="focus-card ${complete ? "complete" : ""}" style="--element-color:${color}">
           ${character.image ? `<img class="card-backdrop-image" src="${escapeHtml(character.image)}" alt="" loading="lazy" />` : ""}
           <div>
-            <p class="eyebrow">${escapeHtml(getPriorityLabel(character.farm.priority))}</p>
+            <p class="eyebrow priority-label priority-${escapeHtml(character.farm.priority)}">${escapeHtml(getPriorityLabel(character.farm.priority))}</p>
             <h2>${escapeHtml(character.name)}</h2>
             <div class="focus-meta">
               ${renderCharacterMetaChips(character)}
