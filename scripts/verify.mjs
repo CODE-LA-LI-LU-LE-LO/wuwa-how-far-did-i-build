@@ -34,10 +34,7 @@ function localReferences(html) {
 }
 
 function loadCharacterSeed(source) {
-  const sandbox = { window: {} };
-  vm.createContext(sandbox);
-  vm.runInContext(source, sandbox, { filename: "data/characters.js" });
-  return sandbox.window.WW_CHARACTER_SEED;
+  return JSON.parse(source);
 }
 
 function createDomStub() {
@@ -82,7 +79,7 @@ function createDomStub() {
   };
 }
 
-function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSource }) {
+async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSource }) {
   const storage = new Map();
   const sandbox = {
     Blob: class {},
@@ -107,6 +104,9 @@ function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSo
     },
     navigator: {},
     fetch: async (url) => {
+      if (String(url).endsWith("data/characters.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(characterSource) };
+      }
       if (String(url).endsWith("data/goal-defaults.json")) {
         return { ok: true, status: 200, json: async () => JSON.parse(goalDefaultsSource) };
       }
@@ -124,8 +124,8 @@ function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSo
 
   vm.createContext(sandbox);
   vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
-  vm.runInContext(characterSource, sandbox, { filename: "data/characters.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
+  await new Promise((resolve) => setTimeout(resolve, 0));
   return sandbox;
 }
 
@@ -140,6 +140,7 @@ const requiredRootFiles = [
   "manifest.webmanifest",
   "styles.css",
   "sw.js",
+  "data/characters.json",
   "data/goal-defaults.json",
 ];
 
@@ -264,7 +265,6 @@ for (const requiredAdminSource of [
   "state.user?.role === userRoles.admin",
   "cloud.doc(cloud.db, \"admins\", user.uid)",
   "adminSnapshot.data()?.enabled === true",
-  "async function saveCloudAdminCharacters()",
   "async function loadGoalDefaultsData()",
   `fetch("data/goal-defaults.json"`,
   "function getGoalDefaultsExportData()",
@@ -275,7 +275,7 @@ for (const requiredAdminSource of [
   }
 }
 
-const characterSeed = loadCharacterSeed(await readText("data/characters.js"));
+const characterSeed = loadCharacterSeed(await readText("data/characters.json"));
 if (!Array.isArray(characterSeed) || characterSeed.length < 60) {
   fail("character seed should include at least 60 entries");
 }
@@ -295,11 +295,11 @@ for (const [index, character] of (characterSeed ?? []).entries()) {
 const sw = await readText("sw.js");
 if (!sw.includes("NETWORK_FIRST_PATHS")) fail("service worker missing network-first list");
 if (!sw.includes("/app-config.js")) fail("service worker should network-first app-config.js");
-if (!sw.includes("/data/characters.js")) fail("service worker should network-first data/characters.js");
+if (!sw.includes("/data/characters.json")) fail("service worker should network-first data/characters.json");
 if (!sw.includes("/data/goal-defaults.json")) fail("service worker should network-first data/goal-defaults.json");
 const appShell = sw.match(/const APP_SHELL = \[([\s\S]*?)\];/)?.[1] ?? "";
 if (appShell.includes("app-config.js")) fail("app-config.js should not be precached");
-if (appShell.includes("data/characters.js")) fail("data/characters.js should not be precached");
+if (appShell.includes("data/characters.json")) fail("data/characters.json should not be precached");
 if (appShell.includes("data/goal-defaults.json")) fail("data/goal-defaults.json should not be precached");
 
 const rules = await readText("firestore.rules");
@@ -311,8 +311,6 @@ for (const requiredRuleSource of [
   "allow get: if signedIn() && request.auth.uid == userId;",
   "allow list: if false;",
   "allow create, update, delete: if false;",
-  "match /admin/{docId}",
-  "allow write: if isAdmin();",
 ]) {
   if (!rules.includes(requiredRuleSource)) {
     fail(`firestore rules missing admin protection: ${requiredRuleSource}`);
@@ -320,9 +318,9 @@ for (const requiredRuleSource of [
 }
 
 try {
-  smokeLoadApp({
+  await smokeLoadApp({
     configSource: await readText("app-config.js"),
-    characterSource: await readText("data/characters.js"),
+    characterSource: await readText("data/characters.json"),
     goalDefaultsSource,
     appSource,
   });
@@ -331,7 +329,7 @@ try {
 }
 
 try {
-  const missingConfigSandbox = smokeLoadApp({
+  const missingConfigSandbox = await smokeLoadApp({
     configSource: `
       window.WW_TRACKER_CONFIG = {
         firebase: {
@@ -342,7 +340,8 @@ try {
         },
       };
     `,
-    characterSource: await readText("data/characters.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
     appSource,
   });
   if (missingConfigSandbox.isAdmin() !== false) {
