@@ -82,7 +82,7 @@ function createDomStub() {
   };
 }
 
-function smokeLoadApp({ configSource, characterSource, appSource }) {
+function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSource }) {
   const storage = new Map();
   const sandbox = {
     Blob: class {},
@@ -106,6 +106,12 @@ function smokeLoadApp({ configSource, characterSource, appSource }) {
       protocol: "https:",
     },
     navigator: {},
+    fetch: async (url) => {
+      if (String(url).endsWith("data/goal-defaults.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(goalDefaultsSource) };
+      }
+      return { ok: false, status: 404, json: async () => ({}) };
+    },
     window: null,
     addEventListener(event, callback) {
       if (event === "load") callback();
@@ -134,6 +140,7 @@ const requiredRootFiles = [
   "manifest.webmanifest",
   "styles.css",
   "sw.js",
+  "data/goal-defaults.json",
 ];
 
 const requiredIconFiles = [
@@ -172,6 +179,12 @@ for (let index = 1; index <= 31; index += 1) {
 
 const html = await readText("index.html");
 const appSource = await readText("app.js");
+const goalDefaultsSource = await readText("data/goal-defaults.json");
+try {
+  JSON.parse(goalDefaultsSource);
+} catch (error) {
+  fail(`data/goal-defaults.json must be valid JSON: ${error.message}`);
+}
 for (const ref of localReferences(html)) {
   await mustExist(ref);
 }
@@ -252,9 +265,9 @@ for (const requiredAdminSource of [
   "cloud.doc(cloud.db, \"admins\", user.uid)",
   "adminSnapshot.data()?.enabled === true",
   "async function saveCloudAdminCharacters()",
-  "async function loadCloudGoalData()",
-  "cloud.doc(cloud.db, \"goal\", \"data\")",
-  "async function saveCloudAdminGoalDefaults()",
+  "async function loadGoalDefaultsData()",
+  `fetch("data/goal-defaults.json"`,
+  "function getGoalDefaultsExportData()",
   "if (!isAdmin()) return;",
 ]) {
   if (!appSource.includes(requiredAdminSource)) {
@@ -283,9 +296,11 @@ const sw = await readText("sw.js");
 if (!sw.includes("NETWORK_FIRST_PATHS")) fail("service worker missing network-first list");
 if (!sw.includes("/app-config.js")) fail("service worker should network-first app-config.js");
 if (!sw.includes("/data/characters.js")) fail("service worker should network-first data/characters.js");
+if (!sw.includes("/data/goal-defaults.json")) fail("service worker should network-first data/goal-defaults.json");
 const appShell = sw.match(/const APP_SHELL = \[([\s\S]*?)\];/)?.[1] ?? "";
 if (appShell.includes("app-config.js")) fail("app-config.js should not be precached");
 if (appShell.includes("data/characters.js")) fail("data/characters.js should not be precached");
+if (appShell.includes("data/goal-defaults.json")) fail("data/goal-defaults.json should not be precached");
 
 const rules = await readText("firestore.rules");
 if (!rules.includes("match /profiles/{userId}")) fail("firestore rules must protect profiles/{userId}");
@@ -298,9 +313,6 @@ for (const requiredRuleSource of [
   "allow create, update, delete: if false;",
   "match /admin/{docId}",
   "allow write: if isAdmin();",
-  "match /goal/{docId}",
-  "allow read: if true;",
-  "allow create, update, delete: if isAdmin();",
 ]) {
   if (!rules.includes(requiredRuleSource)) {
     fail(`firestore rules missing admin protection: ${requiredRuleSource}`);
@@ -311,6 +323,7 @@ try {
   smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.js"),
+    goalDefaultsSource,
     appSource,
   });
 } catch (error) {

@@ -416,6 +416,7 @@ const googleButton = document.querySelector("#googleButton");
 const dialog = document.querySelector("#characterDialog");
 const characterForm = document.querySelector("#characterForm");
 const importInput = document.querySelector("#importInput");
+const exportGoalDefaultsButton = document.querySelector("#exportGoalDefaultsButton");
 const shareNotice = document.querySelector("#shareNotice");
 const saveSnapshotButton = document.querySelector("#saveSnapshotButton");
 const closeShareButton = document.querySelector("#closeShareButton");
@@ -716,6 +717,23 @@ document.querySelector("#exportButton").addEventListener("click", () => {
   link.click();
   URL.revokeObjectURL(url);
   showSessionMessage("백업 파일 생성", "현재 기록을 JSON으로 저장했습니다");
+});
+
+
+exportGoalDefaultsButton.addEventListener("click", () => {
+  if (!isAdmin()) return;
+  const data = JSON.stringify(getGoalDefaultsExportData(), null, 2);
+  const blob = new Blob([`${data}\n`], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "goal-defaults.json";
+  link.click();
+  URL.revokeObjectURL(url);
+  showSessionMessage(
+    "목표 JSON 생성",
+    "다운로드한 파일을 data/goal-defaults.json으로 반영하세요",
+  );
 });
 
 saveSnapshotButton.addEventListener("click", () => {
@@ -1043,7 +1061,10 @@ function getSeedRarity(name) {
 }
 
 function saveAdminGoalDefaults() {
-  saveCloudAdminGoalDefaults();
+  showSessionMessage(
+    "목표 기본값 편집됨",
+    "목표 json 다운로드로 data/goal-defaults.json에 반영할 파일을 저장하세요",
+  );
 }
 
 function getCharacterGoalKey(character = {}) {
@@ -1170,6 +1191,15 @@ function saveState(options = {}) {
   scheduleCloudSave();
 }
 
+function getGoalDefaultsExportData() {
+  const defaults = {};
+  state.characters.forEach((character) => {
+    const key = getCharacterGoalKey(character);
+    if (key) defaults[key] = normalizeGoal(character.goals.admin);
+  });
+  return defaults;
+}
+
 function getPortableState(options = {}) {
   const portableState = normalizeState({
     ...state,
@@ -1206,6 +1236,7 @@ function getPortableState(options = {}) {
 }
 
 function render() {
+  exportGoalDefaultsButton.classList.toggle("hidden", !isAdmin());
   renderFocusStrip();
   renderToolbarMode();
   renderCategoryRail();
@@ -3076,7 +3107,6 @@ async function ensureCloud() {
       adminGoalEditing = false;
       showSessionMessage("로컬 저장 중", "이 브라우저에 자동 저장됩니다");
       updateGoogleButton("signedOut");
-      await loadCloudGoalData();
       render();
       return;
     }
@@ -3115,7 +3145,6 @@ async function ensureCloud() {
       return;
     }
 
-    await loadCloudGoalData();
     const adminEnabled = await refreshAdminRole(user);
     await loadCloudAdminData();
     render();
@@ -3157,16 +3186,17 @@ async function saveCloudState() {
   }
 }
 
-async function loadCloudGoalData() {
-  if (!cloud) return;
+async function loadGoalDefaultsData() {
   try {
-    const snapshot = await cloud.getDoc(cloud.doc(cloud.db, "goal", "data"));
-    const defaults = snapshot.exists() ? snapshot.data()?.defaults : null;
+    const response = await fetch("data/goal-defaults.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const defaults = await response.json();
     adminGoalDefaults = defaults && typeof defaults === "object" ? defaults : {};
-    applyAdminGoalDefaults();
-  } catch (error) {
-    showSessionMessage("공개 목표 불러오기 실패", getReadableCloudError(error));
+  } catch {
+    adminGoalDefaults = {};
+    showSessionMessage("목표 기본값 불러오기 실패", "data/goal-defaults.json을 확인해주세요");
   }
+  applyAdminGoalDefaults();
 }
 
 function applyAdminGoalDefaults() {
@@ -3210,23 +3240,6 @@ async function saveCloudAdminCharacters() {
       "관리자 캐릭터 저장 실패",
       getReadableCloudError(error),
     );
-  }
-}
-
-async function saveCloudAdminGoalDefaults() {
-  if (!isAdmin()) return;
-  try {
-    const ref = cloud.doc(cloud.db, "goal", "data");
-    await cloud.setDoc(
-      ref,
-      {
-        updatedAt: new Date().toISOString(),
-        defaults: adminGoalDefaults,
-      },
-      { merge: true },
-    );
-  } catch (error) {
-    showSessionMessage("관리자 목표 저장 실패", getReadableCloudError(error));
   }
 }
 
@@ -3278,27 +3291,31 @@ function escapeHtml(value) {
 
 let shouldRenderImmediately = true;
 
-if (isSnapshotMode) {
-  showSessionMessage(
-    "공유 기록 보기",
-    "내 기록으로 저장하기 전까지 기존 저장소는 유지됩니다",
-  );
-} else if (hasFirebaseConfig()) {
-  shouldRenderImmediately = false;
-  ensureCloud().catch(() => {
-    showSessionMessage(
-      "로컬 저장 중",
-      "Google 버튼으로 다시 연결할 수 있습니다",
-    );
-    updateGoogleButton("signedOut");
-    render();
-  });
-} else {
-  updateGoogleButton("setup");
-}
+loadGoalDefaultsData()
+  .catch(() => {})
+  .finally(() => {
+    if (isSnapshotMode) {
+      showSessionMessage(
+        "공유 기록 보기",
+        "내 기록으로 저장하기 전까지 기존 저장소는 유지됩니다",
+      );
+    } else if (hasFirebaseConfig()) {
+      shouldRenderImmediately = false;
+      ensureCloud().catch(() => {
+        showSessionMessage(
+          "로컬 저장 중",
+          "Google 버튼으로 다시 연결할 수 있습니다",
+        );
+        updateGoogleButton("signedOut");
+        render();
+      });
+    } else {
+      updateGoogleButton("setup");
+    }
 
-registerServiceWorker();
-if (shouldRenderImmediately) render();
+    registerServiceWorker();
+    if (shouldRenderImmediately) render();
+  });
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || window.location.protocol === "file:")
