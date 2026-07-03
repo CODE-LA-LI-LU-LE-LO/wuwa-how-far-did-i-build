@@ -434,7 +434,7 @@ const sortButtons = document.querySelectorAll("[data-sort]");
 const farmingFilterInputs = document.querySelectorAll("[data-farm-filter]");
 const compactDetailQuery =
   typeof window.matchMedia === "function"
-    ? window.matchMedia("(max-width: 1320px)")
+    ? window.matchMedia("(max-width: 1440px)")
     : null;
 
 let cloud = null;
@@ -513,6 +513,7 @@ let sortMode = "name";
 let activeCategory = "all";
 let farmingFilters = new Set(["owned"]);
 let adminGoalEditing = false;
+let customGoalEditingId = null;
 
 appTabs.forEach((button) => {
   button.addEventListener("click", () => {
@@ -524,6 +525,7 @@ appTabs.forEach((button) => {
 function setActiveTab(tab) {
   activeTab = tab;
   activeCategory = "all";
+  customGoalEditingId = null;
   appTabs.forEach((item) =>
     item.classList.toggle("active", item.dataset.tab === tab),
   );
@@ -1303,13 +1305,26 @@ function renderRoster() {
   });
 
   rosterList.querySelectorAll("[data-goal-mode]").forEach((button) => {
-    button.addEventListener("click", () =>
+    button.addEventListener("click", () => {
+      if (button.dataset.mode !== "custom") {
+        customGoalEditingId = null;
+      }
       updateCharacterField(
         button.dataset.goalMode,
         "goalMode",
         button.dataset.mode,
-      ),
-    );
+      );
+    });
+  });
+
+  rosterList.querySelectorAll("[data-toggle-custom-goal]").forEach((button) => {
+    button.addEventListener("click", () => {
+      customGoalEditingId =
+        customGoalEditingId === button.dataset.toggleCustomGoal
+          ? null
+          : button.dataset.toggleCustomGoal;
+      renderRoster();
+    });
   });
 
   rosterList.querySelectorAll("[data-toggle-admin-goals]").forEach((button) => {
@@ -1594,6 +1609,7 @@ function renderFarmingCard(character) {
   const goal = getActiveGoal(character);
   const complete = isGoalComplete(character);
   const canEditGoal = canEditActiveGoal(character);
+  const isCustomGoalEditing = isCustomGoalEditEnabled(character);
   const rows = goal.stats
     .map((stat, index) => renderStatRow(character, stat, index, canEditGoal))
     .join("");
@@ -1629,6 +1645,7 @@ function renderFarmingCard(character) {
         <button class="${character.goalMode !== "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="admin" type="button">목표</button>
         <button class="${character.goalMode === "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="custom" type="button">수동 입력</button>
         ${isAdmin() ? `<button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>` : ""}
+        ${!isAdmin() && character.goalMode === "custom" ? `<button class="${isCustomGoalEditing ? "active" : ""}" data-toggle-custom-goal="${character.id}" type="button">편집</button>` : ""}
       </div>
 
       <div class="target-grid">
@@ -1711,7 +1728,7 @@ function renderFarmingCard(character) {
           ? `<div class="farm-note-grid">
         <label>
           비고
-          <input data-goal-field="note" data-character="${character.id}" value="${escapeHtml(goal.note)}" placeholder="비고" ${canEditGoal ? "" : "disabled"} />
+          <textarea data-goal-field="note" data-character="${character.id}" rows="3" placeholder="비고" ${canEditGoal ? "" : "disabled"}>${escapeHtml(goal.note)}</textarea>
         </label>
       </div>`
           : ""
@@ -1971,8 +1988,15 @@ function getActiveGoalStats(character) {
   return goal.stats.filter((stat) => isGoalBranchActive(goal, stat.variant));
 }
 
+function isCustomGoalEditEnabled(character) {
+  return (
+    character.goalMode === "custom" &&
+    (isAdmin() || customGoalEditingId === character.id)
+  );
+}
+
 function canEditActiveGoal(character) {
-  return character.goalMode === "custom" || (isAdmin() && adminGoalEditing);
+  return isCustomGoalEditEnabled(character) || (isAdmin() && adminGoalEditing);
 }
 
 function sortCharacters(a, b) {
@@ -2297,6 +2321,8 @@ function updateGoalStatField(id, index, field, value) {
   saveGoalState(character);
   renderStats();
   renderFocusStrip();
+  renderRoster();
+  if (id === selectedId) renderDetail();
 }
 
 function updateRenderedStatRowState(id, index, row) {
@@ -2980,8 +3006,8 @@ function getSignedInSessionTitle(adminEnabled = isAdmin()) {
 function updateGoogleButton(mode) {
   const labels = {
     setup: { text: "!", title: "Firebase 설정 필요" },
-    signedOut: { text: "G", title: "Google 로그인" },
-    signedIn: { text: "↗", title: "Google 로그아웃" },
+    signedOut: { text: "로그인", title: "로그인" },
+    signedIn: { text: "로그아웃", title: "로그아웃" },
   };
   const label = labels[mode] ?? labels.signedOut;
   googleButton.textContent = label.text;

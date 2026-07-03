@@ -42,9 +42,18 @@
             <span id="sessionName">로컬 저장 중</span>
             <small id="sessionHint">이 브라우저에 자동 저장됩니다</small>
           </div>
-          <button class="icon-button" id="googleButton" type="button" title="Google 로그인">
-            <span aria-hidden="true">G</span>
-          </button>
+          <div class="session-actions">
+            <button class="icon-button" id="googleButton" type="button" title="Google 로그인">
+              <span aria-hidden="true">로그인</span>
+            </button>
+            <div class="backup-actions" aria-label="백업 도구">
+              <button class="secondary-button" id="exportButton" type="button">백업</button>
+              <label class="secondary-button file-button">
+                불러오기
+                <input id="importInput" type="file" accept="application/json" />
+              </label>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -103,11 +112,6 @@
             <label><input data-farm-filter="complete" type="checkbox" />목표달성</label>
             <label><input data-farm-filter="incomplete" type="checkbox" />미달성</label>
           </div>
-          <button class="secondary-button" id="exportButton" type="button">백업</button>
-          <label class="secondary-button file-button">
-            불러오기
-            <input id="importInput" type="file" accept="application/json" />
-          </label>
         </section>
 
         <section class="share-notice hidden" id="shareNotice" aria-live="polite">

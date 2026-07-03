@@ -142,6 +142,7 @@ h2 {
 }
 
 .session {
+  align-items: stretch;
   gap: 12px;
   padding: 10px 10px 10px 16px;
   border: 1px solid var(--line);
@@ -180,10 +181,41 @@ h2 {
 }
 
 .icon-button {
-  width: 42px;
+  min-width: 76px;
+  padding: 0 14px;
   background: linear-gradient(135deg, #f4f7ff, #9fd3ff);
   color: #111820;
   font-weight: 900;
+}
+
+
+.session-actions {
+  display: grid;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.backup-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.backup-actions .secondary-button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.78rem;
+}
+
+.farm-note-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.farm-note-grid textarea {
+  min-height: 96px;
+  padding: 10px;
+  line-height: 1.5;
+  resize: vertical;
 }
 
 .icon-button[data-auth-state="setup"] {
@@ -643,6 +675,7 @@ dialog input,
 .echo-grid input,
 .echo-grid select,
 .farm-note-grid input,
+.farm-note-grid textarea,
 .stat-row input,
 .stat-row select {
   border: 1px solid var(--line);
@@ -1108,8 +1141,17 @@ select option {
 .farm-input-grid,
 .farm-note-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.target-grid,
+.echo-grid,
+.farm-input-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.farm-note-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .target-grid {
@@ -1294,6 +1336,7 @@ select option {
 .farm-input-panel input,
 .main-echo-row input,
 .farm-note-grid input,
+.farm-note-grid textarea,
 .echo-stat-row select,
 .stat-row input,
 .stat-row select {
@@ -1745,7 +1788,7 @@ dialog::backdrop {
   }
 }
 
-@media (min-width: 1041px) and (max-width: 1320px) {
+@media (min-width: 1041px) and (max-width: 1440px) {
   .toolbar {
     top: 12px;
     z-index: 31;
