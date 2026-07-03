@@ -105,6 +105,12 @@
             <button data-view="unowned" type="button">미보유</button>
             <button data-view="farming" type="button">파밍 중</button>
           </div>
+          <div class="segmented visibility-filter hidden" role="group" aria-label="공개 여부 필터">
+            <span class="segmented-label">공개여부</span>
+            <button class="active" data-visibility-filter="all" type="button">전체</button>
+            <button data-visibility-filter="public" type="button">공개</button>
+            <button data-visibility-filter="private" type="button">비공개</button>
+          </div>
           <div class="filter-checks farming-filter" aria-label="파밍 필터">
             <label><input data-farm-filter="all" type="checkbox" />전체</label>
             <label><input data-farm-filter="owned" type="checkbox" checked />보유</label>
