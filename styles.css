@@ -1382,6 +1382,57 @@ select option {
   min-width: 0;
 }
 
+.echo-set-row select,
+.target-grid .echo-picker-button,
+.target-grid .echo-picker-options button,
+.echo-stat-row .branch-cell select,
+.echo-stat-row > select,
+.stat-row .branch-cell select {
+  text-align: center;
+  text-align-last: center;
+}
+
+.target-grid .echo-picker-button,
+.target-grid .echo-picker-options button {
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+}
+
+.target-grid .echo-picker-options button .inline-icon,
+.target-grid .echo-picker-options button .empty-icon {
+  justify-self: center;
+}
+
+.echo-build-input {
+  --echo-build-cell-width: 46px;
+  max-width: calc(var(--echo-build-cell-width) * 5 + 2px);
+  min-height: 52px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  background:
+    repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--echo-build-cell-width) - 1px),
+      rgba(255, 255, 255, 0.12) calc(var(--echo-build-cell-width) - 1px),
+      rgba(255, 255, 255, 0.12) var(--echo-build-cell-width)
+    ),
+    rgba(255, 255, 255, 0.08) !important;
+  color: var(--text);
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: 29px;
+  line-height: 1;
+  text-align: left;
+  text-indent: 17px;
+  caret-color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.echo-build-input::placeholder {
+  color: rgba(247, 251, 255, 0.32);
+  opacity: 1;
+}
+
 .echo-stat-row .stat-picker {
   max-width: none;
 }

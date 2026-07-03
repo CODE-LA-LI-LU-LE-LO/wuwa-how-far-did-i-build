@@ -931,7 +931,9 @@ function normalizeGoal(goal = {}, resetValueStats = false) {
     echoSet: normalizeEchoSetName(goal.echoSet ?? defaultGoal.echoSet),
     echoSets: normalizeGoalEchoSets(goal),
     mainEchoes: normalizeGoalMainEchoes(goal),
-    echoBuild: goal.echoBuild ?? defaultGoal.echoBuild,
+    echoBuild: String(goal.echoBuild ?? defaultGoal.echoBuild)
+      .replace(/\D/g, "")
+      .slice(0, 5),
     mainEcho: goal.mainEcho ?? defaultGoal.mainEcho,
     note: goal.note ?? defaultGoal.note,
     echoStats: normalizeGoalEchoStats(goal, stats),
@@ -1569,14 +1571,25 @@ function renderRoster() {
   });
 
   rosterList.querySelectorAll("[data-goal-field]").forEach((field) => {
-    field.addEventListener("change", () =>
+    if (field.dataset.goalField === "echoBuild") {
+      field.addEventListener("input", () => {
+        field.value = field.value.replace(/\D/g, "").slice(0, 5);
+      });
+    }
+
+    field.addEventListener("change", () => {
+      const value =
+        field.dataset.goalField === "echoBuild"
+          ? field.value.replace(/\D/g, "").slice(0, 5)
+          : field.value;
+      field.value = value;
       updateGoal(
         field.dataset.character,
         field.dataset.goalField,
-        field.value,
+        value,
         field.dataset.goalKey,
-      ),
-    );
+      );
+    });
   });
 }
 
@@ -1710,7 +1723,7 @@ function renderFarmingCard(character) {
         <section class="farm-input-panel">
           <label>
             에코셋 구성
-            <input data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(goal.echoBuild)}" placeholder="예: 43311" ${canEditGoal ? "" : "disabled"} />
+            <input class="echo-build-input" data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(goal.echoBuild)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="에코셋 구성" ${canEditGoal ? "" : "disabled"} />
           </label>
           <div class="stat-table echo-stat-table ${canEditGoal ? "can-edit" : ""}" role="table" aria-label="${escapeHtml(character.name)} 에코셋 구성">
             <div class="echo-stat-row stat-head" role="row">
