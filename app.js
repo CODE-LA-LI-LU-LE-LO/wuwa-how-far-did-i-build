@@ -5,6 +5,31 @@ const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
 const DEFAULT_CHARACTER_SORT_LOCALE = "ko";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
+const HANGUL_BASE_CODE = 0xac00;
+const HANGUL_LAST_CODE = 0xd7a3;
+const HANGUL_SYLLABLE_COUNT = 588;
+const HANGUL_INITIAL_CONSONANTS = [
+  "ㄱ",
+  "ㄲ",
+  "ㄴ",
+  "ㄷ",
+  "ㄸ",
+  "ㄹ",
+  "ㅁ",
+  "ㅂ",
+  "ㅃ",
+  "ㅅ",
+  "ㅆ",
+  "ㅇ",
+  "ㅈ",
+  "ㅉ",
+  "ㅊ",
+  "ㅋ",
+  "ㅌ",
+  "ㅍ",
+  "ㅎ",
+];
+const HANGUL_COMPAT_CONSONANT_PATTERN = /^[ㄱ-ㅎ\s]+$/;
 
 const elementColors = {
   회절: "#ffd75a",
@@ -2097,6 +2122,32 @@ function renderUnknownIcon(label) {
     : "";
 }
 
+function extractHangulInitialConsonants(value) {
+  return [...String(value ?? "")]
+    .map((letter) => {
+      if (letter === " ") return letter;
+
+      const code = letter.charCodeAt(0);
+      if (code < HANGUL_BASE_CODE || code > HANGUL_LAST_CODE) return letter;
+
+      const initialIndex = Math.floor(
+        (code - HANGUL_BASE_CODE) / HANGUL_SYLLABLE_COUNT,
+      );
+      return HANGUL_INITIAL_CONSONANTS[initialIndex] ?? letter;
+    })
+    .join("");
+}
+
+function isHangulConsonantQuery(query) {
+  return HANGUL_COMPAT_CONSONANT_PATTERN.test(query);
+}
+
+function normalizeEchoSetInitialSearchValue(value) {
+  return extractHangulInitialConsonants(value)
+    .replace(/\s/g, "")
+    .toLowerCase();
+}
+
 function renderEchoSetPicker(characterId, index, value, enabled) {
   const selectedValue = normalizeEchoSetName(value);
   const selectedEchoSet = echoSets.find((echoSet) => echoSet.name === selectedValue);
@@ -2138,7 +2189,7 @@ function renderEchoSetPicker(characterId, index, value, enabled) {
         ${echoSets
           .map(
             (echoSet) => `
-              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(echoSet.name.toLowerCase())}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
+              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(echoSet.name.toLowerCase())}" data-echo-set-initials="${escapeHtml(normalizeEchoSetInitialSearchValue(echoSet.name))}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
                 ${renderInlineIcon(echoSet.icon)}
                 <span>${escapeHtml(echoSet.name)}</span>
               </button>
@@ -2279,6 +2330,8 @@ function filterEchoSetOptions(combobox, preferredIndex = 0) {
   const emptyOption = combobox.querySelector("[data-echo-set-empty-option]");
   const emptyResults = combobox.querySelector("[data-echo-set-empty-results]");
   const query = input.value.trim().toLowerCase();
+  const initialQuery = normalizeEchoSetInitialSearchValue(query);
+  const useInitialSearch = Boolean(initialQuery) && isHangulConsonantQuery(query);
   let visibleCount = 0;
 
   if (emptyOption) emptyOption.hidden = Boolean(query);
@@ -2286,7 +2339,11 @@ function filterEchoSetOptions(combobox, preferredIndex = 0) {
   options.forEach((option) => {
     if (option === emptyOption) return;
     const optionName = option.dataset.echoSetName ?? "";
-    const visible = !query || optionName.includes(query);
+    const optionInitials = option.dataset.echoSetInitials ?? "";
+    const visible =
+      !query ||
+      optionName.includes(query) ||
+      (useInitialSearch && optionInitials.includes(initialQuery));
     option.hidden = !visible;
     if (visible) visibleCount += 1;
   });
