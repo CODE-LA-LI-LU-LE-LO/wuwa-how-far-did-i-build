@@ -3782,12 +3782,17 @@ async function initializeApp() {
   if (shouldRenderImmediately) render();
 }
 
+function isPrPreviewPath(pathname = window.location.pathname) {
+  return /(?:^|\/)pr-preview\/pr-\d+\//.test(pathname);
+}
+
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || window.location.protocol === "file:")
     return;
+  if (isPrPreviewPath()) return;
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => {
       showSessionMessage(
         "로컬 저장 중",
         "오프라인 캐시는 다음 접속 때 다시 시도합니다",

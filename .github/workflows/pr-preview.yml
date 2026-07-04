@@ -1,0 +1,64 @@
+name: Deploy PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify static site
+        run: node scripts/verify.mjs
+
+      - name: Check app.js syntax
+        run: node --check app.js
+
+      - name: Prepare preview payload
+        run: |
+          set -euo pipefail
+          rm -rf preview-dist
+          mkdir -p preview-dist
+          rsync -a \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'preview-dist/' \
+            --exclude 'node_modules/' \
+            ./ preview-dist/
+
+      - name: Deploy PR preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: preview-dist
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: auto
+          comment: true
+
+      - name: Write preview summary
+        run: |
+          PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.pull_request.number }}/"
+          {
+            echo "## PR Preview"
+            echo ""
+            echo "Preview URL: ${PREVIEW_URL}"
+            echo ""
+            echo "This preview is isolated under \`/pr-preview/pr-${{ github.event.pull_request.number }}/\` and is refreshed on each PR update."
+          } >> "$GITHUB_STEP_SUMMARY"
