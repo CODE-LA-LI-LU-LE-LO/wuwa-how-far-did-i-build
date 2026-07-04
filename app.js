@@ -2418,7 +2418,12 @@ function updateCharacterField(id, field, value) {
 function updateCurrentStat(id, field, value) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
-  const shouldRerenderRoster = field === "manualComplete";
+
+  const wasComplete = isGoalComplete(character);
+  const isCurrentValueField =
+    field in character.currentStats.values ||
+    field.includes(":") ||
+    valueStatOptions.some((option) => option.key === field);
 
   if (field === "manualComplete") {
     character.currentStats.manualComplete = Boolean(value);
@@ -2427,9 +2432,7 @@ function updateCurrentStat(id, field, value) {
       : character.farm.priority === "done"
         ? "mid"
         : character.farm.priority;
-  } else if (field in character.currentStats.values) {
-    character.currentStats.values[field] = Math.max(0, Number(value) || 0);
-  } else if (field.includes(":") || valueStatOptions.some((option) => option.key === field)) {
+  } else if (isCurrentValueField) {
     character.currentStats.values[field] = Math.max(0, Number(value) || 0);
   } else {
     character.currentStats[field] = value;
@@ -2438,10 +2441,37 @@ function updateCurrentStat(id, field, value) {
   saveState();
   renderStats();
   renderFocusStrip();
-  if (shouldRerenderRoster || field in character.currentStats.values || field.includes(":")) {
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  if (field === "manualComplete" || !isCurrentValueField) {
     renderRoster();
     if (id === selectedId) renderDetail();
   }
+}
+
+function shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete) {
+  if (wasComplete === isComplete) return false;
+  return farmingFilters.has("complete") || farmingFilters.has("incomplete");
+}
+
+function updateRenderedFarmingCardCompletionState(id, complete) {
+  const card = rosterList.querySelector(`[data-farm-card="${CSS.escape(id)}"]`);
+  if (!card) return;
+
+  card.classList.toggle("complete", complete);
+  const statusPill = card.querySelector(".status-pill");
+  if (!statusPill) return;
+
+  const character = state.characters.find((item) => item.id === id);
+  const ownershipPrefix = character?.owned ? "" : "미보유 · ";
+  statusPill.textContent = `${ownershipPrefix}${complete ? "목표달성" : "미달성"}`;
 }
 
 function updateGoal(id, field, value, statKey) {
