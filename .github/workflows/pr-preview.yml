@@ -5,9 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
   pull-requests: write
 
 concurrency:
@@ -18,11 +16,8 @@ jobs:
   deploy-preview:
     runs-on: ubuntu-latest
     if: github.event.pull_request.head.repo.full_name == github.repository
-    environment:
-      name: pr-preview-${{ github.event.pull_request.number }}
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
+      - name: Checkout PR
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -36,32 +31,75 @@ jobs:
       - name: Check app.js syntax
         run: node --check app.js
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - name: Prepare preview payload
+        run: |
+          set -euo pipefail
+          rm -rf preview-dist
+          mkdir -p preview-dist
+          rsync -a \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'preview-branch/' \
+            --exclude 'preview-dist/' \
+            --exclude 'node_modules/' \
+            ./ preview-dist/
 
-      - name: Upload PR preview artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          name: pr-preview-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .
-          include-hidden-files: true
+      - name: Publish preview branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PREVIEW_PATH: pr-${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin pr-preview || true
+          if git show-ref --verify --quiet refs/remotes/origin/pr-preview; then
+            git worktree add preview-branch origin/pr-preview
+            cd preview-branch
+            git checkout -B pr-preview
+          else
+            git worktree add --detach preview-branch
+            cd preview-branch
+            git checkout --orphan pr-preview
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p "${PREVIEW_PATH}"
+          rsync -a --delete ../preview-dist/ "${PREVIEW_PATH}/"
+          touch .nojekyll
+          git add .
+          if git diff --cached --quiet; then
+            echo "No preview changes to publish."
+          else
+            git commit -m "Deploy preview for PR #${{ github.event.pull_request.number }}"
+            git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" HEAD:pr-preview
+          fi
 
-      - name: Deploy PR preview
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Comment preview URL
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: https://raw.githack.com/${{ github.repository }}/pr-preview/pr-${{ github.event.pull_request.number }}/index.html
         with:
-          artifact_name: pr-preview-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
-          preview: true
-          timeout: 900000
-          error_count: 30
-          reporting_interval: 10000
+          script: |
+            const marker = "<!-- pr-preview-url -->";
+            const body = `${marker}\n## PR Preview\n\nPreview URL: ${process.env.PREVIEW_URL}\n\n이 URL은 \`pr-preview\` 브랜치의 \`pr-${context.payload.pull_request.number}/\` 정적 파일을 사용하며, PR이 업데이트될 때마다 같은 URL로 갱신됩니다.`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number, per_page: 100 });
+            const previous = comments.find((comment) => comment.user?.type === "Bot" && comment.body?.includes(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
 
       - name: Write preview summary
+        env:
+          PREVIEW_URL: https://raw.githack.com/${{ github.repository }}/pr-preview/pr-${{ github.event.pull_request.number }}/index.html
         run: |
           {
             echo "## PR Preview"
             echo ""
-            echo "Preview URL: ${{ steps.deployment.outputs.page_url }}"
+            echo "Preview URL: ${PREVIEW_URL}"
             echo ""
-            echo "This preview was deployed with GitHub Pages preview deployments and is refreshed on each PR update."
+            echo "This preview is served from the pr-preview branch and refreshed on each PR update."
           } >> "$GITHUB_STEP_SUMMARY"
