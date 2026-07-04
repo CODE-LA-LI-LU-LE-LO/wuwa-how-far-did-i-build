@@ -1,4 +1,4 @@
-const CACHE_NAME = "ww-farming-tracker-v4";
+const CACHE_NAME = "ww-farming-tracker-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
