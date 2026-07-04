@@ -75,7 +75,7 @@ function createDomStub() {
     querySelectorAll() { return []; },
     createElement() { return element; },
     execCommand() { return true; },
-    body: { append() {} },
+    body: { append() {}, classList },
   };
 }
 
