@@ -513,7 +513,7 @@ let sortMode = "name";
 let activeCategory = "all";
 let visibilityFilter = "all";
 let farmingFilters = new Set(["owned"]);
-let adminGoalEditing = false;
+let adminGoalEditingId = null;
 let customGoalEditingId = null;
 
 appTabs.forEach((button) => {
@@ -1445,15 +1445,22 @@ function bindRosterInteractions(root = rosterList) {
         return;
       }
       const card = button.closest("[data-farm-card]");
-      const shouldDisableEditing = adminGoalEditing && button.classList.contains("active");
-      adminGoalEditing = !shouldDisableEditing;
-      if (card?.dataset.farmCard) {
-        keepFarmCardScrollStable(card.dataset.farmCard, () =>
-          rerenderFarmingCard(card.dataset.farmCard),
-        );
+      const characterId = card?.dataset.farmCard;
+      if (!characterId) {
+        renderRoster();
         return;
       }
-      renderRoster();
+
+      const previousEditingId = adminGoalEditingId;
+      adminGoalEditingId =
+        previousEditingId === characterId ? null : characterId;
+
+      if (previousEditingId && previousEditingId !== characterId) {
+        rerenderFarmingCard(previousEditingId);
+      }
+      keepFarmCardScrollStable(characterId, () =>
+        rerenderFarmingCard(characterId),
+      );
     });
   });
 
@@ -1762,6 +1769,7 @@ function renderFarmingCard(character) {
   const goal = getActiveGoal(character);
   const complete = isGoalComplete(character);
   const canEditGoal = canEditActiveGoal(character);
+  const isAdminGoalEditing = isAdminGoalEditEnabled(character);
   const isCustomGoalEditing = isCustomGoalEditEnabled(character);
   const rows = goal.stats
     .map((stat, index) => renderStatRow(character, stat, index, canEditGoal))
@@ -1797,7 +1805,7 @@ function renderFarmingCard(character) {
       <div class="goal-switch" role="group" aria-label="목표 기준">
         <button class="${character.goalMode !== "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="admin" type="button">목표</button>
         <button class="${character.goalMode === "custom" ? "active" : ""}" data-goal-mode="${character.id}" data-mode="custom" type="button">수동 입력</button>
-        ${isAdmin() && character.goalMode !== "custom" ? `<button class="${adminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button">편집</button>` : ""}
+        ${isAdmin() && character.goalMode !== "custom" ? `<button class="${isAdminGoalEditing ? "active" : ""}" data-toggle-admin-goals type="button" aria-label="${escapeHtml(character.name)} 관리자 목표 편집 ${isAdminGoalEditing ? "끄기" : "켜기"}">편집</button>` : ""}
         ${character.goalMode === "custom" ? `<button class="${isCustomGoalEditing ? "active" : ""}" data-toggle-custom-goal="${character.id}" type="button">편집</button>` : ""}
       </div>
 
@@ -2341,11 +2349,16 @@ function isCustomGoalEditEnabled(character) {
   return character.goalMode === "custom" && customGoalEditingId === character.id;
 }
 
-function canEditActiveGoal(character) {
+function isAdminGoalEditEnabled(character) {
   return (
-    isCustomGoalEditEnabled(character) ||
-    (character.goalMode !== "custom" && isAdmin() && adminGoalEditing)
+    character.goalMode !== "custom" &&
+    isAdmin() &&
+    adminGoalEditingId === character.id
   );
+}
+
+function canEditActiveGoal(character) {
+  return isCustomGoalEditEnabled(character) || isAdminGoalEditEnabled(character);
 }
 
 function sortCharacters(a, b) {
@@ -3535,7 +3548,7 @@ async function ensureCloud() {
   authModule.onAuthStateChanged(auth, async (user) => {
     if (!user) {
       state.user = createDefaultUser();
-      adminGoalEditing = false;
+      adminGoalEditingId = null;
       showSessionMessage("로컬 저장 중", "이 브라우저에 자동 저장됩니다");
       updateGoogleButton("signedOut");
       render();
