@@ -1729,6 +1729,7 @@ function rerenderFarmingCard(id) {
 function renderCategoryRail() {
   if (sortMode === "name") {
     categoryRail.classList.add("hidden");
+    categoryRail.classList.remove("category-rail--weapon");
     categoryRail.innerHTML = "";
     return;
   }
@@ -1738,6 +1739,7 @@ function renderCategoryRail() {
     .sort(sortCategories);
 
   categoryRail.classList.remove("hidden");
+  categoryRail.classList.toggle("category-rail--weapon", sortMode === "weapon");
   categoryRail.innerHTML = `
     <button class="${activeCategory === "all" ? "active" : ""}" data-category="all" type="button" aria-label="전체 카테고리">${renderCategoryLabel("all")}</button>
     ${categories
