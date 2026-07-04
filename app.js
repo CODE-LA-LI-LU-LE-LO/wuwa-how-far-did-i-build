@@ -524,7 +524,7 @@ appTabs.forEach((button) => {
   });
 });
 
-function setActiveTab(tab, { resetCategory = true } = {}) {
+function setActiveTab(tab, { resetCategory = false } = {}) {
   activeTab = tab;
   if (resetCategory) activeCategory = "all";
   customGoalEditingId = null;
