@@ -1313,14 +1313,93 @@ function closeOpenPickers(exceptPicker = null) {
 }
 
 function setupDetailPicker(picker) {
+  const summary = picker.querySelector("summary.echo-picker-button");
+  const options = [...picker.querySelectorAll(".echo-picker-options button")];
+  let activeIndex = getInitialDetailPickerOptionIndex(options);
+
+  const updateSummaryExpanded = () => {
+    summary?.setAttribute("aria-expanded", picker.open ? "true" : "false");
+  };
+
+  const updateActiveOption = (nextIndex) => {
+    if (!options.length) return;
+    activeIndex = (nextIndex + options.length) % options.length;
+    options.forEach((option) => option.classList.remove("keyboard-active"));
+    options[activeIndex].classList.add("keyboard-active");
+    options[activeIndex].scrollIntoView({ block: "nearest" });
+  };
+
+  const openPicker = () => {
+    picker.open = true;
+    closeOpenPickers(picker);
+    updateSummaryExpanded();
+  };
+
+  const closePicker = () => {
+    picker.open = false;
+    updateSummaryExpanded();
+    options.forEach((option) => option.classList.remove("keyboard-active"));
+  };
+
+  if (summary) updateSummaryExpanded();
+
   picker.addEventListener("toggle", () => {
-    if (picker.open) closeOpenPickers(picker);
+    if (picker.open) {
+      closeOpenPickers(picker);
+      activeIndex = getInitialDetailPickerOptionIndex(options);
+      updateActiveOption(activeIndex);
+    }
+    updateSummaryExpanded();
   });
 
   picker.addEventListener("focusout", (event) => {
     if (event.relatedTarget && picker.contains(event.relatedTarget)) return;
-    picker.open = false;
+    closePicker();
   });
+
+  if (!summary || !options.length) return;
+
+  picker.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      openPicker();
+      updateActiveOption(activeIndex + 1);
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      openPicker();
+      updateActiveOption(activeIndex - 1);
+      return;
+    }
+    if (event.key === "Enter" && picker.open) {
+      event.preventDefault();
+      options[activeIndex]?.click();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePicker();
+      summary.focus();
+      return;
+    }
+    if (event.key === "Tab") {
+      closePicker();
+    }
+  });
+
+  options.forEach((option, index) => {
+    option.addEventListener("mousedown", (event) => event.preventDefault());
+    option.addEventListener("focus", () => updateActiveOption(index));
+    option.addEventListener("click", () => closePicker());
+  });
+}
+
+function getInitialDetailPickerOptionIndex(options) {
+  const activeIndex = options.findIndex((option) =>
+    option.classList.contains("active"),
+  );
+  return activeIndex >= 0 ? activeIndex : 0;
 }
 
 function render() {
@@ -1888,7 +1967,7 @@ function renderFarmingCard(character) {
             <div class="echo-stat-row stat-head" role="row">
               <span>분기</span>
               <span>COST</span>
-              <span>주옵</span>
+              <span>속성</span>
               <span></span>
             </div>
             ${echoStatRows}
@@ -1907,12 +1986,12 @@ function renderFarmingCard(character) {
 
         <section class="farm-input-panel">
           <div class="field-heading table-heading">
-            <span>주옵수치입력</span>
+            <span>수치입력</span>
           </div>
           <div class="stat-table" role="table" aria-label="${escapeHtml(character.name)} 목표 스테이터스">
             <div class="stat-row stat-head" role="row">
               <span>분기</span>
-              <span>주옵</span>
+              <span>속성</span>
               <span>권장수치</span>
               <span>내 캐릭터</span>
               <span></span>
@@ -2379,12 +2458,12 @@ function renderStatPicker(
 
   return `
     <details class="echo-picker stat-picker">
-      <summary class="echo-picker-button">${buttonContent}</summary>
-      <div class="echo-picker-options">
+      <summary class="echo-picker-button" aria-haspopup="listbox" aria-expanded="false">${buttonContent}</summary>
+      <div class="echo-picker-options" role="listbox">
         ${options
           .map(
             (option) => `
-              <button type="button" ${dataAttribute} data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(option.key)}" class="${option.key === selectedOption.key ? "active" : ""}">
+              <button type="button" ${dataAttribute} data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(option.key)}" class="${option.key === selectedOption.key ? "active" : ""}" role="option" aria-selected="${option.key === selectedOption.key}">
                 ${renderInlineIcon(option.icon)}
                 <span>${escapeHtml(option.label)}</span>
               </button>
