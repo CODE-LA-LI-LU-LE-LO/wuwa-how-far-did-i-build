@@ -5,6 +5,31 @@ const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
 const DEFAULT_CHARACTER_SORT_LOCALE = "ko";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
+const HANGUL_BASE_CODE = 0xac00;
+const HANGUL_LAST_CODE = 0xd7a3;
+const HANGUL_SYLLABLE_COUNT = 588;
+const HANGUL_INITIAL_CONSONANTS = [
+  "ㄱ",
+  "ㄲ",
+  "ㄴ",
+  "ㄷ",
+  "ㄸ",
+  "ㄹ",
+  "ㅁ",
+  "ㅂ",
+  "ㅃ",
+  "ㅅ",
+  "ㅆ",
+  "ㅇ",
+  "ㅈ",
+  "ㅉ",
+  "ㅊ",
+  "ㅋ",
+  "ㅌ",
+  "ㅍ",
+  "ㅎ",
+];
+const HANGUL_COMPAT_CONSONANT_PATTERN = /^[ㄱ-ㅎ\s]+$/;
 
 const elementColors = {
   회절: "#ffd75a",
@@ -1288,14 +1313,93 @@ function closeOpenPickers(exceptPicker = null) {
 }
 
 function setupDetailPicker(picker) {
+  const summary = picker.querySelector("summary.echo-picker-button");
+  const options = [...picker.querySelectorAll(".echo-picker-options button")];
+  let activeIndex = getInitialDetailPickerOptionIndex(options);
+
+  const updateSummaryExpanded = () => {
+    summary?.setAttribute("aria-expanded", picker.open ? "true" : "false");
+  };
+
+  const updateActiveOption = (nextIndex) => {
+    if (!options.length) return;
+    activeIndex = (nextIndex + options.length) % options.length;
+    options.forEach((option) => option.classList.remove("keyboard-active"));
+    options[activeIndex].classList.add("keyboard-active");
+    options[activeIndex].scrollIntoView({ block: "nearest" });
+  };
+
+  const openPicker = () => {
+    picker.open = true;
+    closeOpenPickers(picker);
+    updateSummaryExpanded();
+  };
+
+  const closePicker = () => {
+    picker.open = false;
+    updateSummaryExpanded();
+    options.forEach((option) => option.classList.remove("keyboard-active"));
+  };
+
+  if (summary) updateSummaryExpanded();
+
   picker.addEventListener("toggle", () => {
-    if (picker.open) closeOpenPickers(picker);
+    if (picker.open) {
+      closeOpenPickers(picker);
+      activeIndex = getInitialDetailPickerOptionIndex(options);
+      updateActiveOption(activeIndex);
+    }
+    updateSummaryExpanded();
   });
 
   picker.addEventListener("focusout", (event) => {
     if (event.relatedTarget && picker.contains(event.relatedTarget)) return;
-    picker.open = false;
+    closePicker();
   });
+
+  if (!summary || !options.length) return;
+
+  picker.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      openPicker();
+      updateActiveOption(activeIndex + 1);
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      openPicker();
+      updateActiveOption(activeIndex - 1);
+      return;
+    }
+    if (event.key === "Enter" && picker.open) {
+      event.preventDefault();
+      options[activeIndex]?.click();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePicker();
+      summary.focus();
+      return;
+    }
+    if (event.key === "Tab") {
+      closePicker();
+    }
+  });
+
+  options.forEach((option, index) => {
+    option.addEventListener("mousedown", (event) => event.preventDefault());
+    option.addEventListener("focus", () => updateActiveOption(index));
+    option.addEventListener("click", () => closePicker());
+  });
+}
+
+function getInitialDetailPickerOptionIndex(options) {
+  const activeIndex = options.findIndex((option) =>
+    option.classList.contains("active"),
+  );
+  return activeIndex >= 0 ? activeIndex : 0;
 }
 
 function render() {
@@ -1863,7 +1967,7 @@ function renderFarmingCard(character) {
             <div class="echo-stat-row stat-head" role="row">
               <span>분기</span>
               <span>COST</span>
-              <span>주옵</span>
+              <span>속성</span>
               <span></span>
             </div>
             ${echoStatRows}
@@ -1882,12 +1986,12 @@ function renderFarmingCard(character) {
 
         <section class="farm-input-panel">
           <div class="field-heading table-heading">
-            <span>주옵수치입력</span>
+            <span>수치입력</span>
           </div>
           <div class="stat-table" role="table" aria-label="${escapeHtml(character.name)} 목표 스테이터스">
             <div class="stat-row stat-head" role="row">
               <span>분기</span>
-              <span>주옵</span>
+              <span>속성</span>
               <span>권장수치</span>
               <span>내 캐릭터</span>
               <span></span>
@@ -2097,6 +2201,32 @@ function renderUnknownIcon(label) {
     : "";
 }
 
+function extractHangulInitialConsonants(value) {
+  return [...String(value ?? "")]
+    .map((letter) => {
+      if (letter === " ") return letter;
+
+      const code = letter.charCodeAt(0);
+      if (code < HANGUL_BASE_CODE || code > HANGUL_LAST_CODE) return letter;
+
+      const initialIndex = Math.floor(
+        (code - HANGUL_BASE_CODE) / HANGUL_SYLLABLE_COUNT,
+      );
+      return HANGUL_INITIAL_CONSONANTS[initialIndex] ?? letter;
+    })
+    .join("");
+}
+
+function isHangulConsonantQuery(query) {
+  return HANGUL_COMPAT_CONSONANT_PATTERN.test(query);
+}
+
+function normalizeEchoSetInitialSearchValue(value) {
+  return extractHangulInitialConsonants(value)
+    .replace(/\s/g, "")
+    .toLowerCase();
+}
+
 function renderEchoSetPicker(characterId, index, value, enabled) {
   const selectedValue = normalizeEchoSetName(value);
   const selectedEchoSet = echoSets.find((echoSet) => echoSet.name === selectedValue);
@@ -2138,7 +2268,7 @@ function renderEchoSetPicker(characterId, index, value, enabled) {
         ${echoSets
           .map(
             (echoSet) => `
-              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(echoSet.name.toLowerCase())}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
+              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(echoSet.name.toLowerCase())}" data-echo-set-initials="${escapeHtml(normalizeEchoSetInitialSearchValue(echoSet.name))}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
                 ${renderInlineIcon(echoSet.icon)}
                 <span>${escapeHtml(echoSet.name)}</span>
               </button>
@@ -2279,6 +2409,8 @@ function filterEchoSetOptions(combobox, preferredIndex = 0) {
   const emptyOption = combobox.querySelector("[data-echo-set-empty-option]");
   const emptyResults = combobox.querySelector("[data-echo-set-empty-results]");
   const query = input.value.trim().toLowerCase();
+  const initialQuery = normalizeEchoSetInitialSearchValue(query);
+  const useInitialSearch = Boolean(initialQuery) && isHangulConsonantQuery(query);
   let visibleCount = 0;
 
   if (emptyOption) emptyOption.hidden = Boolean(query);
@@ -2286,7 +2418,11 @@ function filterEchoSetOptions(combobox, preferredIndex = 0) {
   options.forEach((option) => {
     if (option === emptyOption) return;
     const optionName = option.dataset.echoSetName ?? "";
-    const visible = !query || optionName.includes(query);
+    const optionInitials = option.dataset.echoSetInitials ?? "";
+    const visible =
+      !query ||
+      optionName.includes(query) ||
+      (useInitialSearch && optionInitials.includes(initialQuery));
     option.hidden = !visible;
     if (visible) visibleCount += 1;
   });
@@ -2322,12 +2458,12 @@ function renderStatPicker(
 
   return `
     <details class="echo-picker stat-picker">
-      <summary class="echo-picker-button">${buttonContent}</summary>
-      <div class="echo-picker-options">
+      <summary class="echo-picker-button" aria-haspopup="listbox" aria-expanded="false">${buttonContent}</summary>
+      <div class="echo-picker-options" role="listbox">
         ${options
           .map(
             (option) => `
-              <button type="button" ${dataAttribute} data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(option.key)}" class="${option.key === selectedOption.key ? "active" : ""}">
+              <button type="button" ${dataAttribute} data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(option.key)}" class="${option.key === selectedOption.key ? "active" : ""}" role="option" aria-selected="${option.key === selectedOption.key}">
                 ${renderInlineIcon(option.icon)}
                 <span>${escapeHtml(option.label)}</span>
               </button>

@@ -244,6 +244,10 @@ for (const requiredSource of [
   "normalizeEchoSetName",
   "Lingering Tunes",
   "끊임없는 잔향",
+  "getInitialDetailPickerOptionIndex",
+  'aria-haspopup="listbox"',
+  "수치입력",
+  "<span>속성</span>",
 ]) {
   if (!appSource.includes(requiredSource)) fail(`app.js missing ${requiredSource}`);
 }
@@ -419,6 +423,29 @@ try {
   }
 } catch (error) {
   fail(`app seed priority verification failed: ${error.message}`);
+}
+
+try {
+  const initialSearchSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  if (initialSearchSandbox.extractHangulInitialConsonants("떠오르는 구름") !== "ㄸㅇㄹㄴ ㄱㄹ") {
+    fail("echo set initial search must extract Korean initials from Hangul names");
+  }
+  if (initialSearchSandbox.isHangulConsonantQuery("ㄱㄹ") !== true) {
+    fail("echo set initial search must recognize consonant-only queries");
+  }
+  if (initialSearchSandbox.isHangulConsonantQuery("구름") !== false) {
+    fail("echo set initial search must not treat full Hangul syllables as consonant-only queries");
+  }
+  if (initialSearchSandbox.normalizeEchoSetInitialSearchValue("떠오르는 구름").includes("ㄱㄹ") !== true) {
+    fail("echo set initial search must allow consonant includes matching");
+  }
+} catch (error) {
+  fail(`app echo set initial search verification failed: ${error.message}`);
 }
 
 if (failures.length > 0) {
