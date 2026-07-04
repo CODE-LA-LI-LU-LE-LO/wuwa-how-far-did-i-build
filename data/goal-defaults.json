@@ -28,10 +28,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -107,10 +128,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -186,10 +228,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -265,10 +328,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -344,10 +428,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -423,10 +528,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -502,10 +628,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -581,10 +728,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -660,10 +828,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -739,10 +928,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -890,10 +1100,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -969,10 +1200,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1048,10 +1300,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1117,7 +1390,7 @@
         "name": "플뢰르 드 리스"
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "43311",
     "mainEcho": "악몽 · 켈피",
     "note": "",
     "echoStats": [
@@ -1224,10 +1497,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1303,10 +1597,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1382,10 +1697,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1461,10 +1797,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1540,10 +1897,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1619,10 +1997,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1674,39 +2073,70 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "영광의 칼날로 만들어진 왕관",
+        "pieces": "3 Set"
+      },
+      {
+        "join": "+",
+        "name": "스쳐가는 바람",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "+",
+        "name": "끝없는 하늘",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "+",
+        "name": "영광이 깃든 바람",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "바다의 여인"
+      },
+      {
+        "join": "OR",
+        "name": "케라사우르스 (3코)"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "바다의 여인",
     "note": "",
     "echoStats": [
       {
-        "key": "critRate",
-        "label": "크리확률",
+        "key": "critDamage",
+        "label": "크리피해",
         "cost": "COST 4",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "energy",
-        "label": "공명효율",
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
-        "variant": "-",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
         "branchChecked": false
       },
       {
@@ -1721,7 +2151,7 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 80,
         "cost": "COST 4",
         "variant": "-"
       },
@@ -1735,14 +2165,21 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2000,
+        "cost": "COST 1",
+        "variant": "-"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2300,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -1777,10 +2214,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1856,10 +2314,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -1935,10 +2414,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2000,7 +2500,7 @@
         "name": "악몽 · 폭주의 고릴라"
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "43311",
     "mainEcho": "악몽 · 폭주의 고릴라",
     "note": "",
     "echoStats": [
@@ -2100,10 +2600,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2179,10 +2700,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2258,10 +2800,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2337,10 +2900,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2416,10 +3000,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2495,10 +3100,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2574,10 +3200,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2653,10 +3300,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2732,10 +3400,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2811,10 +3500,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2890,10 +3600,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -2969,10 +3700,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3048,10 +3800,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3127,10 +3900,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3206,10 +4000,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3261,39 +4076,58 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "영광이 깃든 바람",
+        "pieces": "5 Set"
+      },
+      {
+        "join": "+",
+        "name": "찬란한 광휘",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "플뢰르 드 리스"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "플뢰르 드 리스",
     "note": "",
     "echoStats": [
       {
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "-",
+        "variant": "A",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "B",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "A",
         "branchChecked": false
       },
       {
         "key": "energy",
         "label": "공명효율",
         "cost": "COST 3",
-        "variant": "-",
+        "variant": "B",
         "branchChecked": false
       },
       {
@@ -3308,28 +4142,35 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 60,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 200,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 150,
         "cost": "COST 3",
+        "variant": "-"
+      },
+      {
+        "key": "energy",
+        "label": "공명효율",
+        "target": 200,
+        "cost": "COST 1",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 1900,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -3364,10 +4205,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3443,10 +4305,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3522,10 +4405,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3601,10 +4505,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3680,10 +4605,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3759,10 +4705,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3838,10 +4805,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3917,10 +4905,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -3996,10 +5005,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4075,10 +5105,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4154,10 +5205,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4233,10 +5305,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4312,10 +5405,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4391,10 +5505,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4470,10 +5605,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4549,10 +5705,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4628,10 +5805,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
@@ -4707,10 +5905,31 @@
       {
         "key": "critDamage",
         "label": "크리피해",
+        "cost": "COST 4",
+        "variant": "-",
+        "branchChecked": false
+      },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
+      {
+        "key": "aeroDamage",
+        "label": "기류피증",
+        "cost": "COST 3",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
+        "branchChecked": false
+      }
       {
         "key": "energy",
         "label": "공명효율",
