@@ -524,9 +524,9 @@ appTabs.forEach((button) => {
   });
 });
 
-function setActiveTab(tab) {
+function setActiveTab(tab, { resetCategory = true } = {}) {
   activeTab = tab;
-  activeCategory = "all";
+  if (resetCategory) activeCategory = "all";
   customGoalEditingId = null;
   appTabs.forEach((item) =>
     item.classList.toggle("active", item.dataset.tab === tab),
@@ -3088,7 +3088,7 @@ function openFarmingCard(id) {
   if (!character?.owned) return;
 
   selectedId = id;
-  setActiveTab("farming");
+  setActiveTab("farming", { resetCategory: false });
   render();
   requestAnimationFrame(() => {
     const card = rosterList.querySelector(
