@@ -3,6 +3,7 @@ const FIREBASE_VERSION = "10.12.5";
 const SHARE_URL_WARN_LENGTH = 6000;
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const GOAL_DEFAULT_VERSION = "2026-07-value-stat-variants-reset";
+const DEFAULT_CHARACTER_SORT_LOCALE = "ko";
 const CONFIG = window.WW_TRACKER_CONFIG ?? {};
 
 const elementColors = {
@@ -698,7 +699,7 @@ deleteCharacterButton.addEventListener("click", () => {
 
   state.characters = state.characters.filter((item) => item.id !== id);
   if (selectedId === id)
-    selectedId = state.characters.find((item) => item.owned)?.id ?? null;
+    selectedId = getFirstOwnedCharacterId();
   saveState({ skipCloud: true });
   characterForm.reset();
   dialog.close();
@@ -822,7 +823,23 @@ function initializeState() {
   sharedSnapshot = readSharedSnapshot();
   isSnapshotMode = Boolean(sharedSnapshot);
   state = sharedSnapshot ?? loadState();
-  selectedId = state.characters.find((character) => character.owned)?.id ?? null;
+  selectedId = getFirstOwnedCharacterId();
+}
+
+function getFirstOwnedCharacterId(excludedId = "") {
+  return (
+    [...state.characters]
+      .filter((character) => character.owned && character.id !== excludedId)
+      .sort(compareCharacterNames)[0]?.id ?? null
+  );
+}
+
+function compareCharacterNames(a, b) {
+  return a.name.localeCompare(b.name, getCharacterSortLocale());
+}
+
+function getCharacterSortLocale() {
+  return DEFAULT_CHARACTER_SORT_LOCALE;
 }
 
 function loadState() {
@@ -2366,22 +2383,22 @@ function sortCharacters(a, b) {
     return (
       getElementSortScore(a.element) - getElementSortScore(b.element) ||
       a.element.localeCompare(b.element, "ko") ||
-      a.name.localeCompare(b.name, "ko")
+      compareCharacterNames(a, b)
     );
   }
   if (sortMode === "weapon") {
     return (
       getWeaponSortScore(a.weapon) - getWeaponSortScore(b.weapon) ||
-      a.name.localeCompare(b.name, "ko")
+      compareCharacterNames(a, b)
     );
   }
   if (sortMode === "rarity") {
     return (
       Number(getRarity(b)) - Number(getRarity(a)) ||
-      a.name.localeCompare(b.name, "ko")
+      compareCharacterNames(a, b)
     );
   }
-  return a.name.localeCompare(b.name, "ko");
+  return compareCharacterNames(a, b);
 }
 
 function getCategoryValue(character) {
@@ -2958,19 +2975,7 @@ function getRosterEmptyState() {
 }
 
 function renderFocusStrip() {
-  const focusItems = state.characters
-    .filter((character) => character.owned)
-    .sort((a, b) => {
-      const completeScore = Number(isGoalComplete(a)) - Number(isGoalComplete(b));
-      if (completeScore) return completeScore;
-      const priorityScore =
-        getPriorityScore(b.farm.priority) - getPriorityScore(a.farm.priority);
-      return (
-        priorityScore ||
-        getProgress(b) - getProgress(a) ||
-        a.name.localeCompare(b.name, "ko")
-      );
-    });
+  const focusItems = getVisibleFocusCharacters();
 
   if (!focusItems.length) {
     focusStrip.innerHTML = `
@@ -3012,6 +3017,34 @@ function renderFocusStrip() {
   });
 }
 
+function getVisibleFocusCharacters() {
+  return state.characters
+    .filter((character) => character.owned)
+    .filter(matchesActiveToolbarCriteria)
+    .sort(sortFocusCharacters);
+}
+
+function matchesActiveToolbarCriteria(character) {
+  if (activeTab === "ownership") {
+    if (currentView === "owned" && !character.owned) return false;
+    if (currentView === "unowned" && character.owned) return false;
+  }
+  if (activeTab === "farming" && !matchesFarmingFilters(character)) return false;
+  if (!matchesVisibilityFilter(character)) return false;
+  if (
+    activeCategory !== "all" &&
+    getCategoryValue(character) !== activeCategory
+  )
+    return false;
+  return character.name.toLowerCase().includes(searchTerm);
+}
+
+function sortFocusCharacters(a, b) {
+  const completeScore = Number(isGoalComplete(a)) - Number(isGoalComplete(b));
+  if (completeScore) return completeScore;
+  return sortCharacters(a, b);
+}
+
 function openFarmingCard(id) {
   const character = state.characters.find((item) => item.id === id);
   if (!character?.owned) return;
@@ -3051,8 +3084,7 @@ function toggleOwned(id) {
   character.owned = !character.owned;
   if (character.owned) selectedId = id;
   if (!character.owned && selectedId === id) {
-    selectedId =
-      state.characters.find((item) => item.owned && item.id !== id)?.id ?? null;
+    selectedId = getFirstOwnedCharacterId(id);
   }
   saveState();
   render();
@@ -3568,12 +3600,7 @@ async function ensureCloud() {
         const remoteState = normalizeState(snapshot.data());
         state = chooseNewerState(state, remoteState);
         state.user = createGoogleUser(user);
-        selectedId =
-          state.characters.find(
-            (character) => character.id === selectedId && character.owned,
-          )?.id ??
-          state.characters.find((character) => character.owned)?.id ??
-          null;
+        selectedId = getFirstOwnedCharacterId();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
     } catch (error) {
