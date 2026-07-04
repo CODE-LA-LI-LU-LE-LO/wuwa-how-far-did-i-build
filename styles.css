@@ -1242,6 +1242,11 @@ select option {
   cursor: text;
 }
 
+.echo-set-input-shell::after,
+.echo-set-selected-icon {
+  cursor: pointer;
+}
+
 .echo-set-input-shell input {
   width: 100%;
   min-width: 0;

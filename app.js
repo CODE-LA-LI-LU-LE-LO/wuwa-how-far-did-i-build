@@ -135,7 +135,7 @@ const valueStatOptions = [
   };
 });
 const statCostOptions = ["COST 4", "COST 3", "COST 1"];
-const statVariantOptions = ["-", "A", "B", "C"];
+const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];
 const echoSetPieceOptions = ["5 Set", "3 Set", "2 Set", "1 Set"];
 const echoSetJoinOptions = ["+", "OR"];
 
@@ -1695,7 +1695,9 @@ function bindRosterInteractions(root = rosterList) {
       const value =
         field.dataset.goalField === "echoBuild"
           ? field.value.replace(/\D/g, "").slice(0, 5)
-          : field.value;
+          : field.dataset.goalField === "note"
+            ? field.value.trim()
+            : field.value;
       field.value = value;
       updateGoal(
         field.dataset.character,
@@ -2187,6 +2189,17 @@ function setupEchoSetCombobox(combobox) {
   input.addEventListener("focus", () => {
     restoreValueOnBlur = combobox.dataset.value || "";
     input.value = "";
+    openOptions();
+    activeIndex = filterEchoSetOptions(combobox, 0);
+  });
+
+  combobox.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest("[data-echo-set-option]")) return;
+    if (document.activeElement !== input) {
+      input.focus();
+      return;
+    }
     openOptions();
     activeIndex = filterEchoSetOptions(combobox, 0);
   });
@@ -3191,6 +3204,15 @@ function renderDetail() {
     field.addEventListener("input", (event) =>
       updateFarm(character.id, key, event.target.value),
     );
+    if (key === "notes") {
+      field.addEventListener("blur", () => {
+        const trimmedValue = field.value.trim();
+        if (field.value !== trimmedValue) {
+          field.value = trimmedValue;
+          updateFarm(character.id, key, trimmedValue);
+        }
+      });
+    }
   });
 
   detailPanel.innerHTML = "";
