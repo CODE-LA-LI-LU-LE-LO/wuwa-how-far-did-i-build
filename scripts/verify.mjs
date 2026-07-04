@@ -251,6 +251,10 @@ for (const requiredSource of [
 const manifest = JSON.parse(await readText("manifest.webmanifest"));
 if (manifest.display !== "standalone") fail("manifest display must be standalone");
 if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) fail("manifest must include icons");
+
+if (!appSource.includes('const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];')) {
+  fail("app.js must provide stat branch options from - through A-F");
+}
 for (const icon of manifest.icons ?? []) {
   await mustExist(icon.src);
 }
