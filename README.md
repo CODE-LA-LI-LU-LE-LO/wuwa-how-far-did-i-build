@@ -264,6 +264,7 @@ PR 단계에서 실제 화면을 확인할 수 있도록 `.github/workflows/pr-p
 - 검증: Preview 배포 전에 `node scripts/verify.mjs`와 `node --check app.js`를 실행하며, 실패하면 배포하지 않습니다.
 - 상대 경로: preview artifact에는 루트 정적 파일 전체가 포함되므로 `styles.css`, `app.js`, `manifest.webmanifest`, `assets/*`, `data/characters.json`, `data/goal-defaults.json`, `sw.js` 같은 상대 경로 리소스가 함께 배포됩니다.
 - production 보호: production workflow는 기존 `actions/deploy-pages` 기반 `main` 배포 흐름을 유지합니다. PR Preview workflow는 `actions/deploy-pages`의 `preview: true`를 사용해 production 배포를 덮어쓰지 않습니다.
+- 일시 장애 대응: GitHub Pages 배포 상태 조회가 일시적으로 실패할 수 있어 preview 배포 단계는 기본값보다 긴 timeout과 더 많은 status report 오류 허용치를 사용합니다. 그래도 `Deployment failed, try again later.`가 발생하면 GitHub Pages 서비스 일시 장애일 수 있으므로 workflow를 재실행하고 GitHub Status의 Pages 상태를 확인합니다.
 
 > 운영 참고: 이전 `gh-pages` 브랜치 기반 preview 방식은 저장소 Pages Source가 `main` 또는 `GitHub Actions`로 설정된 경우 preview 파일이 공개 URL로 서비스되지 않아 404가 발생할 수 있었습니다. 현재 workflow는 별도 `gh-pages` 브랜치에 쓰지 않고 GitHub Pages preview deployment를 사용하므로 production Pages Source를 preview 때문에 `gh-pages`로 전환하지 않아도 됩니다.
 

@@ -52,6 +52,9 @@ jobs:
         with:
           artifact_name: pr-preview-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
           preview: true
+          timeout: 900000
+          error_count: 30
+          reporting_interval: 10000
 
       - name: Write preview summary
         run: |
