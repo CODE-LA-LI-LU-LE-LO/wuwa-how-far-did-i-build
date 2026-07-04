@@ -331,11 +331,19 @@ h2 {
 }
 
 .toolbar.is-collapsed {
-  min-height: 50px;
-  padding-block: 8px;
+  min-height: 0;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .toolbar.is-collapsed > :not(.sticky-toggle) {
+  display: none;
+}
+
+.category-rail.is-toolbar-collapsed {
   display: none;
 }
 
@@ -353,6 +361,27 @@ h2 {
   font-size: 0.78rem;
   font-weight: 900;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
+}
+
+.toolbar:not(.is-stuck) > .sticky-toggle,
+.focus-strip:not(.is-stuck) > .sticky-toggle {
+  display: none;
+}
+
+.toolbar.is-collapsed > .sticky-toggle,
+.focus-strip.is-collapsed > .sticky-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 80;
+}
+
+body.has-two-collapsed-sticky-sections .toolbar.is-collapsed > .sticky-toggle {
+  right: 152px;
+}
+
+body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggle {
+  right: 16px;
 }
 
 .sticky-toggle:hover,
@@ -451,9 +480,12 @@ h2 {
 }
 
 .focus-strip.is-collapsed {
-  min-height: 50px;
+  min-height: 0;
   overflow: visible;
-  padding-block: 8px;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .focus-strip.is-collapsed .focus-card {
@@ -2033,6 +2065,10 @@ dialog::backdrop {
     padding-right: 96px;
     scrollbar-gutter: stable;
     scrollbar-width: thin;
+  }
+
+  .toolbar.is-collapsed {
+    overflow: visible;
   }
 
   .toolbar::-webkit-scrollbar {
