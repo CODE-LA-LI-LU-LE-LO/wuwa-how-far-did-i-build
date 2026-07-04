@@ -45,7 +45,7 @@ Testing
 
 - PR 작성 전, Korean / English 섹션 분리가 적용되었는지 한 번 더 확인한다.
 
-## Pull Request Follow-up Updates
+## Branch Update Follow-up
 
 - 기존 PR 본문을 직접 수정할 수 있는 도구 또는 권한이 확인되면, 기존 PR 본문을 최신 내용으로 직접 수정한다.
 - 기존 PR 본문을 직접 수정할 수 없고 추가 커밋이 발생했다면, PR 본문을 수정했다고 말하지 않는다.
