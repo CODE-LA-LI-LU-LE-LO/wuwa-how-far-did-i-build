@@ -524,9 +524,9 @@ appTabs.forEach((button) => {
   });
 });
 
-function setActiveTab(tab) {
+function setActiveTab(tab, { resetCategory = true } = {}) {
   activeTab = tab;
-  activeCategory = "all";
+  if (resetCategory) activeCategory = "all";
   customGoalEditingId = null;
   appTabs.forEach((item) =>
     item.classList.toggle("active", item.dataset.tab === tab),
@@ -1729,6 +1729,7 @@ function rerenderFarmingCard(id) {
 function renderCategoryRail() {
   if (sortMode === "name") {
     categoryRail.classList.add("hidden");
+    categoryRail.classList.remove("category-rail--weapon");
     categoryRail.innerHTML = "";
     return;
   }
@@ -1738,6 +1739,7 @@ function renderCategoryRail() {
     .sort(sortCategories);
 
   categoryRail.classList.remove("hidden");
+  categoryRail.classList.toggle("category-rail--weapon", sortMode === "weapon");
   categoryRail.innerHTML = `
     <button class="${activeCategory === "all" ? "active" : ""}" data-category="all" type="button" aria-label="전체 카테고리">${renderCategoryLabel("all")}</button>
     ${categories
@@ -2082,9 +2084,10 @@ function renderCharacterMetaChips(character, { showVisibility = false } = {}) {
   `;
 }
 
-function renderInlineIcon(icon) {
+function renderInlineIcon(icon, extraClass = "") {
+  const classes = ["inline-icon", extraClass].filter(Boolean).join(" ");
   return icon
-    ? `<img class="inline-icon" src="${escapeHtml(icon)}" alt="" loading="lazy" />`
+    ? `<img class="${escapeHtml(classes)}" src="${escapeHtml(icon)}" alt="" loading="lazy" />`
     : "";
 }
 
@@ -2444,7 +2447,8 @@ function renderCategoryLabel(category) {
 function renderCategoryIcon(category) {
   if (category === "all") return `<span class="category-icon" aria-hidden="true">＊</span>`;
   if (sortMode === "element") return renderInlineIcon(elementIcons[category]) || renderUnknownIcon(category);
-  if (sortMode === "weapon") return renderInlineIcon(weaponIcons[category]) || renderUnknownIcon(category);
+  if (sortMode === "weapon")
+    return renderInlineIcon(weaponIcons[category], "weapon-category-icon") || renderUnknownIcon(category);
   if (sortMode === "rarity") return "";
   return "";
 }
@@ -3088,7 +3092,7 @@ function openFarmingCard(id) {
   if (!character?.owned) return;
 
   selectedId = id;
-  setActiveTab("farming");
+  setActiveTab("farming", { resetCategory: false });
   render();
   requestAnimationFrame(() => {
     const card = rosterList.querySelector(
