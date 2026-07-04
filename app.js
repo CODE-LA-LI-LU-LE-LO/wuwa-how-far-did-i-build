@@ -420,6 +420,7 @@ const shareNotice = document.querySelector("#shareNotice");
 const saveSnapshotButton = document.querySelector("#saveSnapshotButton");
 const closeShareButton = document.querySelector("#closeShareButton");
 const toolbar = document.querySelector(".toolbar");
+const toolbarStickyToggle = document.querySelector('[data-sticky-toggle="toolbar"]');
 const focusStripSentinel = document.querySelector("#focusStripSentinel");
 const focusStrip = document.querySelector("#focusStrip");
 const categoryRail = document.querySelector("#categoryRail");
@@ -515,6 +516,8 @@ let sortMode = "name";
 let activeCategory = "all";
 let visibilityFilter = "all";
 let farmingFilters = new Set(["owned"]);
+let stickySectionsCollapsed = { toolbar: false, focus: false };
+let wasScrolledPastStickyThreshold = false;
 let adminGoalEditing = false;
 let customGoalEditingId = null;
 
@@ -581,6 +584,38 @@ farmingFilterInputs.forEach((input) => {
   });
 });
 
+
+function setStickySectionCollapsed(section, collapsed) {
+  stickySectionsCollapsed[section] = collapsed;
+  const element = section === "toolbar" ? toolbar : focusStrip;
+  const button =
+    section === "toolbar"
+      ? toolbarStickyToggle
+      : focusStrip?.querySelector('[data-sticky-toggle="focus"]');
+
+  element?.classList.toggle("is-collapsed", collapsed);
+  if (!button) return;
+
+  button.textContent = collapsed ? "펼치기▼" : "숨기기▲";
+  button.setAttribute("aria-expanded", String(!collapsed));
+}
+
+function syncStickySectionCollapse() {
+  const scrolledPastThreshold = window.scrollY > 24;
+  if (scrolledPastThreshold !== wasScrolledPastStickyThreshold) {
+    wasScrolledPastStickyThreshold = scrolledPastThreshold;
+    setStickySectionCollapsed("toolbar", scrolledPastThreshold);
+    setStickySectionCollapsed("focus", scrolledPastThreshold);
+  } else {
+    setStickySectionCollapsed("toolbar", stickySectionsCollapsed.toolbar);
+    setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
+  }
+}
+
+toolbarStickyToggle?.addEventListener("click", () => {
+  setStickySectionCollapsed("toolbar", !stickySectionsCollapsed.toolbar);
+});
+
 if (compactDetailQuery?.addEventListener) {
   compactDetailQuery.addEventListener("change", (event) => {
     isDetailPanelCollapsed = event.matches;
@@ -600,10 +635,18 @@ detailPanel.addEventListener("click", (event) => {
   renderDetail();
 });
 
-window.addEventListener("scroll", updateFocusStripStickiness, {
-  passive: true,
+window.addEventListener(
+  "scroll",
+  () => {
+    syncStickySectionCollapse();
+    updateFocusStripStickiness();
+  },
+  { passive: true },
+);
+window.addEventListener("resize", () => {
+  syncStickySectionCollapse();
+  updateFocusStripStickiness();
 });
-window.addEventListener("resize", updateFocusStripStickiness);
 
 searchInput.addEventListener("input", (event) => {
   searchTerm = event.target.value.trim().toLowerCase();
@@ -1302,6 +1345,7 @@ function render() {
   renderDetail();
   renderStats();
   renderSnapshotNotice();
+  syncStickySectionCollapse();
   updateFocusStripStickiness();
 }
 
@@ -2822,7 +2866,12 @@ function renderFocusStrip() {
         <p class="eyebrow">Focus</p>
         <h2>보유 처리된 캐릭터가 없습니다</h2>
       </article>
+      <button class="sticky-toggle focus-sticky-toggle" data-sticky-toggle="focus" type="button" aria-controls="focusStrip" aria-expanded="true">숨기기▲</button>
     `;
+    focusStrip.querySelector('[data-sticky-toggle="focus"]')?.addEventListener("click", () => {
+      setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus);
+    });
+    setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
     return;
   }
 
@@ -2848,6 +2897,15 @@ function renderFocusStrip() {
       `;
     })
     .join("");
+
+  focusStrip.insertAdjacentHTML(
+    "beforeend",
+    `<button class="sticky-toggle focus-sticky-toggle" data-sticky-toggle="focus" type="button" aria-controls="focusStrip" aria-expanded="true">숨기기▲</button>`,
+  );
+  focusStrip.querySelector('[data-sticky-toggle="focus"]')?.addEventListener("click", () => {
+    setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus);
+  });
+  setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
 
   focusStrip.querySelectorAll("[data-focus]").forEach((button) => {
     button.addEventListener("click", () => {
