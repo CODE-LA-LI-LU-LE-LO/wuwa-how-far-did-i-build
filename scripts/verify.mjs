@@ -180,6 +180,7 @@ for (let index = 1; index <= 31; index += 1) {
 
 const html = await readText("index.html");
 const appSource = await readText("app.js");
+const stylesSource = await readText("styles.css");
 const goalDefaultsSource = await readText("data/goal-defaults.json");
 try {
   JSON.parse(goalDefaultsSource);
@@ -209,6 +210,21 @@ for (const attribute of [
   'data-field="notes"',
 ]) {
   if (!html.includes(attribute)) fail(`index.html missing ${attribute}`);
+}
+
+for (const removedStickySource of [
+  "sticky-toggle",
+  "focus-strip-sentinel",
+  "focus-sticky-toggle",
+  "hasScrolledPastElement",
+  "syncStickySectionCollapse",
+  "updateFocusStripStickiness",
+  "is-toolbar-collapsed",
+  "has-category-filter",
+]) {
+  if (html.includes(removedStickySource)) fail(`index.html should not include removed sticky UI source: ${removedStickySource}`);
+  if (appSource.includes(removedStickySource)) fail(`app.js should not include removed sticky UI source: ${removedStickySource}`);
+  if (stylesSource.includes(removedStickySource)) fail(`styles.css should not include removed sticky UI source: ${removedStickySource}`);
 }
 
 for (const requiredSource of [
