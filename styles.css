@@ -699,8 +699,8 @@ select option {
   color: #101720;
 }
 
-.category-rail--weapon button.active .inline-icon {
-  filter: invert(1);
+.category-rail button.active .weapon-category-icon {
+  filter: brightness(0) saturate(100%);
 }
 
 .category-icon {

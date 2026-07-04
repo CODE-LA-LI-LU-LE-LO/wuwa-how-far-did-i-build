@@ -2084,9 +2084,10 @@ function renderCharacterMetaChips(character, { showVisibility = false } = {}) {
   `;
 }
 
-function renderInlineIcon(icon) {
+function renderInlineIcon(icon, extraClass = "") {
+  const classes = ["inline-icon", extraClass].filter(Boolean).join(" ");
   return icon
-    ? `<img class="inline-icon" src="${escapeHtml(icon)}" alt="" loading="lazy" />`
+    ? `<img class="${escapeHtml(classes)}" src="${escapeHtml(icon)}" alt="" loading="lazy" />`
     : "";
 }
 
@@ -2446,7 +2447,8 @@ function renderCategoryLabel(category) {
 function renderCategoryIcon(category) {
   if (category === "all") return `<span class="category-icon" aria-hidden="true">＊</span>`;
   if (sortMode === "element") return renderInlineIcon(elementIcons[category]) || renderUnknownIcon(category);
-  if (sortMode === "weapon") return renderInlineIcon(weaponIcons[category]) || renderUnknownIcon(category);
+  if (sortMode === "weapon")
+    return renderInlineIcon(weaponIcons[category], "weapon-category-icon") || renderUnknownIcon(category);
   if (sortMode === "rarity") return "";
   return "";
 }
