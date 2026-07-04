@@ -265,7 +265,7 @@ PR 단계에서 실제 화면을 확인할 수 있도록 `.github/workflows/pr-p
 - 격리 방식: 정적 파일 전체를 `pr-preview/pr-<PR번호>/` 아래에 복사해 배포하므로 `styles.css`, `app.js`, `manifest.webmanifest`, `assets/*`, `data/characters.json`, `data/goal-defaults.json`, `sw.js` 같은 상대 경로 리소스가 같은 하위 경로 안에서 로드됩니다.
 - production 보호: 기존 production GitHub Pages 배포 워크플로인 `.github/workflows/pages.yml`은 `main` push와 수동 실행용으로 유지됩니다. PR Preview는 production 루트 파일을 덮어쓰지 않고 `gh-pages` 브랜치의 `pr-preview/pr-<PR번호>/` 하위 디렉터리에만 배포합니다.
 
-> 운영 참고: `rossjrw/pr-preview-action` 기반 Preview는 GitHub Pages가 배포 브랜치의 파일을 서비스할 수 있어야 실제 URL로 열립니다. 저장소 Pages 설정이 `GitHub Actions` production 배포만 사용하도록 고정되어 있다면 production 배포는 그대로 유지되지만, Preview 브랜치 파일이 공개 Pages URL로 서비스되지 않을 수 있습니다. 이 경우 production 전환 전에 저장소 설정과 Pages 소스 정책을 검토하거나, Preview 전용 Pages 저장소/브랜치를 별도로 연결하는 방식으로 운영하세요.
+> 운영 필수 조건: 이 Preview workflow는 `gh-pages` 브랜치에 `pr-preview/pr-<PR번호>/` 파일을 배포하므로, 해당 URL이 실제로 열리려면 GitHub Pages Source가 `Deploy from a branch`의 `gh-pages` `/ (root)`를 서비스해야 합니다. Source가 `GitHub Actions`로 설정된 상태에서는 `gh-pages` 브랜치에 파일이 있어도 공개 Pages URL로 서비스되지 않아 Preview URL이 404가 됩니다. workflow는 배포 전에 Pages source를 확인하고, `gh-pages` 브랜치가 아니면 잘못된 Preview URL을 남기지 않도록 실패 처리합니다. production URL을 유지하려면 `main` merge 후 production 파일을 같은 Pages 사이트의 루트에 배포하는 운영 전환 계획을 먼저 검토하거나, Preview 전용 Pages 저장소/브랜치를 별도로 연결하세요.
 
 ### 서비스 워커와 Preview 환경
 

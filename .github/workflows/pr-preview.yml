@@ -31,6 +31,22 @@ jobs:
       - name: Check app.js syntax
         run: node --check app.js
 
+      - name: Verify Pages branch source
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data } = await github.rest.repos.getPages({ owner, repo });
+            const source = data.source ?? {};
+            const actual = source.branch ? `${source.branch}/${source.path ?? "/"}` : "GitHub Actions";
+            if (source.branch !== "gh-pages" || (source.path && source.path !== "/")) {
+              core.setFailed([
+                "PR Preview는 gh-pages 브랜치의 pr-preview/pr-<number>/ 경로에 파일을 배포합니다.",
+                `현재 GitHub Pages source는 ${actual}로 확인되어 gh-pages 브랜치의 Preview 파일이 공개 URL로 서비스되지 않습니다.`,
+                "Repository Settings > Pages에서 Source를 Deploy from a branch, Branch를 gh-pages /(root)로 전환하거나 Preview 전용 Pages 저장소/브랜치를 연결한 뒤 다시 실행하세요.",
+              ].join("\n"));
+            }
+
       - name: Prepare preview payload
         run: |
           set -euo pipefail
@@ -44,6 +60,7 @@ jobs:
             ./ preview-dist/
 
       - name: Deploy PR preview
+        id: preview
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: preview-dist
@@ -54,7 +71,10 @@ jobs:
 
       - name: Write preview summary
         run: |
-          PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.pull_request.number }}/"
+          PREVIEW_URL="${{ steps.preview.outputs.preview-url }}"
+          if [ -z "$PREVIEW_URL" ]; then
+            PREVIEW_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.pull_request.number }}/"
+          fi
           {
             echo "## PR Preview"
             echo ""
