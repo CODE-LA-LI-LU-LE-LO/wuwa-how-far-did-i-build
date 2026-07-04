@@ -1598,7 +1598,7 @@ select option {
   display: grid;
   place-items: center;
   width: 24px;
-  height: 24px;
+  height: 40px;
   min-height: 0;
   padding: 0;
   border: 1px solid var(--line);
@@ -1608,9 +1608,9 @@ select option {
 }
 
 .branch-check input {
-  width: 13px;
-  height: 13px;
-  min-height: 13px;
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
   padding: 0;
   margin: 0;
   accent-color: var(--accent);
