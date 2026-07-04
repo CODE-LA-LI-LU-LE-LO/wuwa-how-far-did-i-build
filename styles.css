@@ -1377,6 +1377,10 @@ select option {
   color: var(--text);
 }
 
+.echo-picker-options [hidden] {
+  display: none !important;
+}
+
 .echo-set-empty-results {
   min-height: 38px;
   padding: 10px 8px;

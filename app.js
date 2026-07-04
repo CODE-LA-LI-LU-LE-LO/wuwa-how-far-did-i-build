@@ -1264,6 +1264,34 @@ function getPortableState(options = {}) {
   return portableState;
 }
 
+function closeOpenPickers(exceptPicker = null) {
+  rosterList.querySelectorAll("details.echo-picker[open]").forEach((picker) => {
+    if (picker !== exceptPicker) picker.open = false;
+  });
+
+  rosterList
+    .querySelectorAll("[data-echo-set-combobox].open")
+    .forEach((picker) => {
+      if (picker !== exceptPicker) {
+        picker.classList.remove("open");
+        picker
+          .querySelector("[data-echo-set-search]")
+          ?.setAttribute("aria-expanded", "false");
+      }
+    });
+}
+
+function setupDetailPicker(picker) {
+  picker.addEventListener("toggle", () => {
+    if (picker.open) closeOpenPickers(picker);
+  });
+
+  picker.addEventListener("focusout", (event) => {
+    if (event.relatedTarget && picker.contains(event.relatedTarget)) return;
+    picker.open = false;
+  });
+}
+
 function render() {
   exportCharactersButton.classList.toggle("hidden", !isAdmin());
   exportGoalDefaultsButton.classList.toggle("hidden", !isAdmin());
@@ -1535,7 +1563,8 @@ function renderRoster() {
   });
 
   rosterList.querySelectorAll("[data-goal-stat-field]").forEach((field) => {
-    field.addEventListener("change", () => {
+    const eventName = field.tagName === "INPUT" ? "blur" : "change";
+    field.addEventListener(eventName, () => {
       if (
         field.dataset.goalStatField === "target" &&
         Number(field.value) < 0
@@ -1561,7 +1590,7 @@ function renderRoster() {
   });
 
   rosterList.querySelectorAll("[data-main-echo-field]").forEach((field) => {
-    field.addEventListener("change", () =>
+    field.addEventListener("blur", () =>
       updateGoalMainEcho(
         field.dataset.character,
         Number(field.dataset.index),
@@ -1581,6 +1610,10 @@ function renderRoster() {
       ),
     );
   });
+
+  rosterList
+    .querySelectorAll("details.echo-picker")
+    .forEach(setupDetailPicker);
 
   rosterList
     .querySelectorAll("[data-echo-set-combobox]")
@@ -1614,7 +1647,7 @@ function renderRoster() {
   });
 
   rosterList.querySelectorAll("[data-current-field]").forEach((field) => {
-    field.addEventListener("change", () => {
+    field.addEventListener("blur", () => {
       const normalizedValue = Math.max(0, Number(field.value) || 0);
       field.value = String(normalizedValue);
       updateCurrentStat(
@@ -1634,10 +1667,11 @@ function renderRoster() {
     if (field.dataset.goalField === "echoBuild") {
       field.addEventListener("input", () => {
         field.value = field.value.replace(/\D/g, "").slice(0, 5);
+        updateEchoBuildPreview(field);
       });
     }
 
-    field.addEventListener("change", () => {
+    field.addEventListener("blur", () => {
       const value =
         field.dataset.goalField === "echoBuild"
           ? field.value.replace(/\D/g, "").slice(0, 5)
@@ -1870,6 +1904,21 @@ function renderEchoBuildInput(character, goal, canEditGoal) {
   `;
 }
 
+function updateEchoBuildPreview(input) {
+  const field = input.closest(".echo-build-field");
+  const highlight = field?.querySelector(".echo-build-highlight");
+  if (!field || !highlight) return;
+
+  const value = input.value.replace(/\D/g, "").slice(0, 5);
+  const displayValue = value || "43311";
+  field.classList.toggle("is-placeholder", !value);
+  highlight.innerHTML = Array.from(displayValue.slice(0, 5))
+    .map((digit, index) =>
+      `<span class="${index === 0 ? "main-echo-cost" : ""}">${escapeHtml(digit)}</span>`,
+    )
+    .join("");
+}
+
 function renderGoalEchoSetRow(character, echoSet, index, canEditGoal) {
   return `
     <div class="echo-set-row">
@@ -1945,7 +1994,8 @@ function renderStatRow(character, stat, index, canEditGoal) {
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
   const hasBranch = stat.variant !== "-";
   const met = branchActive && current >= target;
-  const inputDisabled = branchActive ? "" : "disabled";
+  const canEditCurrent = branchActive || canEditGoal;
+  const inputDisabled = canEditCurrent ? "" : "disabled";
   const targetDisabled = canEditGoal ? "" : "disabled";
   const rowInactive = !branchActive && !canEditGoal;
   const option = getStatOption(stat.key, valueStatOptions);
@@ -1967,7 +2017,7 @@ function renderStatRow(character, stat, index, canEditGoal) {
       <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${target}" ${targetDisabled} />
       <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
-        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${branchActive ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
+        <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${canEditCurrent ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
         ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
@@ -2063,6 +2113,7 @@ function setupEchoSetCombobox(combobox) {
   let activeIndex = getInitialEchoSetOptionIndex(options);
 
   const openOptions = () => {
+    closeOpenPickers(combobox);
     combobox.classList.add("open");
     input.setAttribute("aria-expanded", "true");
   };
@@ -2573,8 +2624,8 @@ function updateRenderedValueBranchStates(id) {
       if (branchCheckbox) branchCheckbox.checked = branchActive;
       row.classList.toggle("branch-inactive", !branchActive && !canEditGoal);
       if (targetInput) targetInput.disabled = !canEditGoal;
-      if (currentInput) currentInput.disabled = !branchActive;
-      if (clearButton) clearButton.disabled = !branchActive;
+      if (currentInput) currentInput.disabled = !branchActive && !canEditGoal;
+      if (clearButton) clearButton.disabled = !branchActive && !canEditGoal;
       updateRenderedStatRowState(id, Number(row.dataset.index), row);
     });
 }
@@ -2617,8 +2668,14 @@ function updateRenderedStatRowState(id, index, row) {
 
   const current = getCurrentStatValue(character, stat);
   const target = Number(stat.target ?? 0);
+  const canEditGoal = canEditActiveGoal(character);
   const branchActive = isGoalBranchActive(getActiveGoal(character), stat.variant);
-  row.classList.toggle("branch-inactive", !branchActive && !canEditActiveGoal(character));
+  row.classList.toggle("branch-inactive", !branchActive && !canEditGoal);
+
+  const currentInput = row.querySelector("[data-current-field]");
+  const clearButton = row.querySelector("[data-clear-current]");
+  if (currentInput) currentInput.disabled = !branchActive && !canEditGoal;
+  if (clearButton) clearButton.disabled = !branchActive && !canEditGoal;
   row.classList.toggle("met", branchActive && current >= target);
 }
 
@@ -2697,7 +2754,7 @@ function updateGoalStatKey(id, index, key) {
   const goal = getActiveGoal(character);
   const stat = goal.stats[Number(index)];
   if (!stat) return;
-  if (!isGoalBranchActive(goal, stat.variant)) return;
+  if (!isGoalBranchActive(goal, stat.variant) && !canEditActiveGoal(character)) return;
   const option = getStatOption(key, valueStatOptions);
 
   stat.key = option.key;
