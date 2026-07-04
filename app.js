@@ -1377,11 +1377,15 @@ function renderRoster() {
     )
     .join("");
 
-  rosterList.querySelectorAll("[data-owned]").forEach((button) => {
+  bindRosterInteractions(rosterList);
+}
+
+function bindRosterInteractions(root = rosterList) {
+  root.querySelectorAll("[data-owned]").forEach((button) => {
     button.addEventListener("click", () => toggleOwned(button.dataset.owned));
   });
 
-  rosterList.querySelectorAll("[data-select]").forEach((button) => {
+  root.querySelectorAll("[data-select]").forEach((button) => {
     button.addEventListener("click", () => {
       const character = state.characters.find(
         (item) => item.id === button.dataset.select,
@@ -1399,13 +1403,13 @@ function renderRoster() {
     });
   });
 
-  rosterList.querySelectorAll("[data-edit]").forEach((button) => {
+  root.querySelectorAll("[data-edit]").forEach((button) => {
     button.addEventListener("click", () =>
       openCharacterDialog(button.dataset.edit),
     );
   });
 
-  rosterList.querySelectorAll("[data-goal-mode]").forEach((button) => {
+  root.querySelectorAll("[data-goal-mode]").forEach((button) => {
     button.addEventListener("click", () => {
       if (button.dataset.mode !== "custom") {
         customGoalEditingId = null;
@@ -1418,18 +1422,20 @@ function renderRoster() {
     });
   });
 
-  rosterList.querySelectorAll("[data-toggle-custom-goal]").forEach((button) => {
+  root.querySelectorAll("[data-toggle-custom-goal]").forEach((button) => {
     button.addEventListener("click", () => {
       const characterId = button.dataset.toggleCustomGoal;
       customGoalEditingId =
         customGoalEditingId === characterId
           ? null
           : characterId;
-      keepFarmCardScrollStable(characterId, renderRoster);
+      keepFarmCardScrollStable(characterId, () =>
+        rerenderFarmingCard(characterId),
+      );
     });
   });
 
-  rosterList.querySelectorAll("[data-toggle-admin-goals]").forEach((button) => {
+  root.querySelectorAll("[data-toggle-admin-goals]").forEach((button) => {
     button.addEventListener("click", () => {
       if (!isAdmin()) {
         showSessionMessage(
@@ -1441,48 +1447,50 @@ function renderRoster() {
       const card = button.closest("[data-farm-card]");
       adminGoalEditing = !adminGoalEditing;
       if (card?.dataset.farmCard) {
-        keepFarmCardScrollStable(card.dataset.farmCard, renderRoster);
+        keepFarmCardScrollStable(card.dataset.farmCard, () =>
+          rerenderFarmingCard(card.dataset.farmCard),
+        );
         return;
       }
       renderRoster();
     });
   });
 
-  rosterList.querySelectorAll("[data-add-stat]").forEach((button) => {
+  root.querySelectorAll("[data-add-stat]").forEach((button) => {
     button.addEventListener("click", () => addGoalStat(button.dataset.addStat));
   });
 
-  rosterList.querySelectorAll("[data-add-echo-stat]").forEach((button) => {
+  root.querySelectorAll("[data-add-echo-stat]").forEach((button) => {
     button.addEventListener("click", () =>
       addGoalEchoStat(button.dataset.addEchoStat),
     );
   });
 
-  rosterList.querySelectorAll("[data-add-echo-set]").forEach((button) => {
+  root.querySelectorAll("[data-add-echo-set]").forEach((button) => {
     button.addEventListener("click", () =>
       addGoalEchoSet(button.dataset.addEchoSet),
     );
   });
 
-  rosterList.querySelectorAll("[data-add-main-echo]").forEach((button) => {
+  root.querySelectorAll("[data-add-main-echo]").forEach((button) => {
     button.addEventListener("click", () =>
       addGoalMainEcho(button.dataset.addMainEcho),
     );
   });
 
-  rosterList.querySelectorAll("[data-remove-stat]").forEach((button) => {
+  root.querySelectorAll("[data-remove-stat]").forEach((button) => {
     button.addEventListener("click", () =>
       removeGoalStat(button.dataset.character, button.dataset.removeStat),
     );
   });
 
-  rosterList.querySelectorAll("[data-remove-echo-set]").forEach((button) => {
+  root.querySelectorAll("[data-remove-echo-set]").forEach((button) => {
     button.addEventListener("click", () =>
       removeGoalEchoSet(button.dataset.character, button.dataset.removeEchoSet),
     );
   });
 
-  rosterList.querySelectorAll("[data-remove-main-echo]").forEach((button) => {
+  root.querySelectorAll("[data-remove-main-echo]").forEach((button) => {
     button.addEventListener("click", () =>
       removeGoalMainEcho(
         button.dataset.character,
@@ -1491,7 +1499,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-remove-echo-stat]").forEach((button) => {
+  root.querySelectorAll("[data-remove-echo-stat]").forEach((button) => {
     button.addEventListener("click", () =>
       removeGoalEchoStat(
         button.dataset.character,
@@ -1500,7 +1508,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-stat-key]").forEach((field) => {
+  root.querySelectorAll("[data-stat-key]").forEach((field) => {
     field.addEventListener("change", () =>
       updateGoalStatKey(
         field.dataset.character,
@@ -1510,7 +1518,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-echo-stat-option]").forEach((button) => {
+  root.querySelectorAll("[data-echo-stat-option]").forEach((button) => {
     button.addEventListener("click", () =>
       updateGoalEchoStatKey(
         button.dataset.character,
@@ -1520,7 +1528,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-stat-option]").forEach((button) => {
+  root.querySelectorAll("[data-stat-option]").forEach((button) => {
     button.addEventListener("click", () =>
       updateGoalStatKey(
         button.dataset.character,
@@ -1530,7 +1538,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-echo-stat-field]").forEach((field) => {
+  root.querySelectorAll("[data-echo-stat-field]").forEach((field) => {
     field.addEventListener("change", () => {
       updateGoalEchoStatField(
         field.dataset.character,
@@ -1545,7 +1553,7 @@ function renderRoster() {
     });
   });
 
-  rosterList.querySelectorAll("[data-goal-stat-field]").forEach((field) => {
+  root.querySelectorAll("[data-goal-stat-field]").forEach((field) => {
     const eventName = field.tagName === "INPUT" ? "blur" : "change";
     field.addEventListener(eventName, () => {
       if (
@@ -1572,7 +1580,7 @@ function renderRoster() {
     });
   });
 
-  rosterList.querySelectorAll("[data-main-echo-field]").forEach((field) => {
+  root.querySelectorAll("[data-main-echo-field]").forEach((field) => {
     field.addEventListener("blur", () =>
       updateGoalMainEcho(
         field.dataset.character,
@@ -1583,7 +1591,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-echo-set-field]").forEach((field) => {
+  root.querySelectorAll("[data-echo-set-field]").forEach((field) => {
     field.addEventListener("change", () =>
       updateGoalEchoSet(
         field.dataset.character,
@@ -1594,32 +1602,36 @@ function renderRoster() {
     );
   });
 
-  rosterList
+  root
     .querySelectorAll("details.echo-picker")
     .forEach(setupDetailPicker);
 
-  rosterList
+  root
     .querySelectorAll("[data-echo-set-combobox]")
     .forEach(setupEchoSetCombobox);
 
-  rosterList.querySelectorAll("[data-echo-set-option]").forEach((button) => {
-    button.addEventListener("click", () =>
+  root.querySelectorAll("[data-echo-set-option]").forEach((button) => {
+    button.addEventListener("click", () => {
       updateGoalEchoSet(
         button.dataset.character,
         Number(button.dataset.index),
         "name",
         button.dataset.value,
-      ),
-    );
+      );
+      const combobox = button.closest("[data-echo-set-combobox]");
+      const input = combobox?.querySelector("[data-echo-set-search]");
+      combobox?.classList.remove("open");
+      input?.setAttribute("aria-expanded", "false");
+    });
   });
 
-  rosterList.querySelectorAll("[data-clear-current]").forEach((button) => {
+  root.querySelectorAll("[data-clear-current]").forEach((button) => {
     button.addEventListener("click", () =>
       clearCurrentStat(button.dataset.clearCurrent, button.dataset.statKey),
     );
   });
 
-  rosterList.querySelectorAll("[data-manual-complete]").forEach((input) => {
+  root.querySelectorAll("[data-manual-complete]").forEach((input) => {
     input.addEventListener("change", () =>
       updateCurrentStat(
         input.dataset.manualComplete,
@@ -1629,7 +1641,7 @@ function renderRoster() {
     );
   });
 
-  rosterList.querySelectorAll("[data-current-field]").forEach((field) => {
+  root.querySelectorAll("[data-current-field]").forEach((field) => {
     field.addEventListener("blur", () => {
       const normalizedValue = Math.max(0, Number(field.value) || 0);
       field.value = String(normalizedValue);
@@ -1646,7 +1658,7 @@ function renderRoster() {
     });
   });
 
-  rosterList.querySelectorAll("[data-goal-field]").forEach((field) => {
+  root.querySelectorAll("[data-goal-field]").forEach((field) => {
     if (field.dataset.goalField === "echoBuild") {
       field.addEventListener("input", () => {
         field.value = field.value.replace(/\D/g, "").slice(0, 5);
@@ -1668,6 +1680,21 @@ function renderRoster() {
       );
     });
   });
+}
+
+function rerenderFarmingCard(id) {
+  const character = state.characters.find((item) => item.id === id);
+  const card = rosterList.querySelector(`[data-farm-card="${CSS.escape(id)}"]`);
+  if (!character || !card || activeTab !== "farming") {
+    renderRoster();
+    return;
+  }
+
+  card.outerHTML = renderFarmingCard(character);
+  const updatedCard = rosterList.querySelector(
+    `[data-farm-card="${CSS.escape(id)}"]`,
+  );
+  if (updatedCard) bindRosterInteractions(updatedCard);
 }
 
 function renderCategoryRail() {
@@ -2099,6 +2126,7 @@ function setupEchoSetCombobox(combobox) {
   if (!input) return;
 
   let activeIndex = getInitialEchoSetOptionIndex(options);
+  let restoreValueOnBlur = combobox.dataset.value || "";
 
   const openOptions = () => {
     closeOpenPickers(combobox);
@@ -2112,7 +2140,7 @@ function setupEchoSetCombobox(combobox) {
   };
 
   const resetInputValue = () => {
-    input.value = combobox.dataset.value || "";
+    input.value = combobox.dataset.value || restoreValueOnBlur;
     filterEchoSetOptions(combobox, activeIndex);
   };
 
@@ -2131,8 +2159,10 @@ function setupEchoSetCombobox(combobox) {
   };
 
   input.addEventListener("focus", () => {
+    restoreValueOnBlur = combobox.dataset.value || "";
+    input.value = "";
     openOptions();
-    activeIndex = filterEchoSetOptions(combobox, activeIndex);
+    activeIndex = filterEchoSetOptions(combobox, 0);
   });
 
   input.addEventListener("input", () => {
@@ -2409,16 +2439,29 @@ function matchesFarmingFilters(character) {
 
 function updateCharacterField(id, field, value) {
   const character = state.characters.find((item) => item.id === id);
-  if (!character) return;
+  if (!character || character[field] === value) return;
   character[field] = value;
   saveState();
+
+  if (field === "goalMode") {
+    renderStats();
+    renderFocusStrip();
+    rerenderFarmingCard(id);
+    return;
+  }
+
   render();
 }
 
 function updateCurrentStat(id, field, value) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
-  const shouldRerenderRoster = field === "manualComplete";
+
+  const wasComplete = isGoalComplete(character);
+  const isCurrentValueField =
+    field in character.currentStats.values ||
+    field.includes(":") ||
+    valueStatOptions.some((option) => option.key === field);
 
   if (field === "manualComplete") {
     character.currentStats.manualComplete = Boolean(value);
@@ -2427,9 +2470,7 @@ function updateCurrentStat(id, field, value) {
       : character.farm.priority === "done"
         ? "mid"
         : character.farm.priority;
-  } else if (field in character.currentStats.values) {
-    character.currentStats.values[field] = Math.max(0, Number(value) || 0);
-  } else if (field.includes(":") || valueStatOptions.some((option) => option.key === field)) {
+  } else if (isCurrentValueField) {
     character.currentStats.values[field] = Math.max(0, Number(value) || 0);
   } else {
     character.currentStats[field] = value;
@@ -2438,10 +2479,82 @@ function updateCurrentStat(id, field, value) {
   saveState();
   renderStats();
   renderFocusStrip();
-  if (shouldRerenderRoster || field in character.currentStats.values || field.includes(":")) {
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
     renderRoster();
     if (id === selectedId) renderDetail();
+    return;
   }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  if (field === "manualComplete" || !isCurrentValueField) {
+    rerenderFarmingCard(id);
+    if (id === selectedId) renderDetail();
+  }
+}
+
+function shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete) {
+  if (wasComplete === isComplete) return false;
+  return farmingFilters.has("complete") || farmingFilters.has("incomplete");
+}
+
+function updateRenderedFarmingCardCompletionState(id, complete) {
+  const card = rosterList.querySelector(`[data-farm-card="${CSS.escape(id)}"]`);
+  if (!card) return;
+
+  card.classList.toggle("complete", complete);
+  const statusPill = card.querySelector(".status-pill");
+  if (!statusPill) return;
+
+  const character = state.characters.find((item) => item.id === id);
+  const ownershipPrefix = character?.owned ? "" : "미보유 · ";
+  statusPill.textContent = `${ownershipPrefix}${complete ? "목표달성" : "미달성"}`;
+}
+
+function updateGoalRenderStateAfterEdit(character, wasComplete) {
+  renderStats();
+  renderFocusStrip();
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (character.id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(character.id, isComplete);
+}
+
+function updateRenderedEchoSetCombobox(id, index, value) {
+  const input = rosterList.querySelector(
+    `[data-echo-set-search][data-character="${CSS.escape(id)}"][data-index="${CSS.escape(String(index))}"]`,
+  );
+  const combobox = input?.closest("[data-echo-set-combobox]");
+  if (!input || !combobox) return;
+
+  const selectedValue = normalizeEchoSetName(value);
+  const selectedEchoSet = echoSets.find((echoSet) => echoSet.name === selectedValue);
+  combobox.dataset.value = selectedValue;
+  input.value = selectedValue;
+
+  const selectedIcon = combobox.querySelector(".echo-set-selected-icon");
+  if (selectedIcon) {
+    selectedIcon.innerHTML = selectedEchoSet
+      ? renderInlineIcon(selectedEchoSet.icon)
+      : `<span class="empty-icon" aria-hidden="true"></span>`;
+  }
+
+  combobox.querySelectorAll("[data-echo-set-option]").forEach((option) => {
+    option.classList.toggle("active", option.dataset.value === selectedValue);
+  });
+
+  filterEchoSetOptions(
+    combobox,
+    getInitialEchoSetOptionIndex([
+      ...combobox.querySelectorAll("[data-echo-set-option]"),
+    ]),
+  );
 }
 
 function updateGoal(id, field, value, statKey) {
@@ -2449,33 +2562,48 @@ function updateGoal(id, field, value, statKey) {
   if (!character) return;
   if (!canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
+  const wasComplete = isGoalComplete(character);
 
   if (field === "target") {
     const stat = goal.stats.find((item) => item.key === statKey);
-    if (stat) stat.target = Number(value);
+    if (!stat) return;
+    const nextTarget = Number(value);
+    if (Number(stat.target ?? 0) === nextTarget) return;
+    stat.target = nextTarget;
   } else {
+    if (goal[field] === value) return;
     goal[field] = value;
   }
 
   saveGoalState(character);
-  renderStats();
-  renderRoster();
+  if (field === "note" || field === "echoBuild") return;
+  updateGoalRenderStateAfterEdit(character, wasComplete);
 }
 
 function updateGoalEchoSet(id, index, field, value) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
-  const echoSet = getActiveGoal(character).echoSets[Number(index)];
+  const targetIndex = Number(index);
+  const echoSet = getActiveGoal(character).echoSets[targetIndex];
   if (!echoSet) return;
 
-  if (field === "name") echoSet.name = normalizeEchoSetName(value);
-  if (field === "pieces")
-    echoSet.pieces = echoSetPieceOptions.includes(value) ? value : "5 Set";
-  if (field === "join")
-    echoSet.join = echoSetJoinOptions.includes(value) ? value : "+";
+  const nextValue =
+    field === "name"
+      ? normalizeEchoSetName(value)
+      : field === "pieces"
+        ? echoSetPieceOptions.includes(value)
+          ? value
+          : "5 Set"
+        : field === "join"
+          ? echoSetJoinOptions.includes(value)
+            ? value
+            : "+"
+          : null;
+  if (nextValue === null || echoSet[field] === nextValue) return;
 
+  echoSet[field] = nextValue;
   saveGoalState(character);
-  renderRoster();
+  updateRenderedEchoSetCombobox(id, targetIndex, echoSet.name);
 }
 
 function updateGoalMainEcho(id, index, field, value) {
@@ -2486,11 +2614,14 @@ function updateGoalMainEcho(id, index, field, value) {
   const mainEcho = goal.mainEchoes[targetIndex];
   if (!mainEcho) return;
 
-  if (field === "name") mainEcho.name = String(value ?? "").trim();
+  if (field !== "name") return;
+  const nextName = String(value ?? "").trim();
+  if (mainEcho.name === nextName) return;
+
+  mainEcho.name = nextName;
   if (targetIndex === 0) goal.mainEcho = mainEcho.name;
 
   saveGoalState(character);
-  renderRoster();
 }
 
 function addGoalEchoSet(id) {
@@ -2501,7 +2632,7 @@ function addGoalEchoSet(id) {
 
   goal.echoSets.push({ join: "+", name: "", pieces: "2 Set" });
   saveGoalState(character);
-  renderRoster();
+  rerenderFarmingCard(id);
 }
 
 function addGoalMainEcho(id) {
@@ -2512,7 +2643,7 @@ function addGoalMainEcho(id) {
 
   goal.mainEchoes.push({ join: "OR", name: "" });
   saveGoalState(character);
-  renderRoster();
+  rerenderFarmingCard(id);
 }
 
 function removeGoalEchoSet(id, index) {
@@ -2524,7 +2655,7 @@ function removeGoalEchoSet(id, index) {
 
   goal.echoSets.splice(targetIndex, 1);
   saveGoalState(character);
-  renderRoster();
+  rerenderFarmingCard(id);
 }
 
 function removeGoalMainEcho(id, index) {
@@ -2536,7 +2667,7 @@ function removeGoalMainEcho(id, index) {
 
   goal.mainEchoes.splice(targetIndex, 1);
   saveGoalState(character);
-  renderRoster();
+  rerenderFarmingCard(id);
 }
 
 function updateGoalEchoStatKey(id, index, key) {
@@ -2550,7 +2681,7 @@ function updateGoalEchoStatKey(id, index, key) {
   stat.label = option.label;
 
   saveGoalState(character);
-  renderRoster();
+  rerenderFarmingCard(id);
 }
 
 function updateGoalEchoStatField(id, index, field, value) {
@@ -2561,21 +2692,27 @@ function updateGoalEchoStatField(id, index, field, value) {
   const stat = getActiveGoal(character).echoStats[Number(index)];
   if (!stat) return;
 
-  if (field === "cost")
-    stat.cost = statCostOptions.includes(value) ? value : "COST 1";
+  const wasComplete = isGoalComplete(character);
+  if (field === "cost") {
+    const nextCost = statCostOptions.includes(value) ? value : "COST 1";
+    if (stat.cost === nextCost) return;
+    stat.cost = nextCost;
+  }
   if (field === "variant") {
-    stat.variant = statVariantOptions.includes(value) ? value : "-";
+    const nextVariant = statVariantOptions.includes(value) ? value : "-";
+    if (stat.variant === nextVariant) return;
+    stat.variant = nextVariant;
     if (stat.variant === "-") stat.branchChecked = false;
   }
   if (field === "branchChecked") {
-    stat.branchChecked = stat.variant !== "-" && Boolean(value);
+    const nextChecked = stat.variant !== "-" && Boolean(value);
+    if (stat.branchChecked === nextChecked) return;
+    stat.branchChecked = nextChecked;
   }
 
   saveGoalState(character);
-  if (isBranchCheck) {
-    renderStats();
-    renderFocusStrip();
-    renderRoster();
+  if (field === "variant" || isBranchCheck) {
+    updateGoalRenderStateAfterEdit(character, wasComplete);
   }
 }
 
@@ -2633,7 +2770,9 @@ function removeGoalEchoStat(id, index) {
   const targetIndex = Number(index);
   goal.echoStats.splice(targetIndex, 1);
   saveGoalState(character);
-  renderRoster();
+  renderStats();
+  renderFocusStrip();
+  rerenderFarmingCard(id);
 }
 
 function updateGoalStatField(id, index, field, value) {
@@ -2642,17 +2781,25 @@ function updateGoalStatField(id, index, field, value) {
   const stat = getActiveGoal(character).stats[Number(index)];
   if (!stat) return;
 
-  if (field === "target") stat.target = Math.max(0, Number(value) || 0);
-  if (field === "cost")
-    stat.cost = statCostOptions.includes(value) ? value : "COST 1";
-  if (field === "variant")
-    stat.variant = statVariantOptions.includes(value) ? value : "-";
+  const wasComplete = isGoalComplete(character);
+  if (field === "target") {
+    const nextTarget = Math.max(0, Number(value) || 0);
+    if (Number(stat.target ?? 0) === nextTarget) return;
+    stat.target = nextTarget;
+  }
+  if (field === "cost") {
+    const nextCost = statCostOptions.includes(value) ? value : "COST 1";
+    if (stat.cost === nextCost) return;
+    stat.cost = nextCost;
+  }
+  if (field === "variant") {
+    const nextVariant = statVariantOptions.includes(value) ? value : "-";
+    if (stat.variant === nextVariant) return;
+    stat.variant = nextVariant;
+  }
 
   saveGoalState(character);
-  renderStats();
-  renderFocusStrip();
-  renderRoster();
-  if (id === selectedId) renderDetail();
+  updateGoalRenderStateAfterEdit(character, wasComplete);
 }
 
 function updateRenderedStatRowState(id, index, row) {
@@ -2683,7 +2830,7 @@ function clearCurrentStat(id, key) {
   saveState();
   renderStats();
   renderFocusStrip();
-  renderRoster();
+  rerenderFarmingCard(id);
   if (id === selectedId) renderDetail();
 }
 
@@ -2705,7 +2852,9 @@ function addGoalStat(id) {
     variant: "-",
   });
   saveGoalState(character);
-  renderRoster();
+  renderStats();
+  renderFocusStrip();
+  rerenderFarmingCard(id);
 }
 
 function addGoalEchoStat(id) {
@@ -2726,7 +2875,7 @@ function addGoalEchoStat(id) {
     branchChecked: false,
   });
   saveGoalState(character);
-  renderRoster();
+  rerenderFarmingCard(id);
 }
 
 function removeGoalStat(id, index) {
@@ -2739,7 +2888,8 @@ function removeGoalStat(id, index) {
   goal.stats.splice(targetIndex, 1);
   saveGoalState(character);
   renderStats();
-  renderRoster();
+  renderFocusStrip();
+  rerenderFarmingCard(id);
 }
 
 function updateGoalStatKey(id, index, key) {
@@ -2760,7 +2910,8 @@ function updateGoalStatKey(id, index, key) {
   }
   saveGoalState(character);
   renderStats();
-  renderRoster();
+  renderFocusStrip();
+  rerenderFarmingCard(id);
 }
 
 function getRosterEmptyState() {
