@@ -2733,18 +2733,41 @@ function updateGoalEchoStatField(id, index, field, value) {
     const nextVariant = statVariantOptions.includes(value) ? value : "-";
     if (stat.variant === nextVariant) return;
     stat.variant = nextVariant;
-    if (stat.variant === "-") stat.branchChecked = false;
+    stat.branchChecked =
+      nextVariant !== "-" && isGoalBranchActive(getActiveGoal(character), nextVariant);
   }
   if (field === "branchChecked") {
     const nextChecked = stat.variant !== "-" && Boolean(value);
-    if (stat.branchChecked === nextChecked) return;
-    stat.branchChecked = nextChecked;
+    const matchingStats = getActiveGoal(character).echoStats.filter(
+      (echoStat) => echoStat.variant === stat.variant,
+    );
+    if (matchingStats.every((echoStat) => echoStat.branchChecked === nextChecked)) return;
+    matchingStats.forEach((echoStat) => {
+      echoStat.branchChecked = nextChecked;
+    });
   }
 
   saveGoalState(character);
   if (field === "variant" || isBranchCheck) {
+    updateRenderedEchoBranchCheckStates(character.id);
     updateGoalRenderStateAfterEdit(character, wasComplete);
   }
+}
+
+function updateRenderedEchoBranchCheckStates(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+  const goal = getActiveGoal(character);
+
+  document
+    .querySelectorAll(
+      `[data-echo-stat-field="branchChecked"][data-character="${CSS.escape(id)}"]`,
+    )
+    .forEach((checkbox) => {
+      const stat = goal.echoStats[Number(checkbox.dataset.index)];
+      if (!stat) return;
+      checkbox.checked = stat.variant !== "-" && stat.branchChecked;
+    });
 }
 
 function updateRenderedBranchCheckState(field) {
