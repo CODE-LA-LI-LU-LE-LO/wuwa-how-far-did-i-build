@@ -1586,27 +1586,31 @@ select option {
 .branch-cell {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
+  gap: 4px;
   align-items: center;
 }
 
 .branch-cell.has-branch {
-  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr);
 }
 
 .branch-check {
   display: grid;
   place-items: center;
-  width: 30px;
-  min-height: 30px;
+  width: 24px;
+  height: 24px;
+  min-height: 0;
+  padding: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.08);
+  line-height: 0;
 }
 
 .branch-check input {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
+  margin: 0;
   accent-color: var(--accent);
 }
 
