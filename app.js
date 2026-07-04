@@ -1606,14 +1606,16 @@ function bindRosterInteractions(root = rosterList) {
   });
 
   root.querySelectorAll("[data-main-echo-field]").forEach((field) => {
-    field.addEventListener("blur", () =>
+    field.addEventListener("blur", () => {
+      const value = field.value.trim();
+      field.value = value;
       updateGoalMainEcho(
         field.dataset.character,
         Number(field.dataset.index),
         field.dataset.mainEchoField,
-        field.value,
-      ),
-    );
+        value,
+      );
+    });
   });
 
   root.querySelectorAll("[data-echo-set-field]").forEach((field) => {
