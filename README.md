@@ -253,3 +253,38 @@ node scripts/verify.mjs
 Chromium 계열 브라우저에서 `<meta name="apple-mobile-web-app-capable" content="yes">`는 더 이상 권장되지 않아 콘솔 경고가 표시될 수 있습니다. 이 앱은 표준 `<meta name="mobile-web-app-capable" content="yes">`만 사용합니다.
 
 `web-client-content-script.js`에서 발생하는 `Could not find identifiable element` 오류는 앱 저장소에 포함된 스크립트가 아니라 브라우저 확장 프로그램이나 외부 웹 클라이언트가 페이지에 주입한 content script에서 발생한 오류입니다. 앱 자체 오류인지 확인하려면 시크릿 창 또는 확장 프로그램을 끈 새 브라우저 프로필에서 같은 동작을 다시 확인하세요.
+
+## PR Preview 배포
+
+PR 단계에서 실제 화면을 확인할 수 있도록 `.github/workflows/pr-preview.yml`이 PR 생성, 재오픈, 업데이트 시 정적 사이트를 검증한 뒤 `pr-preview` 브랜치에 PR 번호별 정적 파일을 배포합니다. 기존 production 배포용 `.github/workflows/pages.yml`은 `main` push와 수동 실행용으로 유지되며, PR Preview는 production GitHub Pages 루트 배포와 분리됩니다.
+
+- 생성/갱신 시점: `pull_request`의 `opened`, `reopened`, `synchronize` 이벤트가 발생할 때마다 실행됩니다.
+- Preview 경로: `pr-preview` 브랜치의 `pr-<PR번호>/` 디렉터리에 정적 파일 전체를 배치합니다.
+- Preview URL: PR 댓글과 GitHub Actions summary에 `https://raw.githack.com/<owner>/<repo>/pr-preview/pr-<PR번호>/index.html` 형식으로 표시합니다. GitHub Pages production URL과 다른 URL이므로 production 화면과 혼동하지 않고 확인할 수 있습니다.
+- PR 번호별 격리: 각 PR은 `pr-preview` 브랜치 아래 `pr-<PR번호>/` 디렉터리를 사용하며, PR이 업데이트될 때마다 같은 경로가 최신 파일로 갱신됩니다.
+- 검증: Preview 배포 전에 `node scripts/verify.mjs`와 `node --check app.js`를 실행하며, 실패하면 배포하지 않습니다.
+- 상대 경로: preview 디렉터리에 루트 정적 파일 전체가 포함되므로 `styles.css`, `app.js`, `manifest.webmanifest`, `assets/*`, `data/characters.json`, `data/goal-defaults.json`, `sw.js` 같은 상대 경로 리소스가 같은 하위 경로에서 로드됩니다.
+- production 보호: production workflow는 기존 `actions/deploy-pages` 기반 `main` 배포 흐름을 유지합니다. PR Preview workflow는 `pr-preview` 브랜치만 갱신하므로 production GitHub Pages 루트 배포를 덮어쓰지 않습니다.
+
+> 운영 참고: GitHub Pages는 저장소당 하나의 Pages 사이트만 직접 서비스하므로, production URL과 다른 PR별 URL을 안정적으로 제공하기 위해 Preview 확인 URL은 `pr-preview` 브랜치 파일을 정적 HTML로 렌더링하는 RawHack URL을 사용합니다. production 배포 URL과 main 배포 workflow는 변경하지 않습니다.
+
+### 서비스 워커와 Preview 환경
+
+production에서는 기존 PWA 동작을 유지하기 위해 `sw.js`를 현재 앱 경로 scope로 등록합니다. 반면 Preview URL 경로에는 `/pr-preview/pr-<PR번호>/`가 포함되므로 서비스 워커 등록을 비활성화합니다. Preview에서는 오프라인 캐시/PWA 기능이 제한될 수 있지만, production 서비스 워커 캐시와 Preview 파일이 서로 오염되는 것을 피하는 것이 우선입니다.
+
+### PR Preview 정리
+
+`.github/workflows/pr-preview-cleanup.yml`이 PR `closed` 이벤트에서 `pr-preview` 브랜치의 `pr-<PR번호>/` 디렉터리를 제거합니다. PR이 merge되거나 닫히면 같은 정리 흐름이 실행되며, 결과는 Actions summary와 PR 댓글에서 확인할 수 있습니다. 정리 workflow가 권한 또는 일시적인 GitHub 오류로 실패하면 `pr-preview` 브랜치의 해당 `pr-<PR번호>/` 디렉터리를 수동 삭제하면 됩니다.
+
+### 권장 운영 흐름
+
+1. Codex Cloud에서 작업을 요청합니다.
+2. Codex가 PR을 생성합니다.
+3. `Deploy PR Preview` GitHub Actions 성공 여부를 확인합니다.
+4. PR 댓글 또는 Actions summary의 Preview URL에 접속합니다.
+5. 실제 화면을 확인합니다.
+6. `/review`를 요청합니다.
+7. `/check`를 요청합니다.
+8. 문제가 있으면 같은 PR에서 수정하고 Preview가 갱신되는지 확인합니다.
+9. 문제가 없으면 `/merge`를 진행합니다.
+10. `main` merge 후 기존 production GitHub Pages 배포 완료 여부를 확인합니다.
