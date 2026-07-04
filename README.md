@@ -245,3 +245,9 @@ node scripts/verify.mjs
 - 캐릭터 추가, 편집, 삭제, 공개/비공개 변경 UI가 표시됩니다. 변경 직후 `characters.json` 다운로드 안내가 표시되며, 다운로드한 파일을 저장소의 `data/characters.json`에 덮어쓴 뒤 배포해야 전체 사용자에게 반영됩니다. 브라우저에서 변경한 내용은 파일로 반영하기 전까지 현재 저장 상태에만 반영됩니다.
 - 관리자 목표 편집 버튼이 표시되고, 변경한 관리자 목표 기본값은 [목표 json 다운로드] 버튼으로 `data/goal-defaults.json`에 반영할 파일을 내려받습니다.
 - 로그아웃하면 세션 상태가 `로컬 저장 중`으로 돌아가고 관리자 전용 버튼과 폼이 다시 숨겨집니다.
+
+## 콘솔 경고/오류 확인
+
+Chromium 계열 브라우저에서 `<meta name="apple-mobile-web-app-capable" content="yes">`는 더 이상 권장되지 않아 콘솔 경고가 표시될 수 있습니다. 이 앱은 표준 `<meta name="mobile-web-app-capable" content="yes">`만 사용합니다.
+
+`web-client-content-script.js`에서 발생하는 `Could not find identifiable element` 오류는 앱 저장소에 포함된 스크립트가 아니라 브라우저 확장 프로그램이나 외부 웹 클라이언트가 페이지에 주입한 content script에서 발생한 오류입니다. 앱 자체 오류인지 확인하려면 시크릿 창 또는 확장 프로그램을 끈 새 브라우저 프로필에서 같은 동작을 다시 확인하세요.
