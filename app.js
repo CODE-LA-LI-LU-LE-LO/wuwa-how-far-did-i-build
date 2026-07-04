@@ -1348,11 +1348,6 @@ function getVisibleCharacters() {
       if (activeTab === "ownership") {
         if (currentView === "owned" && !character.owned) return false;
         if (currentView === "unowned" && character.owned) return false;
-        if (
-          currentView === "farming" &&
-          isGoalComplete(character)
-        )
-          return false;
       }
       if (activeTab === "farming" && !matchesFarmingFilters(character))
         return false;
@@ -2011,7 +2006,8 @@ function renderStatRow(character, stat, index, canEditGoal) {
 }
 
 function renderIconChip(label, icon) {
-  return `<span class="chip icon-chip">${renderInlineIcon(icon)}<span class="chip-label">${escapeHtml(label)}</span></span>`;
+  const renderedIcon = icon ? renderInlineIcon(icon) : renderUnknownIcon(label);
+  return `<span class="chip icon-chip">${renderedIcon}<span class="chip-label">${escapeHtml(label)}</span></span>`;
 }
 
 function renderVisibilityChip(character) {
@@ -2032,6 +2028,12 @@ function renderCharacterMetaChips(character, { showVisibility = false } = {}) {
 function renderInlineIcon(icon) {
   return icon
     ? `<img class="inline-icon" src="${escapeHtml(icon)}" alt="" loading="lazy" />`
+    : "";
+}
+
+function renderUnknownIcon(label) {
+  return label === "미정"
+    ? `<span class="inline-icon unknown-icon" aria-hidden="true">?</span>`
     : "";
 }
 
@@ -2365,8 +2367,8 @@ function renderCategoryLabel(category) {
 
 function renderCategoryIcon(category) {
   if (category === "all") return `<span class="category-icon" aria-hidden="true">＊</span>`;
-  if (sortMode === "element") return renderInlineIcon(elementIcons[category]);
-  if (sortMode === "weapon") return renderInlineIcon(weaponIcons[category]);
+  if (sortMode === "element") return renderInlineIcon(elementIcons[category]) || renderUnknownIcon(category);
+  if (sortMode === "weapon") return renderInlineIcon(weaponIcons[category]) || renderUnknownIcon(category);
   if (sortMode === "rarity") return `<span class="category-icon" aria-hidden="true">${escapeHtml(category)}</span>`;
   return "";
 }
@@ -2779,9 +2781,6 @@ function getRosterEmptyState() {
     title = "모든 캐릭터가 보유 상태입니다";
     description =
       "미보유 캐릭터만 보고 싶다면 보유 체크를 끈 캐릭터가 있어야 합니다.";
-  } else if (currentView === "farming") {
-    title = "진행 중인 파밍이 없습니다";
-    description = "보유 캐릭터의 진행률을 조정하면 파밍 중 목록에 나타납니다.";
   }
 
   return `
