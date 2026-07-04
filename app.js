@@ -1582,6 +1582,10 @@ function renderRoster() {
     );
   });
 
+  rosterList
+    .querySelectorAll("[data-echo-set-combobox]")
+    .forEach(setupEchoSetCombobox);
+
   rosterList.querySelectorAll("[data-echo-set-option]").forEach((button) => {
     button.addEventListener("click", () =>
       updateGoalEchoSet(
@@ -2013,26 +2017,176 @@ function renderEchoSetPicker(characterId, index, value, enabled) {
   }
 
   return `
-    <details class="echo-picker echo-set-picker">
-      <summary class="echo-picker-button">${buttonContent}</summary>
-      <div class="echo-picker-options">
-        <button type="button" data-echo-set-option data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="" class="${selectedValue ? "" : "active"}">
+    <div class="echo-picker echo-set-picker echo-set-combobox" data-echo-set-combobox data-value="${escapeHtml(selectedValue)}">
+      <span class="echo-picker-button echo-set-input-shell">
+        <span class="echo-set-selected-icon">${selectedIcon}</span>
+        <input
+          data-echo-set-search
+          data-character="${escapeHtml(characterId)}"
+          data-index="${index}"
+          value="${selectedValue ? escapeHtml(selectedValue) : ""}"
+          placeholder="에코셋 검색"
+          autocomplete="off"
+          role="combobox"
+          aria-expanded="false"
+          aria-label="목표 에코셋 검색"
+        />
+      </span>
+      <div class="echo-picker-options echo-set-options" data-echo-set-options>
+        <button type="button" data-echo-set-option data-echo-set-empty-option data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="" class="${selectedValue ? "" : "active"}">
           <span class="empty-icon" aria-hidden="true"></span>
           <span>선택 안 함</span>
         </button>
         ${echoSets
           .map(
             (echoSet) => `
-              <button type="button" data-echo-set-option data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
+              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(echoSet.name.toLowerCase())}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
                 ${renderInlineIcon(echoSet.icon)}
                 <span>${escapeHtml(echoSet.name)}</span>
               </button>
             `,
           )
           .join("")}
+        <span class="echo-set-empty-results" data-echo-set-empty-results hidden>일치하는 에코셋이 없습니다</span>
       </div>
-    </details>
+    </div>
   `;
+}
+
+function setupEchoSetCombobox(combobox) {
+  const input = combobox.querySelector("[data-echo-set-search]");
+  const options = [...combobox.querySelectorAll("[data-echo-set-option]")];
+  const emptyOption = combobox.querySelector("[data-echo-set-empty-option]");
+  const emptyResults = combobox.querySelector("[data-echo-set-empty-results]");
+  if (!input) return;
+
+  let activeIndex = getInitialEchoSetOptionIndex(options);
+
+  const openOptions = () => {
+    combobox.classList.add("open");
+    input.setAttribute("aria-expanded", "true");
+  };
+
+  const closeOptions = () => {
+    combobox.classList.remove("open");
+    input.setAttribute("aria-expanded", "false");
+  };
+
+  const resetInputValue = () => {
+    input.value = combobox.dataset.value || "";
+    filterEchoSetOptions(combobox, activeIndex);
+  };
+
+  const updateActiveOption = (nextIndex) => {
+    const visibleOptions = getVisibleEchoSetOptions(options);
+    if (!visibleOptions.length) {
+      activeIndex = -1;
+      options.forEach((option) => option.classList.remove("keyboard-active"));
+      return;
+    }
+
+    activeIndex = (nextIndex + visibleOptions.length) % visibleOptions.length;
+    options.forEach((option) => option.classList.remove("keyboard-active"));
+    visibleOptions[activeIndex].classList.add("keyboard-active");
+    visibleOptions[activeIndex].scrollIntoView({ block: "nearest" });
+  };
+
+  input.addEventListener("focus", () => {
+    openOptions();
+    activeIndex = filterEchoSetOptions(combobox, activeIndex);
+  });
+
+  input.addEventListener("input", () => {
+    openOptions();
+    activeIndex = filterEchoSetOptions(combobox, 0);
+  });
+
+  input.addEventListener("keydown", (event) => {
+    const visibleOptions = getVisibleEchoSetOptions(options);
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      openOptions();
+      updateActiveOption(activeIndex + 1);
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      openOptions();
+      updateActiveOption(activeIndex - 1);
+      return;
+    }
+    if (event.key === "Enter" && combobox.classList.contains("open")) {
+      event.preventDefault();
+      const selectedOption =
+        visibleOptions[activeIndex] ?? visibleOptions[0] ?? null;
+      selectedOption?.click();
+      return;
+    }
+    if (event.key === "Escape") {
+      resetInputValue();
+      closeOptions();
+      input.blur();
+      return;
+    }
+    if (event.key === "Tab") {
+      resetInputValue();
+      closeOptions();
+    }
+  });
+
+  combobox.addEventListener("focusout", (event) => {
+    if (event.relatedTarget && combobox.contains(event.relatedTarget)) return;
+    resetInputValue();
+    closeOptions();
+  });
+
+  options.forEach((option) => {
+    option.addEventListener("mousedown", (event) => event.preventDefault());
+  });
+
+  if (emptyOption) emptyOption.hidden = Boolean(input.value.trim());
+  if (emptyResults) emptyResults.hidden = true;
+  filterEchoSetOptions(combobox, activeIndex);
+}
+
+function getInitialEchoSetOptionIndex(options) {
+  const activeIndex = options.findIndex((option) =>
+    option.classList.contains("active"),
+  );
+  return activeIndex >= 0 ? activeIndex : 0;
+}
+
+function getVisibleEchoSetOptions(options) {
+  return options.filter((option) => !option.hidden);
+}
+
+function filterEchoSetOptions(combobox, preferredIndex = 0) {
+  const input = combobox.querySelector("[data-echo-set-search]");
+  const options = [...combobox.querySelectorAll("[data-echo-set-option]")];
+  const emptyOption = combobox.querySelector("[data-echo-set-empty-option]");
+  const emptyResults = combobox.querySelector("[data-echo-set-empty-results]");
+  const query = input.value.trim().toLowerCase();
+  let visibleCount = 0;
+
+  if (emptyOption) emptyOption.hidden = Boolean(query);
+
+  options.forEach((option) => {
+    if (option === emptyOption) return;
+    const optionName = option.dataset.echoSetName ?? "";
+    const visible = !query || optionName.includes(query);
+    option.hidden = !visible;
+    if (visible) visibleCount += 1;
+  });
+
+  if (emptyResults) emptyResults.hidden = visibleCount > 0;
+
+  const visibleOptions = getVisibleEchoSetOptions(options);
+  options.forEach((option) => option.classList.remove("keyboard-active"));
+  if (!visibleOptions.length) return -1;
+
+  const nextIndex = Math.min(Math.max(preferredIndex, 0), visibleOptions.length - 1);
+  visibleOptions[nextIndex].classList.add("keyboard-active");
+  return nextIndex;
 }
 
 function renderStatPicker(
