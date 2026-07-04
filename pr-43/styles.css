@@ -1610,6 +1610,8 @@ select option {
 .branch-check input {
   width: 13px;
   height: 13px;
+  min-height: 13px;
+  padding: 0;
   margin: 0;
   accent-color: var(--accent);
 }
