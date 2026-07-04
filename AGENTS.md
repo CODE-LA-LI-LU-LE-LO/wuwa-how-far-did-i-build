@@ -26,7 +26,8 @@ Description
 <한국어로 작성>
 
 Testing
-KO: <한국어로 작성>
+<한국어로 작성>
+
 ---
 
 English
@@ -39,6 +40,7 @@ Description
 
 Testing
 <Write in English>
+
 ```
 
 - PR 작성 전, Korean / English 섹션 분리가 적용되었는지 한 번 더 확인한다.
