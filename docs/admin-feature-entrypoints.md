@@ -14,7 +14,7 @@
 | 캐릭터 편집 | 캐릭터 카드의 `[data-edit]` 버튼 | `app.js`의 `[data-edit]` 클릭 핸들러가 `openCharacterDialog(id)`를 호출하고, `#characterForm` submit 핸들러가 기존 캐릭터에 `Object.assign(existing, payload)` 적용 | 캐릭터 이름, 이미지, 속성, 무기, 등급, 공개 여부 |
 | 캐릭터 제거 | 캐릭터 편집 다이얼로그의 `#deleteCharacterButton` 버튼 | `app.js`의 `#deleteCharacterButton` 클릭 핸들러가 `state.characters`에서 대상 캐릭터를 제거 | 캐릭터 목록 |
 | 캐릭터 공개/비공개 변경 | 캐릭터 추가/편집 다이얼로그의 `#newVisibility` select | `app.js`의 `#characterForm` submit 핸들러가 `isPublic` 값을 저장 | 캐릭터 공개 여부 |
-| 관리자 목표 스테이터스 기본값 편집 | 파밍 카드의 `[data-toggle-admin-goals]` 편집 버튼과 `[data-goal-field]`, 목표 스탯/에코 관련 입력 UI | `app.js`의 `[data-toggle-admin-goals]` 클릭 핸들러가 `adminGoalEditing`을 토글하고, 목표 입력 핸들러들이 `updateGoal()` 및 관련 목표 수정 함수로 관리자 목표를 수정 | `data/goal-defaults.json`, `character.goals.admin`, `adminGoalDefaults` |
+| 관리자 목표 스테이터스 기본값 편집 | 파밍 카드의 `[data-toggle-admin-goals]` 편집 버튼과 `[data-goal-field]`, 목표 스탯/에코 관련 입력 UI | `app.js`의 `[data-toggle-admin-goals]` 클릭 핸들러가 `adminGoalEditingId`를 해당 캐릭터 단위로 토글하고, 목표 입력 핸들러들이 `updateGoal()` 및 관련 목표 수정 함수로 관리자 목표를 수정 | `data/goal-defaults.json`, `character.goals.admin`, `adminGoalDefaults` |
 
 ## 일반 사용자 기능
 
