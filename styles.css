@@ -371,17 +371,18 @@ h2 {
 .toolbar.is-collapsed > .sticky-toggle,
 .focus-strip.is-collapsed > .sticky-toggle {
   position: fixed;
+  top: 16px;
   right: 16px;
-  bottom: 16px;
+  bottom: auto;
   z-index: 80;
 }
 
 body.has-two-collapsed-sticky-sections .toolbar.is-collapsed > .sticky-toggle {
-  right: 152px;
+  right: 16px;
 }
 
 body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggle {
-  right: 16px;
+  right: 92px;
 }
 
 .sticky-toggle:hover,

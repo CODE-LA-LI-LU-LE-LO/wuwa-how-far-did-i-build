@@ -517,7 +517,7 @@ let activeCategory = "all";
 let visibilityFilter = "all";
 let farmingFilters = new Set(["owned"]);
 let stickySectionsCollapsed = { toolbar: false, focus: false };
-let wasScrolledPastStickyThreshold = false;
+let stickySectionPastThreshold = { toolbar: false, focus: false };
 let adminGoalEditing = false;
 let customGoalEditingId = null;
 
@@ -615,21 +615,42 @@ function setStickySectionCollapsed(section, collapsed) {
   button.setAttribute("aria-expanded", String(!collapsed));
 }
 
-function syncStickySectionCollapse() {
-  const scrolledPastThreshold = window.scrollY > 24;
-  toolbar?.classList.toggle("is-stuck", scrolledPastThreshold);
-  if (!scrolledPastThreshold) {
-    focusStrip?.classList.remove("is-stuck");
-  }
+function getStickySectionHeight(element) {
+  if (!element) return 0;
+  const measuredHeight = Math.max(element.offsetHeight, element.scrollHeight);
+  const previousHeight = Number(element.dataset.stickyExpandedHeight || 0);
+  const nextHeight = Math.max(previousHeight, measuredHeight);
+  element.dataset.stickyExpandedHeight = String(nextHeight);
+  return nextHeight;
+}
 
-  if (scrolledPastThreshold !== wasScrolledPastStickyThreshold) {
-    wasScrolledPastStickyThreshold = scrolledPastThreshold;
-    setStickySectionCollapsed("toolbar", scrolledPastThreshold);
-    setStickySectionCollapsed("focus", scrolledPastThreshold);
+function hasScrolledPastElement(element) {
+  if (!element) return false;
+  return window.scrollY >= element.offsetTop + getStickySectionHeight(element);
+}
+
+function hasReachedStickyEdge(element) {
+  if (!element?.getBoundingClientRect) return false;
+  const computedStyle = window.getComputedStyle?.(element);
+  const stickyTop = Number.parseFloat(computedStyle?.top) || 0;
+  return element.getBoundingClientRect().top <= stickyTop;
+}
+
+function syncStickySectionState(section, element) {
+  const scrolledPastSection = hasScrolledPastElement(element);
+  element?.classList.toggle("is-stuck", scrolledPastSection || hasReachedStickyEdge(element));
+
+  if (scrolledPastSection !== stickySectionPastThreshold[section]) {
+    stickySectionPastThreshold[section] = scrolledPastSection;
+    setStickySectionCollapsed(section, scrolledPastSection);
   } else {
-    setStickySectionCollapsed("toolbar", stickySectionsCollapsed.toolbar);
-    setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
+    setStickySectionCollapsed(section, stickySectionsCollapsed[section]);
   }
+}
+
+function syncStickySectionCollapse() {
+  syncStickySectionState("toolbar", toolbar);
+  syncStickySectionState("focus", focusStrip);
 }
 
 toolbarStickyToggle?.addEventListener("click", () => {
