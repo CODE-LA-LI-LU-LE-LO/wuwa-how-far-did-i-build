@@ -90,7 +90,7 @@
           <button data-tab="farming" type="button">파밍 관리</button>
         </section>
 
-        <section class="toolbar" aria-label="목록 도구">
+        <section class="toolbar" id="toolbar" aria-label="목록 도구">
           <label class="search-box">
             <span aria-hidden="true">⌕</span>
             <input id="searchInput" type="search" placeholder="캐릭터 검색" />
@@ -120,6 +120,7 @@
             <label><input data-farm-filter="complete" type="checkbox" />목표달성</label>
             <label><input data-farm-filter="incomplete" type="checkbox" />미달성</label>
           </div>
+          <button class="sticky-toggle" data-sticky-toggle="toolbar" type="button" aria-controls="toolbar" aria-expanded="true">숨기기▲</button>
         </section>
 
         <section class="share-notice hidden" id="shareNotice" aria-live="polite">

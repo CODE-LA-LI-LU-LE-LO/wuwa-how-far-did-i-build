@@ -324,10 +324,41 @@ h2 {
   z-index: 5;
   gap: 10px;
   margin-bottom: 18px;
-  padding: 12px;
+  padding: 12px 96px 12px 12px;
   border-radius: 8px;
   background: rgba(9, 13, 19, 0.78);
   animation: liftEnter 640ms 160ms ease both;
+}
+
+.toolbar.is-collapsed {
+  min-height: 50px;
+  padding-block: 8px;
+}
+
+.toolbar.is-collapsed > :not(.sticky-toggle) {
+  display: none;
+}
+
+.sticky-toggle {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  z-index: 2;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(92, 228, 208, 0.18);
+  color: var(--soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
+}
+
+.sticky-toggle:hover,
+.sticky-toggle:focus-visible {
+  background: rgba(92, 228, 208, 0.28);
+  color: var(--text);
 }
 
 .share-notice {
@@ -399,7 +430,7 @@ h2 {
   gap: 12px;
   margin-bottom: 18px;
   overflow-x: auto;
-  padding: 8px 0;
+  padding: 8px 96px 8px 0;
   scroll-snap-type: x proximity;
   transition:
     background 180ms ease,
@@ -417,6 +448,24 @@ h2 {
   background: linear-gradient(180deg, rgba(8, 11, 16, 0.9) 0%, rgba(8, 11, 16, 0.66) 58%, rgba(8, 11, 16, 0.24) 100%);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(18px) saturate(130%);
+}
+
+.focus-strip.is-collapsed {
+  min-height: 50px;
+  overflow: visible;
+  padding-block: 8px;
+}
+
+.focus-strip.is-collapsed .focus-card {
+  display: none;
+}
+
+.focus-sticky-toggle {
+  position: sticky;
+  right: 10px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  align-self: flex-end;
 }
 
 .focus-card {
@@ -1981,6 +2030,7 @@ dialog::backdrop {
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 16px;
+    padding-right: 96px;
     scrollbar-gutter: stable;
     scrollbar-width: thin;
   }
@@ -2197,7 +2247,9 @@ dialog::backdrop {
   }
 
   .toolbar {
-    position: static;
+    position: sticky;
+    top: 8px;
+    z-index: 31;
     flex-wrap: wrap;
   }
 
