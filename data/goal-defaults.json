@@ -883,19 +883,19 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "냉철한 결단",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "이성 무장"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
-    "note": "",
+    "echoBuild": "43311",
+    "mainEcho": "이성 무장",
+    "note": "- 절지 편성 시 공명효율 요구치 110",
     "echoStats": [
       {
         "key": "critRate",
@@ -905,22 +905,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -930,13 +923,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -958,21 +944,21 @@
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 290,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2350,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -1843,27 +1829,20 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "소리 없이 내려앉은 기도의 눈",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "공명의 메아리 · 명식 · 허무의 신"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "공명의 메아리 · 명식 · 허무의 신",
     "note": "",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -1872,15 +1851,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -1890,13 +1869,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -1911,7 +1883,7 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 75,
         "cost": "COST 4",
         "variant": "-"
       },
@@ -1925,7 +1897,7 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 125,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -1933,6 +1905,13 @@
         "key": "attack",
         "label": "공격력",
         "target": 2200,
+        "cost": "COST 1",
+        "variant": "-"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2500,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -2546,18 +2525,18 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "야밤의 서리",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "반디의 군세"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "반디의 군세",
     "note": "",
     "echoStats": [
       {
@@ -2568,22 +2547,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -2593,13 +2565,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -2614,14 +2579,14 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 65,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 240,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -2646,27 +2611,33 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "소리 없이 내려앉은 기도의 눈",
+        "pieces": "5 Set"
+      },
+      {
+        "join": "OR",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "글로모스 (3코)"
+      },
+      {
+        "join": "OR",
+        "name": "음험한 백로"
+      },
+      {
+        "join": "OR",
+        "name": "타종 거북이"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "34311",
+    "mainEcho": "글로모스 (3코)",
     "note": "",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -2675,15 +2646,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -2693,13 +2664,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -2714,30 +2678,37 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 75,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 265,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 0,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
+        "target": 2000,
+        "cost": "COST 1",
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
         "target": 2200,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "B"
       }
     ]
   },
@@ -5823,19 +5794,28 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
+      },
+      {
+        "join": "+",
+        "name": "하늘의 합주곡",
+        "pieces": "2 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "헤카테"
+      },
+      {
+        "join": "OR",
+        "name": "음험한 백로"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
-    "note": "",
+    "echoBuild": "43311",
+    "mainEcho": "헤카테",
+    "note": "- 1돌 이상 시 공명효율 요구치 감소",
     "echoStats": [
       {
         "key": "critRate",
@@ -5845,22 +5825,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "glacioDamage",
+        "label": "응결피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -5870,13 +5843,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -5898,21 +5864,21 @@
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 290,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 1800,
         "cost": "COST 1",
         "variant": "-"
       }
