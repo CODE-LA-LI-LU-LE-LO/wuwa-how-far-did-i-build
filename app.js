@@ -722,12 +722,12 @@ document.querySelector("#exportButton").addEventListener("click", () => {
   showSessionMessage("백업 파일 생성", "현재 기록을 JSON으로 저장했습니다");
 });
 
-exportCharactersButton.addEventListener("click", () => {
+exportCharactersButton?.addEventListener("click", () => {
   if (!isAdmin()) return;
   downloadCharactersJson();
 });
 
-exportGoalDefaultsButton.addEventListener("click", () => {
+exportGoalDefaultsButton?.addEventListener("click", () => {
   if (!isAdmin()) return;
   const data = JSON.stringify(getGoalDefaultsExportData(), null, 2);
   const blob = new Blob([`${data}\n`], { type: "application/json" });
@@ -1282,8 +1282,8 @@ function setupDetailPicker(picker) {
 }
 
 function render() {
-  exportCharactersButton.classList.toggle("hidden", !isAdmin());
-  exportGoalDefaultsButton.classList.toggle("hidden", !isAdmin());
+  exportCharactersButton?.classList.toggle("hidden", !isAdmin());
+  exportGoalDefaultsButton?.classList.toggle("hidden", !isAdmin());
   renderFocusStrip();
   renderToolbarMode();
   renderCategoryRail();
@@ -1445,7 +1445,8 @@ function bindRosterInteractions(root = rosterList) {
         return;
       }
       const card = button.closest("[data-farm-card]");
-      adminGoalEditing = !adminGoalEditing;
+      const shouldDisableEditing = adminGoalEditing && button.classList.contains("active");
+      adminGoalEditing = !shouldDisableEditing;
       if (card?.dataset.farmCard) {
         keepFarmCardScrollStable(card.dataset.farmCard, () =>
           rerenderFarmingCard(card.dataset.farmCard),

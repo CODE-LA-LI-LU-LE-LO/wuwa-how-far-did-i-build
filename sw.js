@@ -1,4 +1,4 @@
-const CACHE_NAME = "ww-farming-tracker-v3";
+const CACHE_NAME = "ww-farming-tracker-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -37,6 +37,7 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
+  if (!isCacheableRequest(url)) return;
   if (NETWORK_FIRST_PATHS.some((path) => url.pathname.endsWith(path))) {
     event.respondWith(networkFirst(event.request));
     return;
@@ -56,9 +57,18 @@ function networkFirst(request) {
 
 function fetchAndCache(request) {
   return fetch(request).then((response) => {
-    if (!response || response.status !== 200) return response;
+    if (!response || response.status !== 200 || response.type === "opaque") {
+      return response;
+    }
     const copy = response.clone();
-    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.put(request, copy))
+      .catch(() => {});
     return response;
   });
+}
+
+function isCacheableRequest(url) {
+  return url.protocol === "http:" || url.protocol === "https:";
 }
