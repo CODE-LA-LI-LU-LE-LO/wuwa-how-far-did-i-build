@@ -2006,20 +2006,6 @@ dialog::backdrop {
     cursor: pointer;
   }
 
-  .detail-panel.is-collapsed::after {
-    position: absolute;
-    right: 8px;
-    bottom: -2px;
-    width: 20px;
-    height: 20px;
-    border-right: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-    border-radius: 0 0 8px;
-    background: inherit;
-    content: "";
-    transform: rotate(28deg);
-  }
-
   .detail-panel.is-collapsed .detail-content {
     display: block;
     height: 100%;
