@@ -585,6 +585,17 @@ farmingFilterInputs.forEach((input) => {
 });
 
 
+function getCollapsedStickyLabel(section) {
+  return section === "toolbar" ? "검색▼" : "보유캐릭터▼";
+}
+
+function syncStickyToggleDocking() {
+  document.body.classList.toggle(
+    "has-two-collapsed-sticky-sections",
+    Boolean(stickySectionsCollapsed.toolbar && stickySectionsCollapsed.focus),
+  );
+}
+
 function setStickySectionCollapsed(section, collapsed) {
   stickySectionsCollapsed[section] = collapsed;
   const element = section === "toolbar" ? toolbar : focusStrip;
@@ -594,14 +605,23 @@ function setStickySectionCollapsed(section, collapsed) {
       : focusStrip?.querySelector('[data-sticky-toggle="focus"]');
 
   element?.classList.toggle("is-collapsed", collapsed);
+  if (section === "toolbar") {
+    categoryRail?.classList.toggle("is-toolbar-collapsed", collapsed);
+  }
+  syncStickyToggleDocking();
   if (!button) return;
 
-  button.textContent = collapsed ? "펼치기▼" : "숨기기▲";
+  button.textContent = collapsed ? getCollapsedStickyLabel(section) : "숨기기▲";
   button.setAttribute("aria-expanded", String(!collapsed));
 }
 
 function syncStickySectionCollapse() {
   const scrolledPastThreshold = window.scrollY > 24;
+  toolbar?.classList.toggle("is-stuck", scrolledPastThreshold);
+  if (!scrolledPastThreshold) {
+    focusStrip?.classList.remove("is-stuck");
+  }
+
   if (scrolledPastThreshold !== wasScrolledPastStickyThreshold) {
     wasScrolledPastStickyThreshold = scrolledPastThreshold;
     setStickySectionCollapsed("toolbar", scrolledPastThreshold);
@@ -2919,11 +2939,12 @@ function updateFocusStripStickiness() {
   const sentinelTop = focusStripSentinel.getBoundingClientRect().top;
   const toolbarStyle = toolbar ? getComputedStyle(toolbar) : null;
   const toolbarBottom =
+    toolbar?.classList.contains("is-stuck") &&
     toolbarStyle?.position === "sticky" &&
     typeof toolbar?.getBoundingClientRect === "function"
       ? toolbar.getBoundingClientRect().bottom
       : 0;
-  focusStrip.classList.toggle("is-stuck", sentinelTop <= toolbarBottom);
+  focusStrip.classList.toggle("is-stuck", toolbarBottom > 0 && sentinelTop <= toolbarBottom);
 }
 
 function openFarmingCard(id) {
