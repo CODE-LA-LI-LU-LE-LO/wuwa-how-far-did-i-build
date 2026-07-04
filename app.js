@@ -2369,7 +2369,7 @@ function renderCategoryIcon(category) {
   if (category === "all") return `<span class="category-icon" aria-hidden="true">＊</span>`;
   if (sortMode === "element") return renderInlineIcon(elementIcons[category]) || renderUnknownIcon(category);
   if (sortMode === "weapon") return renderInlineIcon(weaponIcons[category]) || renderUnknownIcon(category);
-  if (sortMode === "rarity") return `<span class="category-icon" aria-hidden="true">${escapeHtml(category)}</span>`;
+  if (sortMode === "rarity") return "";
   return "";
 }
 
