@@ -244,6 +244,10 @@ for (const requiredSource of [
   "normalizeEchoSetName",
   "Lingering Tunes",
   "끊임없는 잔향",
+  "getInitialDetailPickerOptionIndex",
+  'aria-haspopup="listbox"',
+  "수치입력",
+  "<span>속성</span>",
 ]) {
   if (!appSource.includes(requiredSource)) fail(`app.js missing ${requiredSource}`);
 }
