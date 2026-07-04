@@ -191,7 +191,6 @@ h2 {
   font-weight: 900;
 }
 
-
 .session-actions {
   display: grid;
   gap: 8px;
@@ -319,76 +318,13 @@ h2 {
 }
 
 .toolbar {
-  position: sticky;
-  top: 12px;
-  z-index: 5;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 18px;
-  padding: 12px 96px 12px 12px;
+  margin-bottom: 10px;
+  padding: 12px;
   border-radius: 8px;
   background: rgba(9, 13, 19, 0.78);
   animation: liftEnter 640ms 160ms ease both;
-}
-
-.toolbar.is-collapsed {
-  min-height: 0;
-  padding: 0;
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.toolbar.is-collapsed > :not(.sticky-toggle) {
-  display: none;
-}
-
-.category-rail.is-toolbar-collapsed {
-  display: none;
-}
-
-.sticky-toggle {
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  z-index: 2;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(92, 228, 208, 0.18);
-  color: var(--soft);
-  font-size: 0.78rem;
-  font-weight: 900;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
-}
-
-.toolbar:not(.is-stuck) > .sticky-toggle,
-.focus-strip:not(.is-stuck) > .sticky-toggle {
-  display: none;
-}
-
-.toolbar.is-collapsed > .sticky-toggle,
-.focus-strip.is-collapsed > .sticky-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  bottom: auto;
-  z-index: 80;
-}
-
-body.has-two-collapsed-sticky-sections .toolbar.is-collapsed > .sticky-toggle {
-  right: 16px;
-}
-
-body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggle {
-  right: 92px;
-}
-
-.sticky-toggle:hover,
-.sticky-toggle:focus-visible {
-  background: rgba(92, 228, 208, 0.28);
-  color: var(--text);
 }
 
 .share-notice {
@@ -453,52 +389,12 @@ body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggl
 }
 
 .focus-strip {
-  position: sticky;
-  top: 0;
-  z-index: 30;
   display: flex;
   gap: 12px;
   margin-bottom: 18px;
   overflow-x: auto;
-  padding: 8px 96px 8px 0;
+  padding: 8px 0;
   scroll-snap-type: x proximity;
-  transition:
-    background 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.focus-strip-sentinel {
-  height: 0;
-  pointer-events: none;
-}
-
-.focus-strip.is-stuck {
-  margin-inline: 0;
-  padding: 16px 12px 8px;
-  background: linear-gradient(180deg, rgba(8, 11, 16, 0.9) 0%, rgba(8, 11, 16, 0.66) 58%, rgba(8, 11, 16, 0.24) 100%);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(18px) saturate(130%);
-}
-
-.focus-strip.is-collapsed {
-  min-height: 0;
-  overflow: visible;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.focus-strip.is-collapsed .focus-card {
-  display: none;
-}
-
-.focus-sticky-toggle {
-  position: sticky;
-  right: 10px;
-  margin-left: auto;
-  flex: 0 0 auto;
-  align-self: flex-end;
 }
 
 .focus-card {
@@ -534,16 +430,6 @@ body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggl
 .roster-card.complete .card-backdrop-image {
   opacity: 0.16;
   filter: grayscale(100%) saturate(70%) contrast(102%);
-}
-
-.focus-strip.is-stuck .focus-card {
-  flex-basis: 226px;
-  min-height: 72px;
-  padding: 10px;
-  background:
-    linear-gradient(180deg, rgba(8, 11, 16, 0.82) 0%, rgba(8, 11, 16, 0.58) 54%, rgba(8, 11, 16, 0.18) 100%),
-    linear-gradient(135deg, color-mix(in srgb, var(--element-color, var(--accent)), transparent 82%), rgba(255, 255, 255, 0.06)),
-    rgba(12, 18, 26, 0.5);
 }
 
 .focus-card > :not(.card-backdrop-image) {
@@ -586,16 +472,6 @@ body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggl
   margin-bottom: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.focus-strip.is-stuck .focus-card h2 {
-  margin-bottom: 6px;
-  font-size: 0.98rem;
-}
-
-.focus-strip.is-stuck .focus-card .eyebrow,
-.focus-strip.is-stuck .focus-action {
-  display: none;
 }
 
 .focus-meta,
@@ -657,64 +533,6 @@ body.has-two-collapsed-sticky-sections .focus-strip.is-collapsed > .sticky-toggl
   grid-column: 1 / -1;
   min-width: 58px;
   min-height: 34px;
-}
-
-.focus-strip.is-stuck .focus-open {
-  position: absolute;
-  right: 2px;
-  bottom: 10px;
-  width: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  padding: 0;
-  font-size: 0;
-}
-
-.focus-strip.is-stuck .focus-open::before {
-  content: "↗";
-  font-size: 1rem;
-}
-
-.focus-strip.is-stuck .focus-meta {
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 5px;
-  padding-right: 36px;
-}
-
-.focus-strip.is-stuck .focus-meta .chip {
-  width: 30px;
-  height: 30px;
-  justify-content: center;
-  gap: 0;
-  padding: 0;
-  font-size: 0;
-}
-
-.focus-strip.is-stuck .focus-meta .chip-label {
-  display: none;
-}
-
-.focus-strip.is-stuck .focus-meta .rarity-chip {
-  width: auto;
-  min-width: 30px;
-  padding: 0 8px;
-  font-size: 0.72rem;
-}
-
-.focus-strip.is-stuck .focus-meta .inline-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.focus-strip.is-stuck .focus-meta strong {
-  display: inline-flex;
-  align-items: center;
-  min-width: 38px;
-  height: 30px;
-  justify-content: center;
-  padding: 0 6px;
-  font-size: 0.72rem;
 }
 
 .search-box {
@@ -845,25 +663,31 @@ select option {
 }
 
 .category-rail {
-  position: sticky;
-  top: 86px;
-  display: grid;
-  flex: 0 0 142px;
+  display: flex;
   gap: 8px;
-  margin-left: -160px;
-  padding: 12px;
+  overflow-x: auto;
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(9, 13, 19, 0.72);
   backdrop-filter: blur(18px);
+  scrollbar-width: thin;
+}
+
+.category-rail.hidden {
+  display: none;
 }
 
 .category-rail button {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   gap: 6px;
   min-height: 38px;
+  padding: 0 14px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.06);
   color: var(--muted);
@@ -873,6 +697,14 @@ select option {
 .category-rail button.active {
   background: var(--text);
   color: #101720;
+}
+
+.category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  font-weight: 900;
 }
 
 .panel {
@@ -2057,19 +1889,12 @@ dialog::backdrop {
 
 @media (min-width: 1041px) and (max-width: 1440px) {
   .toolbar {
-    top: 12px;
-    z-index: 31;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 16px;
-    padding-right: 96px;
     scrollbar-gutter: stable;
     scrollbar-width: thin;
-  }
-
-  .toolbar.is-collapsed {
-    overflow: visible;
   }
 
   .toolbar::-webkit-scrollbar {
@@ -2082,14 +1907,6 @@ dialog::backdrop {
     background: rgba(255, 255, 255, 0.34);
   }
 
-  .focus-strip {
-    top: 96px;
-  }
-
-  .focus-strip.has-category-filter {
-    top: 166px;
-  }
-
   .toolbar > * {
     flex: 0 0 auto;
   }
@@ -2100,27 +1917,6 @@ dialog::backdrop {
 
   .toolbar .filter-checks {
     flex-wrap: nowrap;
-  }
-
-  .workspace {
-    display: block;
-  }
-
-  .category-rail {
-    position: sticky;
-    top: 104px;
-    z-index: 30;
-    display: flex;
-    overflow-x: auto;
-    width: 100%;
-    margin: 8px 0 14px;
-    flex: 0 0 auto;
-    scrollbar-width: thin;
-  }
-
-  .category-rail button {
-    flex: 0 0 auto;
-    padding: 0 14px;
   }
 
   .roster-panel {
@@ -2227,18 +2023,6 @@ dialog::backdrop {
     min-height: 0;
   }
 
-  .category-rail {
-    position: static;
-    display: flex;
-    overflow-x: auto;
-    flex: 0 0 auto;
-    margin-left: 0;
-  }
-
-  .category-rail button {
-    flex: 0 0 auto;
-    padding: 0 14px;
-  }
 }
 
 @media (max-width: 760px) {
@@ -2284,30 +2068,7 @@ dialog::backdrop {
   }
 
   .toolbar {
-    position: sticky;
-    top: 8px;
-    z-index: 31;
     flex-wrap: wrap;
-  }
-
-  .focus-strip.is-stuck .focus-card {
-    flex: 0 0 204px;
-    min-height: 68px;
-    padding: 8px;
-  }
-
-  .focus-strip.is-stuck .focus-card h2 {
-    font-size: 0.92rem;
-  }
-
-  .focus-strip.is-stuck .focus-meta .chip {
-    width: 28px;
-    height: 28px;
-  }
-
-  .focus-strip.is-stuck .focus-open {
-    right: 2px;
-    bottom: 8px;
   }
 
   .search-box,
@@ -2342,6 +2103,21 @@ dialog::backdrop {
   .app-tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .category-rail {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .category-rail button {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+  }
+
+  .category-rail .category-label {
+    display: none;
   }
 
   .filter-checks label {

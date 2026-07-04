@@ -419,9 +419,6 @@ const exportGoalDefaultsButton = document.querySelector("#exportGoalDefaultsButt
 const shareNotice = document.querySelector("#shareNotice");
 const saveSnapshotButton = document.querySelector("#saveSnapshotButton");
 const closeShareButton = document.querySelector("#closeShareButton");
-const toolbar = document.querySelector(".toolbar");
-const toolbarStickyToggle = document.querySelector('[data-sticky-toggle="toolbar"]');
-const focusStripSentinel = document.querySelector("#focusStripSentinel");
 const focusStrip = document.querySelector("#focusStrip");
 const categoryRail = document.querySelector("#categoryRail");
 const listEyebrow = document.querySelector("#listEyebrow");
@@ -516,9 +513,6 @@ let sortMode = "name";
 let activeCategory = "all";
 let visibilityFilter = "all";
 let farmingFilters = new Set(["owned"]);
-let stickySectionsCollapsed = { toolbar: false, focus: false };
-let stickySectionPastThreshold = { toolbar: false, focus: false };
-let stickySectionManuallyExpandedPastThreshold = { toolbar: false, focus: false };
 let adminGoalEditing = false;
 let customGoalEditingId = null;
 
@@ -560,7 +554,6 @@ document.querySelectorAll("[data-view]").forEach((button) => {
   });
 });
 
-
 visibilityFilterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     visibilityFilter = button.dataset.visibilityFilter;
@@ -585,92 +578,6 @@ farmingFilterInputs.forEach((input) => {
   });
 });
 
-
-function getCollapsedStickyLabel(section) {
-  return section === "toolbar" ? "검색▼" : "보유캐릭터▼";
-}
-
-function syncStickyToggleDocking() {
-  document.body.classList.toggle(
-    "has-two-collapsed-sticky-sections",
-    Boolean(stickySectionsCollapsed.toolbar && stickySectionsCollapsed.focus),
-  );
-}
-
-function setStickySectionCollapsed(section, collapsed, options = {}) {
-  if (options.manual) {
-    stickySectionManuallyExpandedPastThreshold[section] =
-      !collapsed && Boolean(stickySectionPastThreshold[section]);
-  }
-  stickySectionsCollapsed[section] = collapsed;
-  const element = section === "toolbar" ? toolbar : focusStrip;
-  const button =
-    section === "toolbar"
-      ? toolbarStickyToggle
-      : focusStrip?.querySelector('[data-sticky-toggle="focus"]');
-
-  element?.classList.toggle("is-collapsed", collapsed);
-  if (section === "toolbar") {
-    categoryRail?.classList.toggle("is-toolbar-collapsed", collapsed);
-  }
-  syncStickyToggleDocking();
-  if (!button) return;
-
-  button.textContent = collapsed ? getCollapsedStickyLabel(section) : "숨기기▲";
-  button.setAttribute("aria-expanded", String(!collapsed));
-}
-
-function getStickySectionHeight(element) {
-  if (!element) return 0;
-  const measuredHeight = Math.max(element.offsetHeight, element.scrollHeight);
-  const previousHeight = Number(element.dataset.stickyExpandedHeight || 0);
-  const nextHeight = Math.max(previousHeight, measuredHeight);
-  element.dataset.stickyExpandedHeight = String(nextHeight);
-  return nextHeight;
-}
-
-function hasScrolledPastElement(element) {
-  if (!element) return false;
-  return window.scrollY >= element.offsetTop + getStickySectionHeight(element);
-}
-
-function hasReachedStickyEdge(element) {
-  if (!element?.getBoundingClientRect) return false;
-  const computedStyle = window.getComputedStyle?.(element);
-  const stickyTop = Number.parseFloat(computedStyle?.top) || 0;
-  return element.getBoundingClientRect().top <= stickyTop;
-}
-
-function syncStickySectionState(section, element) {
-  const scrolledPastSection = hasScrolledPastElement(element);
-  element?.classList.toggle("is-stuck", scrolledPastSection || hasReachedStickyEdge(element));
-
-  if (!scrolledPastSection) {
-    stickySectionManuallyExpandedPastThreshold[section] = false;
-  }
-
-  const shouldAutoCollapse =
-    scrolledPastSection && !stickySectionManuallyExpandedPastThreshold[section];
-
-  if (scrolledPastSection !== stickySectionPastThreshold[section]) {
-    stickySectionPastThreshold[section] = scrolledPastSection;
-    setStickySectionCollapsed(section, shouldAutoCollapse);
-  } else if (shouldAutoCollapse && !stickySectionsCollapsed[section]) {
-    setStickySectionCollapsed(section, true);
-  } else {
-    setStickySectionCollapsed(section, stickySectionsCollapsed[section]);
-  }
-}
-
-function syncStickySectionCollapse() {
-  syncStickySectionState("toolbar", toolbar);
-  syncStickySectionState("focus", focusStrip);
-}
-
-toolbarStickyToggle?.addEventListener("click", () => {
-  setStickySectionCollapsed("toolbar", !stickySectionsCollapsed.toolbar, { manual: true });
-});
-
 if (compactDetailQuery?.addEventListener) {
   compactDetailQuery.addEventListener("change", (event) => {
     isDetailPanelCollapsed = event.matches;
@@ -688,19 +595,6 @@ detailPanel.addEventListener("click", (event) => {
   event.preventDefault();
   isDetailPanelCollapsed = false;
   renderDetail();
-});
-
-window.addEventListener(
-  "scroll",
-  () => {
-    syncStickySectionCollapse();
-    updateFocusStripStickiness();
-  },
-  { passive: true },
-);
-window.addEventListener("resize", () => {
-  syncStickySectionCollapse();
-  updateFocusStripStickiness();
 });
 
 searchInput.addEventListener("input", (event) => {
@@ -828,7 +722,6 @@ document.querySelector("#exportButton").addEventListener("click", () => {
   showSessionMessage("백업 파일 생성", "현재 기록을 JSON으로 저장했습니다");
 });
 
-
 exportCharactersButton.addEventListener("click", () => {
   if (!isAdmin()) return;
   downloadCharactersJson();
@@ -912,7 +805,6 @@ googleButton.addEventListener("click", async () => {
     showSessionMessage("로그인 실패", getReadableAuthError(error));
   }
 });
-
 
 async function loadCharacterSeedData() {
   try {
@@ -1268,7 +1160,6 @@ function findSeedCharacter(name) {
   );
 }
 
-
 function saveState(options = {}) {
   state.updatedAt = new Date().toISOString();
   if (!isSnapshotMode || options.force) {
@@ -1400,8 +1291,6 @@ function render() {
   renderDetail();
   renderStats();
   renderSnapshotNotice();
-  syncStickySectionCollapse();
-  updateFocusStripStickiness();
 }
 
 function keepFarmCardScrollStable(id, renderCallback) {
@@ -1787,8 +1676,6 @@ function renderRoster() {
 }
 
 function renderCategoryRail() {
-  focusStrip.classList.toggle("has-category-filter", sortMode !== "name");
-
   if (sortMode === "name") {
     categoryRail.classList.add("hidden");
     categoryRail.innerHTML = "";
@@ -1801,11 +1688,11 @@ function renderCategoryRail() {
 
   categoryRail.classList.remove("hidden");
   categoryRail.innerHTML = `
-    <button class="${activeCategory === "all" ? "active" : ""}" data-category="all" type="button">${sortMode === "rarity" ? "ALL" : "전체"}</button>
+    <button class="${activeCategory === "all" ? "active" : ""}" data-category="all" type="button" aria-label="전체 카테고리">${renderCategoryLabel("all")}</button>
     ${categories
       .map(
         (category) => `
-      <button class="${activeCategory === category ? "active" : ""}" data-category="${escapeHtml(category)}" type="button">${renderCategoryLabel(category)}</button>
+      <button class="${activeCategory === category ? "active" : ""}" data-category="${escapeHtml(category)}" type="button" aria-label="${escapeHtml(category)} 카테고리">${renderCategoryLabel(category)}</button>
     `,
       )
       .join("")}
@@ -2471,11 +2358,17 @@ function sortCategories(a, b) {
 }
 
 function renderCategoryLabel(category) {
-  if (sortMode === "element")
-    return `${renderInlineIcon(elementIcons[category])}${escapeHtml(category)}`;
-  if (sortMode === "weapon")
-    return `${renderInlineIcon(weaponIcons[category])}${escapeHtml(category)}`;
-  return escapeHtml(category);
+  const label = category === "all" ? (sortMode === "rarity" ? "ALL" : "전체") : category;
+  const icon = renderCategoryIcon(category);
+  return `${icon}<span class="category-label">${escapeHtml(label)}</span>`;
+}
+
+function renderCategoryIcon(category) {
+  if (category === "all") return `<span class="category-icon" aria-hidden="true">＊</span>`;
+  if (sortMode === "element") return renderInlineIcon(elementIcons[category]);
+  if (sortMode === "weapon") return renderInlineIcon(weaponIcons[category]);
+  if (sortMode === "rarity") return `<span class="category-icon" aria-hidden="true">${escapeHtml(category)}</span>`;
+  return "";
 }
 
 function getRarity(character) {
@@ -2921,12 +2814,7 @@ function renderFocusStrip() {
         <p class="eyebrow">Focus</p>
         <h2>보유 처리된 캐릭터가 없습니다</h2>
       </article>
-      <button class="sticky-toggle focus-sticky-toggle" data-sticky-toggle="focus" type="button" aria-controls="focusStrip" aria-expanded="true">숨기기▲</button>
     `;
-    focusStrip.querySelector('[data-sticky-toggle="focus"]')?.addEventListener("click", () => {
-      setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus, { manual: true });
-    });
-    setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
     return;
   }
 
@@ -2953,33 +2841,11 @@ function renderFocusStrip() {
     })
     .join("");
 
-  focusStrip.insertAdjacentHTML(
-    "beforeend",
-    `<button class="sticky-toggle focus-sticky-toggle" data-sticky-toggle="focus" type="button" aria-controls="focusStrip" aria-expanded="true">숨기기▲</button>`,
-  );
-  focusStrip.querySelector('[data-sticky-toggle="focus"]')?.addEventListener("click", () => {
-    setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus, { manual: true });
-  });
-  setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
-
   focusStrip.querySelectorAll("[data-focus]").forEach((button) => {
     button.addEventListener("click", () => {
       openFarmingCard(button.dataset.focus);
     });
   });
-}
-
-function updateFocusStripStickiness() {
-  if (typeof focusStripSentinel.getBoundingClientRect !== "function") return;
-  const sentinelTop = focusStripSentinel.getBoundingClientRect().top;
-  const toolbarStyle = toolbar ? getComputedStyle(toolbar) : null;
-  const toolbarBottom =
-    toolbar?.classList.contains("is-stuck") &&
-    toolbarStyle?.position === "sticky" &&
-    typeof toolbar?.getBoundingClientRect === "function"
-      ? toolbar.getBoundingClientRect().bottom
-      : 0;
-  focusStrip.classList.toggle("is-stuck", toolbarBottom > 0 && sentinelTop <= toolbarBottom);
 }
 
 function openFarmingCard(id) {
