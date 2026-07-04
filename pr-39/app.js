@@ -2194,7 +2194,8 @@ function setupEchoSetCombobox(combobox) {
   });
 
   combobox.addEventListener("click", (event) => {
-    if (event.target.closest("[data-echo-set-option]")) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest("[data-echo-set-option]")) return;
     if (document.activeElement !== input) {
       input.focus();
       return;
