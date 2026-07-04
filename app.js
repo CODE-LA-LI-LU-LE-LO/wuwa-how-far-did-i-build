@@ -518,6 +518,7 @@ let visibilityFilter = "all";
 let farmingFilters = new Set(["owned"]);
 let stickySectionsCollapsed = { toolbar: false, focus: false };
 let stickySectionPastThreshold = { toolbar: false, focus: false };
+let stickySectionManuallyExpandedPastThreshold = { toolbar: false, focus: false };
 let adminGoalEditing = false;
 let customGoalEditingId = null;
 
@@ -596,7 +597,11 @@ function syncStickyToggleDocking() {
   );
 }
 
-function setStickySectionCollapsed(section, collapsed) {
+function setStickySectionCollapsed(section, collapsed, options = {}) {
+  if (options.manual) {
+    stickySectionManuallyExpandedPastThreshold[section] =
+      !collapsed && Boolean(stickySectionPastThreshold[section]);
+  }
   stickySectionsCollapsed[section] = collapsed;
   const element = section === "toolbar" ? toolbar : focusStrip;
   const button =
@@ -640,9 +645,18 @@ function syncStickySectionState(section, element) {
   const scrolledPastSection = hasScrolledPastElement(element);
   element?.classList.toggle("is-stuck", scrolledPastSection || hasReachedStickyEdge(element));
 
+  if (!scrolledPastSection) {
+    stickySectionManuallyExpandedPastThreshold[section] = false;
+  }
+
+  const shouldAutoCollapse =
+    scrolledPastSection && !stickySectionManuallyExpandedPastThreshold[section];
+
   if (scrolledPastSection !== stickySectionPastThreshold[section]) {
     stickySectionPastThreshold[section] = scrolledPastSection;
-    setStickySectionCollapsed(section, scrolledPastSection);
+    setStickySectionCollapsed(section, shouldAutoCollapse);
+  } else if (shouldAutoCollapse && !stickySectionsCollapsed[section]) {
+    setStickySectionCollapsed(section, true);
   } else {
     setStickySectionCollapsed(section, stickySectionsCollapsed[section]);
   }
@@ -654,7 +668,7 @@ function syncStickySectionCollapse() {
 }
 
 toolbarStickyToggle?.addEventListener("click", () => {
-  setStickySectionCollapsed("toolbar", !stickySectionsCollapsed.toolbar);
+  setStickySectionCollapsed("toolbar", !stickySectionsCollapsed.toolbar, { manual: true });
 });
 
 if (compactDetailQuery?.addEventListener) {
@@ -2910,7 +2924,7 @@ function renderFocusStrip() {
       <button class="sticky-toggle focus-sticky-toggle" data-sticky-toggle="focus" type="button" aria-controls="focusStrip" aria-expanded="true">숨기기▲</button>
     `;
     focusStrip.querySelector('[data-sticky-toggle="focus"]')?.addEventListener("click", () => {
-      setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus);
+      setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus, { manual: true });
     });
     setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
     return;
@@ -2944,7 +2958,7 @@ function renderFocusStrip() {
     `<button class="sticky-toggle focus-sticky-toggle" data-sticky-toggle="focus" type="button" aria-controls="focusStrip" aria-expanded="true">숨기기▲</button>`,
   );
   focusStrip.querySelector('[data-sticky-toggle="focus"]')?.addEventListener("click", () => {
-    setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus);
+    setStickySectionCollapsed("focus", !stickySectionsCollapsed.focus, { manual: true });
   });
   setStickySectionCollapsed("focus", stickySectionsCollapsed.focus);
 
