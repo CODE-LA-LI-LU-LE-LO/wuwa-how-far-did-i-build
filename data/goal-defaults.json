@@ -794,18 +794,18 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "영광이 깃든 바람",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "플뢰르 드 리스"
       }
     ],
-    "echoBuild": "43311",
-    "mainEcho": "",
+    "echoBuild": "44111",
+    "mainEcho": "플뢰르 드 리스",
     "note": "",
     "echoStats": [
       {
@@ -818,20 +818,13 @@
       {
         "key": "critDamage",
         "label": "크리피해",
-        "cost": "COST 3",
+        "cost": "COST 4",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "attack",
-        "label": "공격력%",
+        "key": "hp",
+        "label": "체력%",
         "cost": "COST 1",
         "variant": "-",
         "branchChecked": false
@@ -860,9 +853,9 @@
         "variant": "-"
       },
       {
-        "key": "attack",
-        "label": "공격력",
-        "target": 2200,
+        "key": "hp",
+        "label": "체력",
+        "target": 50000,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -1110,39 +1103,50 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "끝없는 하늘",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 켈피"
+      },
+      {
+        "join": "OR",
+        "name": "플뢰르 드 리스"
       }
     ],
     "echoBuild": "43311",
-    "mainEcho": "",
+    "mainEcho": "악몽 · 켈피",
     "note": "",
     "echoStats": [
       {
-        "key": "critRate",
-        "label": "크리확률",
+        "key": "critDamage",
+        "label": "크리피해",
         "cost": "COST 4",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "energy",
-        "label": "공명효율",
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
-        "variant": "-",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
         "branchChecked": false
       },
       {
@@ -1157,14 +1161,14 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 75,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 275,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -1178,9 +1182,16 @@
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 1800,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2100,
+        "cost": "COST 1",
+        "variant": "B"
       }
     ]
   },
@@ -1979,18 +1990,18 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "스쳐가는 바람",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 폭주의 고릴라"
       }
     ],
     "echoBuild": "43311",
-    "mainEcho": "",
+    "mainEcho": "악몽 · 폭주의 고릴라",
     "note": "",
     "echoStats": [
       {
@@ -2001,17 +2012,24 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "energy",
-        "label": "공명효율",
+        "key": "aeroDamage",
+        "label": "기류피증",
         "cost": "COST 3",
-        "variant": "-",
+        "variant": "A",
+        "branchChecked": false
+      },
+      {
+        "key": "attack",
+        "label": "공격력%",
+        "cost": "COST 3",
+        "variant": "B",
         "branchChecked": false
       },
       {
@@ -2040,14 +2058,14 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2250,
         "cost": "COST 1",
         "variant": "-"
       }
