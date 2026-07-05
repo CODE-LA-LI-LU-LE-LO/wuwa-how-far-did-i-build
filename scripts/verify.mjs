@@ -90,6 +90,7 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
     atob: (value) => Buffer.from(value, "base64").toString("binary"),
     btoa: (value) => Buffer.from(value, "binary").toString("base64"),
     crypto: { randomUUID: () => "verify-id" },
+    CSS: { escape: (value) => String(value) },
     document: createDomStub(),
     history: { replaceState() {} },
     localStorage: {
@@ -125,6 +126,7 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
   vm.createContext(sandbox);
   vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
+  sandbox.__getState = vm.runInContext("() => state", sandbox);
   await new Promise((resolve) => setTimeout(resolve, 0));
   return sandbox;
 }
@@ -258,6 +260,51 @@ if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) fail("manifes
 
 if (!appSource.includes('const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];')) {
   fail("app.js must provide stat branch options from - through A-F");
+}
+if (!/const valueStatOptions = \[[\s\S]*"healingBonus"[\s\S]*\]\.map/.test(appSource)) {
+  fail("app.js value stat options must include healingBonus for numeric input attributes");
+}
+if (!appSource.includes('label: "치료효과+"')) {
+  fail("app.js healing bonus label must use 치료효과+");
+}
+if (appSource.includes('label: "치유효과+"')) {
+  fail("app.js should not use 치유효과+ as the displayed healing bonus label");
+}
+for (const requiredGoalEditSource of [
+  "에코 구성은 2개에서 10개까지 설정할 수 있습니다.",
+  "주옵은 1개에서 7개까지 설정할 수 있습니다.",
+  "echoBuildAlt",
+  "echo-build-or",
+  "goal.echoStats.length <= 2",
+  "goal.echoStats.length >= 10",
+  "goal.stats.length <= 1",
+  "updateRenderedStatPickerOption",
+  "updateRenderedGoalStatKey",
+]) {
+  if (!appSource.includes(requiredGoalEditSource)) {
+    fail(`app.js missing goal edit behavior source: ${requiredGoalEditSource}`);
+  }
+}
+const clearCurrentStatSource = appSource.match(/function clearCurrentStat\([\s\S]*?\n}\n\nfunction addGoalStat/)?.[0] ?? "";
+const updateGoalEchoStatKeySource = appSource.match(/function updateGoalEchoStatKey\([\s\S]*?\n}\n\nfunction updateGoalEchoStatField/)?.[0] ?? "";
+if (!updateGoalEchoStatKeySource.includes("updateRenderedStatPickerOption")) {
+  fail("updateGoalEchoStatKey must update the picker without a full card redraw");
+}
+if (updateGoalEchoStatKeySource.includes("rerenderFarmingCard(id)")) {
+  fail("updateGoalEchoStatKey should not rerender the whole farming card");
+}
+const updateGoalStatKeySource = appSource.match(/function updateGoalStatKey\([\s\S]*?\n}\n\nfunction updateRenderedStatPickerOption/)?.[0] ?? "";
+if (!updateGoalStatKeySource.includes("updateRenderedGoalStatKey")) {
+  fail("updateGoalStatKey must update the goal stat row without a full card redraw");
+}
+if (updateGoalStatKeySource.includes("rerenderFarmingCard(id)")) {
+  fail("updateGoalStatKey should not rerender the whole farming card");
+}
+if (!clearCurrentStatSource.includes("updateRenderedCurrentStatValues(id, key)")) {
+  fail("clearCurrentStat must update rendered current stat values without a full card redraw");
+}
+if (clearCurrentStatSource.includes("rerenderFarmingCard(id)")) {
+  fail("clearCurrentStat should not rerender the whole farming card for simple value resets");
 }
 for (const icon of manifest.icons ?? []) {
   await mustExist(icon.src);
@@ -446,6 +493,90 @@ try {
   }
 } catch (error) {
   fail(`app echo set initial search verification failed: ${error.message}`);
+}
+
+try {
+  const currentStatSyncSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const character = currentStatSyncSandbox.createCharacter({
+    name: "테스트",
+    element: "미정",
+    weapon: "미정",
+  });
+  character.goals.admin.stats = [
+    { key: "atk", label: "공격력", target: 2000, cost: "COST 1", variant: "A" },
+    { key: "atk", label: "공격력", target: 2000, cost: "COST 1", variant: "B" },
+    { key: "hp", label: "HP", target: 20000, cost: "COST 1", variant: "-" },
+  ];
+  currentStatSyncSandbox.__getState().characters = [character];
+  currentStatSyncSandbox.updateCurrentStat(character.id, "A:atk", 200);
+  if (
+    character.currentStats.values["A:atk"] !== 200 ||
+    character.currentStats.values["B:atk"] !== 200
+  ) {
+    fail("current stat inputs with the same attribute must sync across branch variants");
+  }
+  currentStatSyncSandbox.updateCurrentStat(character.id, "B:atk", 350);
+  if (
+    character.currentStats.values["A:atk"] !== 350 ||
+    character.currentStats.values["B:atk"] !== 350
+  ) {
+    fail("later current stat edits must overwrite matching attribute branch values");
+  }
+  if (character.currentStats.values.hp === 350) {
+    fail("current stat sync must not overwrite different attributes");
+  }
+  character.currentStats.values.hp = 123;
+  currentStatSyncSandbox.clearCurrentStat(character.id, "A:atk");
+  if (
+    character.currentStats.values["A:atk"] !== 0 ||
+    character.currentStats.values["B:atk"] !== 0
+  ) {
+    fail("clearing a current stat must sync zero to matching branch values");
+  }
+  if (character.currentStats.values.hp === 0) {
+    fail("current stat clear sync must not overwrite different attributes");
+  }
+} catch (error) {
+  fail(`app current stat sync verification failed: ${error.message}`);
+}
+
+try {
+  const goalShapeSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const normalizedGoal = goalShapeSandbox.normalizeGoal({
+    echoBuild: "43311",
+    echoBuildAlt: "44111",
+    echoStats: [
+      { key: "critRate", label: "크리확률" },
+      { key: "critDamage", label: "크리피해" },
+    ],
+    stats: [
+      { key: "healingBonus", label: "치유효과+", target: 30 },
+    ],
+  });
+  if (normalizedGoal.echoBuildAlt !== "44111") {
+    fail("alternate echo build must be normalized and preserved");
+  }
+  if (normalizedGoal.echoStats.length !== 2) {
+    fail("echo stat normalization must allow a minimum of two rows");
+  }
+  if (normalizedGoal.stats.length !== 1) {
+    fail("goal stat normalization must allow a minimum of one row");
+  }
+  if (normalizedGoal.stats[0]?.label !== "치료효과+") {
+    fail("legacy healing bonus labels must normalize to 치료효과+");
+  }
+} catch (error) {
+  fail(`app goal shape verification failed: ${error.message}`);
 }
 
 if (failures.length > 0) {

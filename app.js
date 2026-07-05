@@ -93,7 +93,7 @@ const statOptions = [
   },
   {
     key: "healingBonus",
-    label: "치유효과+",
+    label: "치료효과+",
     icon: "assets/icons/stats/heal.webp",
     defaultTarget: 0,
   },
@@ -152,6 +152,7 @@ const valueStatOptions = [
   "attack",
   "defense",
   "hp",
+  "healingBonus",
 ].map((key) => {
   const option = statOptions.find((item) => item.key === key);
   return {
@@ -340,6 +341,7 @@ const defaultGoal = {
   echoSets: [{ join: "+", name: "", pieces: "5 Set" }],
   mainEchoes: [{ join: "OR", name: "" }],
   echoBuild: "43311",
+  echoBuildAlt: "",
   mainEcho: "",
   note: "",
   echoStats: [
@@ -994,7 +996,7 @@ function normalizeGoal(goal = {}, resetValueStats = false) {
       : defaultGoal.stats;
   const stats = rawStats.map(normalizeGoalStat).filter(Boolean).slice(0, 7);
 
-  while (stats.length < 3) {
+  while (stats.length < 1) {
     const nextOption =
       valueStatOptions.find(
         (option) => !stats.some((stat) => stat.key === option.key),
@@ -1007,6 +1009,9 @@ function normalizeGoal(goal = {}, resetValueStats = false) {
     echoSets: normalizeGoalEchoSets(goal),
     mainEchoes: normalizeGoalMainEchoes(goal),
     echoBuild: String(goal.echoBuild ?? defaultGoal.echoBuild)
+      .replace(/\D/g, "")
+      .slice(0, 5),
+    echoBuildAlt: String(goal.echoBuildAlt ?? "")
       .replace(/\D/g, "")
       .slice(0, 5),
     mainEcho: goal.mainEcho ?? defaultGoal.mainEcho,
@@ -1065,9 +1070,9 @@ function normalizeGoalEchoStats(goal = {}, fallbackStats = defaultGoal.echoStats
   const stats = rawStats
     .map((stat) => normalizeGoalEchoStat(stat))
     .filter(Boolean)
-    .slice(0, 7);
+    .slice(0, 10);
 
-  while (stats.length < 3) {
+  while (stats.length < 2) {
     const nextOption =
       statOptions.find(
         (option) => !stats.some((stat) => stat.key === option.key),
@@ -1081,7 +1086,8 @@ function normalizeGoalEchoStats(goal = {}, fallbackStats = defaultGoal.echoStats
 function normalizeGoalEchoStat(stat = {}) {
   const option =
     statOptions.find((item) => item.key === stat.key) ??
-    statOptions.find((item) => item.label === stat.label);
+    statOptions.find((item) => item.label === stat.label) ??
+    getLegacyStatLabelOption(stat.label, statOptions);
   if (!option) return null;
   return {
     key: option.key,
@@ -1098,7 +1104,8 @@ function normalizeGoalEchoStat(stat = {}) {
 function normalizeGoalStat(stat = {}) {
   const option =
     valueStatOptions.find((item) => item.key === stat.key) ??
-    valueStatOptions.find((item) => item.label === stat.label);
+    valueStatOptions.find((item) => item.label === stat.label) ??
+    getLegacyStatLabelOption(stat.label, valueStatOptions);
   if (!option) return null;
   return {
     key: option.key,
@@ -1107,6 +1114,13 @@ function normalizeGoalStat(stat = {}) {
     cost: statCostOptions.includes(stat.cost) ? stat.cost : "COST 1",
     variant: statVariantOptions.includes(stat.variant) ? stat.variant : "-",
   };
+}
+
+function getLegacyStatLabelOption(label, options = statOptions) {
+  if (label === "치유효과+") {
+    return options.find((item) => item.key === "healingBonus") ?? null;
+  }
+  return null;
 }
 
 function normalizeCurrentStats(currentStats = {}) {
@@ -1800,7 +1814,7 @@ function bindRosterInteractions(root = rosterList) {
   });
 
   root.querySelectorAll("[data-goal-field]").forEach((field) => {
-    if (field.dataset.goalField === "echoBuild") {
+    if (field.dataset.goalField === "echoBuild" || field.dataset.goalField === "echoBuildAlt") {
       field.addEventListener("input", () => {
         field.value = field.value.replace(/\D/g, "").slice(0, 5);
         updateEchoBuildPreview(field);
@@ -1809,7 +1823,7 @@ function bindRosterInteractions(root = rosterList) {
 
     field.addEventListener("blur", () => {
       const value =
-        field.dataset.goalField === "echoBuild"
+        field.dataset.goalField === "echoBuild" || field.dataset.goalField === "echoBuildAlt"
           ? field.value.replace(/\D/g, "").slice(0, 5)
           : field.dataset.goalField === "note"
             ? field.value.trim()
@@ -2011,8 +2025,8 @@ function renderFarmingCard(character) {
             canEditGoal
               ? `
             <div class="stat-actions">
-              <button class="ghost-button" data-add-echo-stat="${character.id}" type="button" ${goal.echoStats.length < 7 ? "" : "disabled"}>에코 구성 추가</button>
-              <small>에코 구성은 3개에서 7개까지 설정할 수 있습니다.</small>
+              <button class="ghost-button" data-add-echo-stat="${character.id}" type="button" ${goal.echoStats.length < 10 ? "" : "disabled"}>에코 구성 추가</button>
+              <small>에코 구성은 2개에서 10개까지 설정할 수 있습니다.</small>
             </div>
           `
               : ""
@@ -2038,7 +2052,7 @@ function renderFarmingCard(character) {
               ? `
             <div class="stat-actions">
               <button class="ghost-button" data-add-stat="${character.id}" type="button" ${goal.stats.length < 7 ? "" : "disabled"}>주옵 추가</button>
-              <small>주옵은 3개에서 7개까지 설정할 수 있습니다.</small>
+              <small>주옵은 1개에서 7개까지 설정할 수 있습니다.</small>
             </div>
           `
               : ""
@@ -2066,7 +2080,36 @@ function renderFarmingCard(character) {
 }
 
 function renderEchoBuildInput(character, goal, canEditGoal) {
-  const value = String(goal.echoBuild ?? "").replace(/\D/g, "").slice(0, 5);
+  const primaryField = renderEchoBuildField(
+    character.id,
+    "echoBuild",
+    goal.echoBuild,
+    "에코셋 구성",
+    canEditGoal,
+  );
+  const secondaryValue = String(goal.echoBuildAlt ?? "")
+    .replace(/\D/g, "")
+    .slice(0, 5);
+
+  if (!canEditGoal && !secondaryValue) return primaryField;
+
+  return `
+    <span class="echo-build-group">
+      ${primaryField}
+      <span class="echo-build-or">OR</span>
+      ${renderEchoBuildField(
+        character.id,
+        "echoBuildAlt",
+        secondaryValue,
+        "대체 에코셋 구성",
+        canEditGoal,
+      )}
+    </span>
+  `;
+}
+
+function renderEchoBuildField(characterId, fieldName, rawValue, label, canEditGoal) {
+  const value = String(rawValue ?? "").replace(/\D/g, "").slice(0, 5);
   const displayValue = value || "43311";
   const digits = Array.from(displayValue.slice(0, 5));
   const digitCells = digits
@@ -2078,7 +2121,7 @@ function renderEchoBuildInput(character, goal, canEditGoal) {
   return `
     <span class="echo-build-field ${value ? "" : "is-placeholder"}">
       <span class="echo-build-highlight" aria-hidden="true">${digitCells}</span>
-      <input class="echo-build-input" data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(value)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="에코셋 구성" ${canEditGoal ? "" : "disabled"} />
+      <input class="echo-build-input" data-goal-field="${fieldName}" data-character="${characterId}" value="${escapeHtml(value)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="${escapeHtml(label)}" ${canEditGoal ? "" : "disabled"} />
     </span>
   `;
 }
@@ -2149,7 +2192,7 @@ function renderEchoStatRow(character, stat, index, canEditGoal) {
         dataAttribute: "data-echo-stat-option",
       })}
       <span class="stat-row-actions">
-        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-echo-stat="${index}" type="button" ${getActiveGoal(character).echoStats.length > 3 ? "" : "disabled"} title="에코 구성 제거">-</button>` : ""}
+        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-echo-stat="${index}" type="button" ${getActiveGoal(character).echoStats.length > 2 ? "" : "disabled"} title="에코 구성 제거">-</button>` : ""}
       </span>
     </div>
   `;
@@ -2197,7 +2240,7 @@ function renderStatRow(character, stat, index, canEditGoal) {
       <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" step="5" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
         <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${canEditCurrent ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
-        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
+        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 1 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
   `;
@@ -2544,6 +2587,18 @@ function getCurrentStatValueKey(stat) {
     : stat.key;
 }
 
+function getCurrentStatBaseKey(valueKey = "") {
+  const [, variantStatKey] = String(valueKey).split(":");
+  return variantStatKey || String(valueKey);
+}
+
+function getMatchingCurrentStatKeys(character, valueKey) {
+  const baseKey = getCurrentStatBaseKey(valueKey);
+  return getActiveGoal(character).stats
+    .filter((stat) => stat.key === baseKey)
+    .map(getCurrentStatValueKey);
+}
+
 function getCurrentStatValue(character, stat) {
   return Number(character.currentStats.values[getCurrentStatValueKey(stat)] ?? 0);
 }
@@ -2694,7 +2749,7 @@ function updateCurrentStat(id, field, value) {
         ? "mid"
         : character.farm.priority;
   } else if (isCurrentValueField) {
-    character.currentStats.values[field] = Math.max(0, Number(value) || 0);
+    updateCurrentStatValuesByAttribute(character, field, value);
   } else {
     character.currentStats[field] = value;
   }
@@ -2711,10 +2766,43 @@ function updateCurrentStat(id, field, value) {
   }
 
   updateRenderedFarmingCardCompletionState(id, isComplete);
+  if (isCurrentValueField) {
+    updateRenderedCurrentStatValues(id, field);
+  }
   if (field === "manualComplete" || !isCurrentValueField) {
     rerenderFarmingCard(id);
     if (id === selectedId) renderDetail();
   }
+}
+
+function updateCurrentStatValuesByAttribute(character, field, value) {
+  const normalizedValue = Math.max(0, Number(value) || 0);
+  const matchingKeys = getMatchingCurrentStatKeys(character, field);
+  const keys = matchingKeys.length ? matchingKeys : [field];
+
+  keys.forEach((key) => {
+    character.currentStats.values[key] = normalizedValue;
+  });
+}
+
+function updateRenderedCurrentStatValues(id, field) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  const matchingKeys = new Set(getMatchingCurrentStatKeys(character, field));
+  if (!matchingKeys.size) matchingKeys.add(field);
+
+  document
+    .querySelectorAll(`[data-current-field][data-character="${CSS.escape(id)}"]`)
+    .forEach((input) => {
+      if (!matchingKeys.has(input.dataset.currentField)) return;
+      input.value = String(character.currentStats.values[input.dataset.currentField] ?? 0);
+      updateRenderedStatRowState(
+        id,
+        Number(input.dataset.index),
+        input.closest(".stat-row"),
+      );
+    });
 }
 
 function shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete) {
@@ -2799,7 +2887,7 @@ function updateGoal(id, field, value, statKey) {
   }
 
   saveGoalState(character);
-  if (field === "note" || field === "echoBuild") return;
+  if (field === "note" || field === "echoBuild" || field === "echoBuildAlt") return;
   updateGoalRenderStateAfterEdit(character, wasComplete);
 }
 
@@ -2897,14 +2985,21 @@ function updateGoalEchoStatKey(id, index, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const option = getStatOption(key, statOptions);
-  const stat = getActiveGoal(character).echoStats[Number(index)];
+  const targetIndex = Number(index);
+  const stat = getActiveGoal(character).echoStats[targetIndex];
   if (!stat) return;
 
   stat.key = option.key;
   stat.label = option.label;
 
   saveGoalState(character);
-  rerenderFarmingCard(id);
+  updateRenderedStatPickerOption(
+    id,
+    targetIndex,
+    option.key,
+    "data-echo-stat-option",
+    statOptions,
+  );
 }
 
 function updateGoalEchoStatField(id, index, field, value) {
@@ -3011,7 +3106,7 @@ function removeGoalEchoStat(id, index) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.echoStats.length <= 3) return;
+  if (goal.echoStats.length <= 2) return;
 
   const targetIndex = Number(index);
   goal.echoStats.splice(targetIndex, 1);
@@ -3069,15 +3164,38 @@ function updateRenderedStatRowState(id, index, row) {
 function clearCurrentStat(id, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
-  character.currentStats.values[key] = 0;
+
+  const wasComplete = isGoalComplete(character);
+  updateCurrentStatValuesByAttribute(character, key, 0);
   character.currentStats.manualComplete = false;
   if (character.farm.priority === "done") character.farm.priority = "mid";
 
   saveState();
   renderStats();
   renderFocusStrip();
-  rerenderFarmingCard(id);
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  updateRenderedCurrentStatValues(id, key);
+  updateRenderedManualCompleteInput(id);
   if (id === selectedId) renderDetail();
+}
+
+function updateRenderedManualCompleteInput(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  document
+    .querySelectorAll(`[data-manual-complete="${CSS.escape(id)}"]`)
+    .forEach((input) => {
+      input.checked = character.currentStats.manualComplete;
+    });
 }
 
 function addGoalStat(id) {
@@ -3107,7 +3225,7 @@ function addGoalEchoStat(id) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.echoStats.length >= 7) return;
+  if (goal.echoStats.length >= 10) return;
 
   const option =
     statOptions.find(
@@ -3128,7 +3246,7 @@ function removeGoalStat(id, index) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.stats.length <= 3) return;
+  if (goal.stats.length <= 1) return;
 
   const targetIndex = Number(index);
   goal.stats.splice(targetIndex, 1);
@@ -3142,10 +3260,12 @@ function updateGoalStatKey(id, index, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  const stat = goal.stats[Number(index)];
+  const targetIndex = Number(index);
+  const stat = goal.stats[targetIndex];
   if (!stat) return;
   if (!isGoalBranchActive(goal, stat.variant) && !canEditActiveGoal(character)) return;
   const option = getStatOption(key, valueStatOptions);
+  const wasComplete = isGoalComplete(character);
 
   stat.key = option.key;
   stat.label = option.label;
@@ -3157,7 +3277,74 @@ function updateGoalStatKey(id, index, key) {
   saveGoalState(character);
   renderStats();
   renderFocusStrip();
-  rerenderFarmingCard(id);
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  updateRenderedStatPickerOption(
+    id,
+    targetIndex,
+    option.key,
+    "data-stat-option",
+    valueStatOptions,
+  );
+  updateRenderedGoalStatKey(id, targetIndex);
+  if (id === selectedId) renderDetail();
+}
+
+function updateRenderedStatPickerOption(
+  id,
+  index,
+  key,
+  dataAttribute,
+  options = statOptions,
+) {
+  const selector = `[${dataAttribute}][data-character="${CSS.escape(id)}"][data-index="${CSS.escape(String(index))}"]`;
+  const buttons = [...document.querySelectorAll(selector)];
+  if (!buttons.length) return;
+
+  const selectedOption = getStatOption(key, options);
+  const picker = buttons[0].closest(".stat-picker");
+  const summary = picker?.querySelector("summary.echo-picker-button");
+  if (summary) {
+    summary.innerHTML = `${renderInlineIcon(selectedOption.icon)}<span>${escapeHtml(selectedOption.label)}</span>`;
+  }
+
+  buttons.forEach((button) => {
+    const isSelected = button.dataset.value === selectedOption.key;
+    button.classList.toggle("active", isSelected);
+    button.setAttribute("aria-selected", String(isSelected));
+  });
+}
+
+function updateRenderedGoalStatKey(id, index) {
+  const character = state.characters.find((item) => item.id === id);
+  const stat = character ? getActiveGoal(character).stats[Number(index)] : null;
+  if (!character || !stat) return;
+
+  const row = document.querySelector(
+    `[data-stat-row="${CSS.escape(id)}"][data-index="${CSS.escape(String(index))}"]`,
+  );
+  if (!row) return;
+
+  const currentKey = getCurrentStatValueKey(stat);
+  const targetInput = row.querySelector("[data-goal-stat-field='target']");
+  const currentInput = row.querySelector("[data-current-field]");
+  const clearButton = row.querySelector("[data-clear-current]");
+
+  if (targetInput) targetInput.value = String(Number(stat.target ?? 0));
+  if (currentInput) {
+    currentInput.dataset.currentField = currentKey;
+    currentInput.value = String(getCurrentStatValue(character, stat));
+  }
+  if (clearButton) clearButton.dataset.statKey = currentKey;
+
+  updateRenderedStatRowState(id, Number(index), row);
 }
 
 function getRosterEmptyState() {
