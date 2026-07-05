@@ -3157,7 +3157,7 @@ function updateRenderedStatRowState(id, index, row) {
 function clearCurrentStat(id, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
-  character.currentStats.values[key] = 0;
+  updateCurrentStatValuesByAttribute(character, key, 0);
   character.currentStats.manualComplete = false;
   if (character.farm.priority === "done") character.farm.priority = "mid";
 
