@@ -261,6 +261,9 @@ if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) fail("manifes
 if (!appSource.includes('const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];')) {
   fail("app.js must provide stat branch options from - through A-F");
 }
+if (!/const valueStatOptions = \[[\s\S]*"healingBonus"[\s\S]*\]\.map/.test(appSource)) {
+  fail("app.js value stat options must include healingBonus for numeric input attributes");
+}
 for (const icon of manifest.icons ?? []) {
   await mustExist(icon.src);
 }

@@ -152,6 +152,7 @@ const valueStatOptions = [
   "attack",
   "defense",
   "hp",
+  "healingBonus",
 ].map((key) => {
   const option = statOptions.find((item) => item.key === key);
   return {
