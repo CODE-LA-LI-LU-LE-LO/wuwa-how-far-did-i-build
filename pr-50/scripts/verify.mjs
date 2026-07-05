@@ -1,0 +1,685 @@
+import { readFile, stat } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import vm from "node:vm";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const failures = [];
+
+function fail(message) {
+  failures.push(message);
+}
+
+async function readText(path) {
+  return readFile(resolve(root, path), "utf8");
+}
+
+async function mustExist(path) {
+  try {
+    const info = await stat(resolve(root, path));
+    if (!info.isFile()) fail(`${path} is not a file`);
+  } catch {
+    fail(`${path} is missing`);
+  }
+}
+
+function localReferences(html) {
+  const refs = [];
+  for (const match of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
+    const ref = match[1];
+    if (/^(https?:|data:|#)/.test(ref)) continue;
+    refs.push(ref);
+  }
+  return refs;
+}
+
+function loadCharacterSeed(source) {
+  return JSON.parse(source);
+}
+
+function createDomStub() {
+  const classList = {
+    add() {},
+    remove() {},
+    toggle() {},
+  };
+
+  const element = {
+    value: "",
+    dataset: {},
+    files: [],
+    style: { setProperty() {} },
+    classList,
+    addEventListener() {},
+    append() {},
+    click() {},
+    cloneNode() { return element; },
+    close() {},
+    focus() {},
+    querySelector() { return element; },
+    querySelectorAll() { return []; },
+    remove() {},
+    scrollIntoView() {},
+    select() {},
+    setAttribute() {},
+    showModal() {},
+    get content() { return element; },
+    set innerHTML(value) { this._innerHTML = value; },
+    get innerHTML() { return this._innerHTML ?? ""; },
+    set textContent(value) { this._textContent = value; },
+    get textContent() { return this._textContent ?? ""; },
+  };
+
+  return {
+    querySelector() { return element; },
+    querySelectorAll() { return []; },
+    createElement() { return element; },
+    execCommand() { return true; },
+    body: { append() {}, classList },
+  };
+}
+
+async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, versionSource, appSource }) {
+  versionSource ??= '{"version":"ver.verify"}';
+  const storage = new Map();
+  const sandbox = {
+    Blob: class {},
+    URL,
+    URLSearchParams,
+    TextDecoder,
+    TextEncoder,
+    atob: (value) => Buffer.from(value, "base64").toString("binary"),
+    btoa: (value) => Buffer.from(value, "binary").toString("base64"),
+    crypto: { randomUUID: () => "verify-id" },
+    CSS: { escape: (value) => String(value) },
+    document: createDomStub(),
+    history: { replaceState() {} },
+    localStorage: {
+      getItem: (key) => storage.get(key) ?? null,
+      removeItem: (key) => storage.delete(key),
+      setItem: (key, value) => storage.set(key, value),
+    },
+    location: {
+      hash: "",
+      href: "https://example.test/tracker/",
+      protocol: "https:",
+    },
+    navigator: {},
+    fetch: async (url) => {
+      if (String(url).endsWith("data/characters.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(characterSource) };
+      }
+      if (String(url).endsWith("data/goal-defaults.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(goalDefaultsSource) };
+      }
+      if (String(url).endsWith("data/echo-sets.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(echoSetsSource) };
+      }
+      if (String(url).endsWith("data/version.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(versionSource) };
+      }
+      return { ok: false, status: 404, json: async () => ({}) };
+    },
+    window: null,
+    addEventListener(event, callback) {
+      if (event === "load") callback();
+    },
+    clearTimeout,
+    console,
+    setTimeout,
+  };
+  sandbox.window = sandbox;
+
+  vm.createContext(sandbox);
+  vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
+  vm.runInContext(appSource, sandbox, { filename: "app.js" });
+  sandbox.__getState = vm.runInContext("() => state", sandbox);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  return sandbox;
+}
+
+const requiredRootFiles = [
+  ".nojekyll",
+  "app-config.js",
+  "app-config.example.js",
+  "app.js",
+  "firebase.json",
+  "firestore.rules",
+  "index.html",
+  "manifest.webmanifest",
+  "styles.css",
+  "sw.js",
+  "data/characters.json",
+  "data/goal-defaults.json",
+  "data/echo-sets.json",
+  "data/version.json",
+];
+
+const requiredIconFiles = [
+  "assets/icons/elements/aero.webp",
+  "assets/icons/elements/electro.webp",
+  "assets/icons/elements/fusion.webp",
+  "assets/icons/elements/glacio.webp",
+  "assets/icons/elements/havoc.webp",
+  "assets/icons/elements/spectro.webp",
+  "assets/icons/weapons/broadblade.webp",
+  "assets/icons/weapons/gauntlets.webp",
+  "assets/icons/weapons/pistols.webp",
+  "assets/icons/weapons/rectifier.webp",
+  "assets/icons/weapons/sword.webp",
+  "assets/icons/stats/atk.webp",
+  "assets/icons/stats/crit.webp",
+  "assets/icons/stats/critdmg.webp",
+  "assets/icons/stats/def.webp",
+  "assets/icons/stats/energy.webp",
+  "assets/icons/stats/heal.webp",
+  "assets/icons/stats/hp.webp",
+  "assets/icons/ui/lock-closed.svg",
+];
+
+for (const file of requiredRootFiles) {
+  await mustExist(file);
+}
+
+for (const file of requiredIconFiles) {
+  await mustExist(file);
+}
+
+for (let index = 1; index <= 31; index += 1) {
+  await mustExist(`assets/icons/echoes/set_${index}.webp`);
+}
+
+const html = await readText("index.html");
+const appSource = await readText("app.js");
+const stylesSource = await readText("styles.css");
+const goalDefaultsSource = await readText("data/goal-defaults.json");
+const echoSetsSource = await readText("data/echo-sets.json");
+let goalDefaults;
+try {
+  goalDefaults = JSON.parse(goalDefaultsSource);
+} catch (error) {
+  fail(`data/goal-defaults.json must be valid JSON: ${error.message}`);
+}
+
+let echoSetsData;
+try {
+  echoSetsData = JSON.parse(echoSetsSource);
+  if (!Array.isArray(echoSetsData) || !echoSetsData.length) {
+    fail("data/echo-sets.json must include at least one echo set");
+  }
+  echoSetsData.forEach((echoSet, index) => {
+    for (const field of ["id", "name", "en", "icon"]) {
+      if (typeof echoSet?.[field] !== "string" || !echoSet[field].trim()) {
+        fail(`data/echo-sets.json item ${index} must include a non-empty ${field}`);
+      }
+    }
+    if (!/^set_\d+$/.test(echoSet.id)) {
+      fail(`data/echo-sets.json item ${index} id must use set_N format`);
+    }
+    if (echoSet.icon !== `assets/icons/echoes/${echoSet.id}.webp`) {
+      fail(`data/echo-sets.json item ${index} icon must match its id`);
+    }
+    if (echoSet.aliases !== undefined && (!Array.isArray(echoSet.aliases) || echoSet.aliases.some((alias) => typeof alias !== "string"))) {
+      fail(`data/echo-sets.json item ${index} aliases must be an array of strings`);
+    }
+  });
+} catch (error) {
+  fail(`data/echo-sets.json must be valid JSON: ${error.message}`);
+}
+
+const echoSetNames = new Set(echoSetsData.map((echoSet) => echoSet.name));
+const echoSetEnglishNames = new Set(echoSetsData.map((echoSet) => echoSet.en));
+const goalEchoSetNames = new Set();
+for (const [characterId, goal] of Object.entries(goalDefaults)) {
+  for (const [index, echoSet] of (goal?.echoSets ?? []).entries()) {
+    const name = echoSet?.name;
+    if (!name) continue;
+    goalEchoSetNames.add(name);
+    if (!echoSetNames.has(name)) {
+      fail(`data/goal-defaults.json ${characterId}.echoSets[${index}].name must use a Korean data/echo-sets.json name`);
+    }
+    if (echoSetEnglishNames.has(name)) {
+      fail(`data/goal-defaults.json ${characterId}.echoSets[${index}].name must not store English echo set names`);
+    }
+  }
+}
+if (!goalEchoSetNames.size) {
+  fail("data/goal-defaults.json must include Korean echo set names");
+}
+
+const normalizeEchoSetNameSource = appSource.match(/function normalizeEchoSetName\([\s\S]*?\n}\n\nfunction getStatOption/)?.[0] ?? "";
+if (!normalizeEchoSetNameSource.includes("echoSet.name === name")) {
+  fail("normalizeEchoSetName must continue matching Korean echo set names");
+}
+if (!normalizeEchoSetNameSource.includes("echoSet.en === name")) {
+  fail("normalizeEchoSetName must continue matching English echo set names");
+}
+if (!normalizeEchoSetNameSource.includes("echoSet.aliases?.includes(name)")) {
+  fail("normalizeEchoSetName must match echo set aliases when aliases are present");
+}
+if (normalizeEchoSetNameSource.includes("echoSet.id === name")) {
+  fail("normalizeEchoSetName should not normalize echo set ids as stored names");
+}
+
+const getEchoSetIconSource = appSource.match(/function getEchoSetIcon\([\s\S]*?\n}\n\nfunction normalizeEchoSetName/)?.[0] ?? "";
+if (!getEchoSetIconSource.includes("echoSets.find")) {
+  fail("getEchoSetIcon must continue looking up icons from the loaded echoSets array");
+}
+if (!getEchoSetIconSource.includes("normalizeEchoSetName(name)")) {
+  fail("getEchoSetIcon must normalize names before looking up icons");
+}
+
+const versionSource = await readText("data/version.json");
+try {
+  const versionData = JSON.parse(versionSource);
+  if (typeof versionData.version !== "string" || !versionData.version.trim()) {
+    fail("data/version.json must include a non-empty version string");
+  }
+} catch (error) {
+  fail(`data/version.json must be valid JSON: ${error.message}`);
+}
+for (const ref of localReferences(html)) {
+  await mustExist(ref);
+}
+
+const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map((match) => match[1]));
+for (const match of appSource.matchAll(/querySelector(?:All)?\(\s*["']#([A-Za-z0-9_-]+)["']\s*\)/g)) {
+  const id = match[1];
+  if (!htmlIds.has(id)) fail(`app.js references missing DOM id #${id}`);
+}
+
+for (const attribute of [
+  "data-view",
+  "data-close-dialog",
+  'data-sort="weapon"',
+  'data-sort="rarity"',
+  'id="newRarity"',
+  "data-field",
+  'data-field="manualComplete"',
+  'data-field="priority"',
+  'data-field="nextAction"',
+  'data-field="notes"',
+]) {
+  if (!html.includes(attribute)) fail(`index.html missing ${attribute}`);
+}
+
+for (const removedStickySource of [
+  "sticky-toggle",
+  "focus-strip-sentinel",
+  "focus-sticky-toggle",
+  "hasScrolledPastElement",
+  "syncStickySectionCollapse",
+  "updateFocusStripStickiness",
+  "is-toolbar-collapsed",
+  "has-category-filter",
+]) {
+  if (html.includes(removedStickySource)) fail(`index.html should not include removed sticky UI source: ${removedStickySource}`);
+  if (appSource.includes(removedStickySource)) fail(`app.js should not include removed sticky UI source: ${removedStickySource}`);
+  if (stylesSource.includes(removedStickySource)) fail(`styles.css should not include removed sticky UI source: ${removedStickySource}`);
+}
+
+for (const requiredSource of [
+  "MAX_IMAGE_BYTES",
+  "resolveImageInput",
+  "2MB 이하 이미지만 업로드할 수 있습니다",
+  "data-add-stat",
+  "data-remove-stat",
+  "목표</button>",
+  "수동 입력</button>",
+  "편집</button>",
+  "weaponOrder",
+  "getWeaponSortScore",
+  "getRarity",
+  "card-backdrop-image",
+  "card-select-surface",
+  "normalizeEchoSetName",
+  "getInitialDetailPickerOptionIndex",
+  'aria-haspopup="listbox"',
+  "수치입력",
+  "<span>속성</span>",
+]) {
+  if (!appSource.includes(requiredSource)) fail(`app.js missing ${requiredSource}`);
+}
+
+for (const requiredEchoSetSource of ["Lingering Tunes", "끊임없는 잔향"]) {
+  if (!echoSetsSource.includes(requiredEchoSetSource)) {
+    fail(`data/echo-sets.json missing ${requiredEchoSetSource}`);
+  }
+}
+
+const manifest = JSON.parse(await readText("manifest.webmanifest"));
+if (manifest.display !== "standalone") fail("manifest display must be standalone");
+if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) fail("manifest must include icons");
+
+if (!appSource.includes('const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];')) {
+  fail("app.js must provide stat branch options from - through A-F");
+}
+if (!/const valueStatOptions = \[[\s\S]*"healingBonus"[\s\S]*\]\.map/.test(appSource)) {
+  fail("app.js value stat options must include healingBonus for numeric input attributes");
+}
+if (!appSource.includes('label: "치료효과+"')) {
+  fail("app.js healing bonus label must use 치료효과+");
+}
+if (appSource.includes('label: "치유효과+"')) {
+  fail("app.js should not use 치유효과+ as the displayed healing bonus label");
+}
+for (const requiredGoalEditSource of [
+  "에코 구성은 2개에서 10개까지 설정할 수 있습니다.",
+  "주옵은 1개에서 7개까지 설정할 수 있습니다.",
+  "echoBuildAlt",
+  "echo-build-or",
+  "goal.echoStats.length <= 2",
+  "goal.echoStats.length >= 10",
+  "goal.stats.length <= 1",
+  "updateRenderedStatPickerOption",
+  "updateRenderedGoalStatKey",
+]) {
+  if (!appSource.includes(requiredGoalEditSource)) {
+    fail(`app.js missing goal edit behavior source: ${requiredGoalEditSource}`);
+  }
+}
+const clearCurrentStatSource = appSource.match(/function clearCurrentStat\([\s\S]*?\n}\n\nfunction addGoalStat/)?.[0] ?? "";
+const updateGoalEchoStatKeySource = appSource.match(/function updateGoalEchoStatKey\([\s\S]*?\n}\n\nfunction updateGoalEchoStatField/)?.[0] ?? "";
+if (!updateGoalEchoStatKeySource.includes("updateRenderedStatPickerOption")) {
+  fail("updateGoalEchoStatKey must update the picker without a full card redraw");
+}
+if (updateGoalEchoStatKeySource.includes("rerenderFarmingCard(id)")) {
+  fail("updateGoalEchoStatKey should not rerender the whole farming card");
+}
+const updateGoalStatKeySource = appSource.match(/function updateGoalStatKey\([\s\S]*?\n}\n\nfunction updateRenderedStatPickerOption/)?.[0] ?? "";
+if (!updateGoalStatKeySource.includes("updateRenderedGoalStatKey")) {
+  fail("updateGoalStatKey must update the goal stat row without a full card redraw");
+}
+if (updateGoalStatKeySource.includes("rerenderFarmingCard(id)")) {
+  fail("updateGoalStatKey should not rerender the whole farming card");
+}
+if (!clearCurrentStatSource.includes("updateRenderedCurrentStatValues(id, key)")) {
+  fail("clearCurrentStat must update rendered current stat values without a full card redraw");
+}
+if (clearCurrentStatSource.includes("rerenderFarmingCard(id)")) {
+  fail("clearCurrentStat should not rerender the whole farming card for simple value resets");
+}
+for (const icon of manifest.icons ?? []) {
+  await mustExist(icon.src);
+}
+
+const config = await readText("app-config.js");
+const configExample = await readText("app-config.example.js");
+for (const field of ["apiKey", "authDomain", "projectId", "appId"]) {
+  if (!config.includes(field)) fail(`app-config.js missing ${field}`);
+  if (!configExample.includes(field)) fail(`app-config.example.js missing ${field}`);
+}
+for (const [path, source] of [
+  ["app-config.js", config],
+  ["app-config.example.js", configExample],
+]) {
+  if (/\b(adminEmails|adminUids)\b/.test(source)) {
+    fail(`${path} must not include frontend admin identifier lists`);
+  }
+  if (/\b(serviceAccount|privateKey|PRIVATE KEY|Admin SDK)\b/.test(source)) {
+    fail(`${path} must not include private Firebase credentials`);
+  }
+}
+if (/\b(adminEmails|adminUids)\b/.test(appSource)) {
+  fail("app.js must not parse admin email/uid lists from frontend config");
+}
+for (const requiredAdminSource of [
+  "function isAdmin()",
+  "cloud?.auth.currentUser",
+  "state.user?.role === userRoles.admin",
+  "cloud.doc(cloud.db, \"admins\", user.uid)",
+  "adminSnapshot.data()?.enabled === true",
+  "async function loadGoalDefaultsData()",
+  `fetch("data/goal-defaults.json"`,
+  "async function loadVersionData()",
+  `fetch("data/version.json"`,
+  "function getGoalDefaultsExportData()",
+  "function offerCharactersJsonDownload()",
+  "function downloadCharactersJson()",
+  "downloadCharactersJson();",
+  "if (!isAdmin()) return;",
+]) {
+  if (!appSource.includes(requiredAdminSource)) {
+    fail(`app.js missing admin verification guard: ${requiredAdminSource}`);
+  }
+}
+
+const characterSeed = loadCharacterSeed(await readText("data/characters.json"));
+if (!Array.isArray(characterSeed) || characterSeed.length < 60) {
+  fail("character seed should include at least 60 entries");
+}
+for (const [index, character] of (characterSeed ?? []).entries()) {
+  for (const field of ["name", "element", "weapon", "rarity", "image"]) {
+    if (!character[field]) fail(`character seed ${index} missing ${field}`);
+  }
+  if (!["4", "5"].includes(String(character.rarity))) {
+    fail(`character seed ${index} has invalid rarity`);
+  }
+  if (!/^assets\/characters\/[a-z0-9-]+\.(webp|png)$/.test(character.image)) {
+    fail(`character seed ${index} has invalid local image path`);
+  }
+  await mustExist(character.image);
+}
+
+const sw = await readText("sw.js");
+if (!sw.includes("NETWORK_FIRST_PATHS")) fail("service worker missing network-first list");
+for (const networkFirstPath of ["/index.html", "/app.js", "/styles.css"]) {
+  if (!sw.includes(networkFirstPath)) fail(`service worker should network-first ${networkFirstPath}`);
+}
+if (!sw.includes("/app-config.js")) fail("service worker should network-first app-config.js");
+if (!sw.includes("/data/characters.json")) fail("service worker should network-first data/characters.json");
+if (!sw.includes("/data/goal-defaults.json")) fail("service worker should network-first data/goal-defaults.json");
+if (!sw.includes("/data/echo-sets.json")) fail("service worker should network-first data/echo-sets.json");
+if (!sw.includes("/data/version.json")) fail("service worker should network-first data/version.json");
+const appShell = sw.match(/const APP_SHELL = \[([\s\S]*?)\];/)?.[1] ?? "";
+if (appShell.includes("app-config.js")) fail("app-config.js should not be precached");
+if (appShell.includes("data/characters.json")) fail("data/characters.json should not be precached");
+if (appShell.includes("data/goal-defaults.json")) fail("data/goal-defaults.json should not be precached");
+if (appShell.includes("data/echo-sets.json")) fail("data/echo-sets.json should not be precached");
+if (appShell.includes("data/version.json")) fail("data/version.json should not be precached");
+
+const rules = await readText("firestore.rules");
+if (!rules.includes("match /profiles/{userId}")) fail("firestore rules must protect profiles/{userId}");
+if (!rules.includes("request.auth.uid == userId")) fail("firestore rules must require owner uid");
+if (!rules.includes("allow read, write: if false")) fail("firestore rules must deny fallback access");
+for (const requiredRuleSource of [
+  "match /admins/{userId}",
+  "allow get: if signedIn() && request.auth.uid == userId;",
+  "allow list: if false;",
+  "allow create, update, delete: if false;",
+]) {
+  if (!rules.includes(requiredRuleSource)) {
+    fail(`firestore rules missing admin protection: ${requiredRuleSource}`);
+  }
+}
+
+try {
+  await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+} catch (error) {
+  fail(`app smoke load failed: ${error.message}`);
+}
+
+try {
+  const missingConfigSandbox = await smokeLoadApp({
+    configSource: `
+      window.WW_TRACKER_CONFIG = {
+        firebase: {
+          apiKey: "",
+          authDomain: "",
+          projectId: "",
+          appId: "",
+        },
+      };
+    `,
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  if (missingConfigSandbox.isAdmin() !== false) {
+    fail("isAdmin() must default to false without a signed-in Firebase user");
+  }
+  if (missingConfigSandbox.hasFirebaseConfig() !== false) {
+    fail("missing Firebase config should keep hasFirebaseConfig() false");
+  }
+} catch (error) {
+  fail(`app missing-config smoke load failed: ${error.message}`);
+}
+
+try {
+  const syncSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const [seedCharacter] = JSON.parse(await readText("data/characters.json"));
+  const normalizedState = syncSandbox.normalizeState({
+    user: { role: "user" },
+    updatedAt: "2026-01-01T00:00:00.000Z",
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "saved-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        element: "저장된 속성",
+        weapon: "저장된 무기",
+        rarity: "1",
+        image: "saved.webp",
+        isPublic: seedCharacter.isPublic === false,
+        owned: true,
+      },
+    ],
+  });
+  const [normalizedCharacter] = normalizedState.characters;
+  if (
+    normalizedCharacter?.element !== seedCharacter.element ||
+    normalizedCharacter?.weapon !== seedCharacter.weapon ||
+    normalizedCharacter?.rarity !== String(seedCharacter.rarity) ||
+    normalizedCharacter?.image !== seedCharacter.image ||
+    normalizedCharacter?.isPublic !== (seedCharacter.isPublic !== false) ||
+    normalizedCharacter?.owned !== true
+  ) {
+    fail("seed character data must override saved character metadata while preserving user state");
+  }
+} catch (error) {
+  fail(`app seed priority verification failed: ${error.message}`);
+}
+
+try {
+  const initialSearchSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  if (initialSearchSandbox.extractHangulInitialConsonants("떠오르는 구름") !== "ㄸㅇㄹㄴ ㄱㄹ") {
+    fail("echo set initial search must extract Korean initials from Hangul names");
+  }
+  if (initialSearchSandbox.isHangulConsonantQuery("ㄱㄹ") !== true) {
+    fail("echo set initial search must recognize consonant-only queries");
+  }
+  if (initialSearchSandbox.isHangulConsonantQuery("구름") !== false) {
+    fail("echo set initial search must not treat full Hangul syllables as consonant-only queries");
+  }
+  if (initialSearchSandbox.normalizeEchoSetInitialSearchValue("떠오르는 구름").includes("ㄱㄹ") !== true) {
+    fail("echo set initial search must allow consonant includes matching");
+  }
+} catch (error) {
+  fail(`app echo set initial search verification failed: ${error.message}`);
+}
+
+try {
+  const currentStatSyncSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const character = currentStatSyncSandbox.createCharacter({
+    name: "테스트",
+    element: "미정",
+    weapon: "미정",
+  });
+  character.goals.admin.stats = [
+    { key: "atk", label: "공격력", target: 2000, cost: "COST 1", variant: "A" },
+    { key: "atk", label: "공격력", target: 2000, cost: "COST 1", variant: "B" },
+    { key: "hp", label: "HP", target: 20000, cost: "COST 1", variant: "-" },
+  ];
+  currentStatSyncSandbox.__getState().characters = [character];
+  currentStatSyncSandbox.updateCurrentStat(character.id, "A:atk", 200);
+  if (
+    character.currentStats.values["A:atk"] !== 200 ||
+    character.currentStats.values["B:atk"] !== 200
+  ) {
+    fail("current stat inputs with the same attribute must sync across branch variants");
+  }
+  currentStatSyncSandbox.updateCurrentStat(character.id, "B:atk", 350);
+  if (
+    character.currentStats.values["A:atk"] !== 350 ||
+    character.currentStats.values["B:atk"] !== 350
+  ) {
+    fail("later current stat edits must overwrite matching attribute branch values");
+  }
+  if (character.currentStats.values.hp === 350) {
+    fail("current stat sync must not overwrite different attributes");
+  }
+  character.currentStats.values.hp = 123;
+  currentStatSyncSandbox.clearCurrentStat(character.id, "A:atk");
+  if (
+    character.currentStats.values["A:atk"] !== 0 ||
+    character.currentStats.values["B:atk"] !== 0
+  ) {
+    fail("clearing a current stat must sync zero to matching branch values");
+  }
+  if (character.currentStats.values.hp === 0) {
+    fail("current stat clear sync must not overwrite different attributes");
+  }
+} catch (error) {
+  fail(`app current stat sync verification failed: ${error.message}`);
+}
+
+try {
+  const goalShapeSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const normalizedGoal = goalShapeSandbox.normalizeGoal({
+    echoBuild: "43311",
+    echoBuildAlt: "44111",
+    echoStats: [
+      { key: "critRate", label: "크리확률" },
+      { key: "critDamage", label: "크리피해" },
+    ],
+    stats: [
+      { key: "healingBonus", label: "치유효과+", target: 30 },
+    ],
+  });
+  if (normalizedGoal.echoBuildAlt !== "44111") {
+    fail("alternate echo build must be normalized and preserved");
+  }
+  if (normalizedGoal.echoStats.length !== 2) {
+    fail("echo stat normalization must allow a minimum of two rows");
+  }
+  if (normalizedGoal.stats.length !== 1) {
+    fail("goal stat normalization must allow a minimum of one row");
+  }
+  if (normalizedGoal.stats[0]?.label !== "치료효과+") {
+    fail("legacy healing bonus labels must normalize to 치료효과+");
+  }
+} catch (error) {
+  fail(`app goal shape verification failed: ${error.message}`);
+}
+
+if (failures.length > 0) {
+  throw new Error(`Static verification failed:\n- ${failures.join("\n- ")}`);
+}
+
+console.log("Static verification passed.");
