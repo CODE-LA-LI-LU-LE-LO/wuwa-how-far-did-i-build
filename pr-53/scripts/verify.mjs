@@ -625,6 +625,56 @@ try {
   if (branchA?.branchChecked !== true || branchB?.branchChecked !== false) {
     fail("admin goal branch checkbox selections must persist separately from admin goal defaults");
   }
+
+  const legacyNormalizedState = adminBranchSandbox.normalizeState({
+    user: { role: "user" },
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "legacy-branch-saved-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        owned: true,
+        goals: {
+          admin: {
+            echoStats: [
+              {
+                key: "crit",
+                label: "크리티컬",
+                cost: "COST 4",
+                variant: "A",
+                branchChecked: true,
+              },
+              {
+                key: "atk",
+                label: "공격력%",
+                cost: "COST 3",
+                variant: "B",
+                branchChecked: false,
+              },
+            ],
+          },
+        },
+      },
+    ],
+  });
+  const legacyCharacter = legacyNormalizedState.characters.find(
+    (item) => item.en === "Aalto",
+  );
+  const legacyBranchA = legacyCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "A",
+  );
+  const legacyBranchB = legacyCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "B",
+  );
+  if (
+    legacyCharacter?.adminGoalBranches?.A !== true ||
+    legacyCharacter?.adminGoalBranches?.B !== false ||
+    legacyBranchA?.branchChecked !== true ||
+    legacyBranchB?.branchChecked !== false
+  ) {
+    fail("legacy admin goal branch checkbox selections must migrate to adminGoalBranches");
+  }
 } catch (error) {
   fail(`app admin branch persistence verification failed: ${error.message}`);
 }
