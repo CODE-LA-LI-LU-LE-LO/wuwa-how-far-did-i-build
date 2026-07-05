@@ -1689,6 +1689,9 @@ select:disabled {
 }
 
 .complete-check {
+  justify-self: end;
+  width: fit-content;
+  max-width: 100%;
   justify-content: flex-end;
   gap: 8px;
   color: var(--soft);
