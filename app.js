@@ -996,7 +996,7 @@ function normalizeGoal(goal = {}, resetValueStats = false) {
       : defaultGoal.stats;
   const stats = rawStats.map(normalizeGoalStat).filter(Boolean).slice(0, 7);
 
-  while (stats.length < 2) {
+  while (stats.length < 1) {
     const nextOption =
       valueStatOptions.find(
         (option) => !stats.some((stat) => stat.key === option.key),
@@ -2052,7 +2052,7 @@ function renderFarmingCard(character) {
               ? `
             <div class="stat-actions">
               <button class="ghost-button" data-add-stat="${character.id}" type="button" ${goal.stats.length < 7 ? "" : "disabled"}>주옵 추가</button>
-              <small>주옵은 2개에서 7개까지 설정할 수 있습니다.</small>
+              <small>주옵은 1개에서 7개까지 설정할 수 있습니다.</small>
             </div>
           `
               : ""
@@ -2240,7 +2240,7 @@ function renderStatRow(character, stat, index, canEditGoal) {
       <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" step="5" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
         <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${canEditCurrent ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
-        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 2 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
+        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 1 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
   `;
@@ -3216,7 +3216,7 @@ function removeGoalStat(id, index) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.stats.length <= 2) return;
+  if (goal.stats.length <= 1) return;
 
   const targetIndex = Number(index);
   goal.stats.splice(targetIndex, 1);
