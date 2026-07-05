@@ -1,0 +1,188 @@
+[
+  {
+    "id": "set_1",
+    "name": "야밤의 서리",
+    "en": "Freezing Frost",
+    "icon": "assets/icons/echoes/set_1.webp"
+  },
+  {
+    "id": "set_2",
+    "name": "솟구치는 용암",
+    "en": "Molten Rift",
+    "icon": "assets/icons/echoes/set_2.webp"
+  },
+  {
+    "id": "set_3",
+    "name": "울려퍼지는 뇌음",
+    "en": "Void Thunder",
+    "icon": "assets/icons/echoes/set_3.webp"
+  },
+  {
+    "id": "set_4",
+    "name": "스쳐가는 바람",
+    "en": "Sierra Gale",
+    "icon": "assets/icons/echoes/set_4.webp"
+  },
+  {
+    "id": "set_5",
+    "name": "빛나는 별",
+    "en": "Celestial Light",
+    "icon": "assets/icons/echoes/set_5.webp"
+  },
+  {
+    "id": "set_6",
+    "name": "빛을 삼키는 해",
+    "en": "Havoc Eclipse",
+    "icon": "assets/icons/echoes/set_6.webp"
+  },
+  {
+    "id": "set_7",
+    "name": "찬란한 광휘",
+    "en": "Rejuvenating Glow",
+    "icon": "assets/icons/echoes/set_7.webp"
+  },
+  {
+    "id": "set_8",
+    "name": "떠오르는 구름",
+    "en": "Moonlit Clouds",
+    "icon": "assets/icons/echoes/set_8.webp"
+  },
+  {
+    "id": "set_9",
+    "name": "끊임없는 잔향",
+    "en": "Lingering Tunes",
+    "icon": "assets/icons/echoes/set_9.webp"
+  },
+  {
+    "id": "set_10",
+    "name": "냉철한 결단",
+    "en": "Frosty Resolve",
+    "icon": "assets/icons/echoes/set_10.webp"
+  },
+  {
+    "id": "set_11",
+    "name": "영원의 광채",
+    "en": "Eternal Radiance",
+    "icon": "assets/icons/echoes/set_11.webp"
+  },
+  {
+    "id": "set_12",
+    "name": "어둠의 장막",
+    "en": "Midnight Veil",
+    "icon": "assets/icons/echoes/set_12.webp"
+  },
+  {
+    "id": "set_13",
+    "name": "하늘의 합주곡",
+    "en": "Empyrean Anthem",
+    "icon": "assets/icons/echoes/set_13.webp"
+  },
+  {
+    "id": "set_14",
+    "name": "파도에 맞선 용기",
+    "en": "Tidebreaking Courage",
+    "icon": "assets/icons/echoes/set_14.webp"
+  },
+  {
+    "id": "set_15",
+    "name": "끝없는 하늘",
+    "en": "Gusts of Welkin",
+    "icon": "assets/icons/echoes/set_15.webp"
+  },
+  {
+    "id": "set_17",
+    "name": "영광이 깃든 바람",
+    "en": "Windward Pilgrimage",
+    "icon": "assets/icons/echoes/set_17.webp"
+  },
+  {
+    "id": "set_16",
+    "name": "울부짖는 늑대의 불꽃",
+    "en": "Flaming Clawprint",
+    "icon": "assets/icons/echoes/set_16.webp"
+  },
+  {
+    "id": "set_18",
+    "name": "뒤틀린 피안의 꿈",
+    "en": "Dream of the Lost",
+    "icon": "assets/icons/echoes/set_18.webp"
+  },
+  {
+    "id": "set_19",
+    "name": "영광의 칼날로 만들어진 왕관",
+    "en": "Crown of Valor",
+    "icon": "assets/icons/echoes/set_19.webp"
+  },
+  {
+    "id": "set_20",
+    "name": "만물의 숨결에 비롯된 울림",
+    "en": "Law of Harmony",
+    "icon": "assets/icons/echoes/set_20.webp"
+  },
+  {
+    "id": "set_21",
+    "name": "불타는 깃털을 펼친 사냥꾼의 그림자",
+    "en": "Flamewing's Shadow",
+    "icon": "assets/icons/echoes/set_21.webp"
+  },
+  {
+    "id": "set_22",
+    "name": "운명을 붕괴시키는 현",
+    "en": "Thread of Severed Fate",
+    "icon": "assets/icons/echoes/set_22.webp"
+  },
+  {
+    "id": "set_24",
+    "name": "역광 속 눈부신 서약",
+    "en": "Pact of Neonlight Leap",
+    "icon": "assets/icons/echoes/set_24.webp"
+  },
+  {
+    "id": "set_23",
+    "name": "빛을 쫓는 별의 고리",
+    "en": "Halo of Starry Radiance",
+    "icon": "assets/icons/echoes/set_23.webp"
+  },
+  {
+    "id": "set_25",
+    "name": "흐르는 금빛 속 진리의 답",
+    "en": "Rite of Gilded Revelation",
+    "icon": "assets/icons/echoes/set_25.webp"
+  },
+  {
+    "id": "set_26",
+    "name": "긴 여정을 떠나는 별",
+    "en": "Trailblazing Star",
+    "icon": "assets/icons/echoes/set_26.webp"
+  },
+  {
+    "id": "set_27",
+    "name": "오색찬란한 거품",
+    "en": "Chromatic Foam",
+    "icon": "assets/icons/echoes/set_27.webp"
+  },
+  {
+    "id": "set_28",
+    "name": "함의의 소리를 따라",
+    "en": "Sound of True Name",
+    "icon": "assets/icons/echoes/set_28.webp"
+  },
+  {
+    "id": "set_30",
+    "name": "소리 없이 내려앉은 기도의 눈",
+    "en": "Wishes of Quiet Snowfall",
+    "icon": "assets/icons/echoes/set_30.webp"
+  },
+  {
+    "id": "set_29",
+    "name": "마음을 엮은 꿈의 그림자",
+    "en": "Reel of Spliced Memories",
+    "icon": "assets/icons/echoes/set_29.webp"
+  },
+  {
+    "id": "set_31",
+    "name": "꿈을 깨뜨리는 망령의 악몽",
+    "en": "Shadow of Shattered Dreams",
+    "icon": "assets/icons/echoes/set_31.webp"
+  }
+]
