@@ -274,6 +274,7 @@ h2 {
 
 .reference-links {
   display: grid;
+  justify-items: start;
   gap: 8px;
 }
 
