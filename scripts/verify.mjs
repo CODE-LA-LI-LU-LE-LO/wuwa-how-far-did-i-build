@@ -194,8 +194,9 @@ const appSource = await readText("app.js");
 const stylesSource = await readText("styles.css");
 const goalDefaultsSource = await readText("data/goal-defaults.json");
 const echoSetsSource = await readText("data/echo-sets.json");
+let goalDefaults;
 try {
-  JSON.parse(goalDefaultsSource);
+  goalDefaults = JSON.parse(goalDefaultsSource);
 } catch (error) {
   fail(`data/goal-defaults.json must be valid JSON: ${error.message}`);
 }
@@ -224,6 +225,48 @@ try {
   });
 } catch (error) {
   fail(`data/echo-sets.json must be valid JSON: ${error.message}`);
+}
+
+const echoSetNames = new Set(echoSetsData.map((echoSet) => echoSet.name));
+const echoSetEnglishNames = new Set(echoSetsData.map((echoSet) => echoSet.en));
+const goalEchoSetNames = new Set();
+for (const [characterId, goal] of Object.entries(goalDefaults)) {
+  for (const [index, echoSet] of (goal?.echoSets ?? []).entries()) {
+    const name = echoSet?.name;
+    if (!name) continue;
+    goalEchoSetNames.add(name);
+    if (!echoSetNames.has(name)) {
+      fail(`data/goal-defaults.json ${characterId}.echoSets[${index}].name must use a Korean data/echo-sets.json name`);
+    }
+    if (echoSetEnglishNames.has(name)) {
+      fail(`data/goal-defaults.json ${characterId}.echoSets[${index}].name must not store English echo set names`);
+    }
+  }
+}
+if (!goalEchoSetNames.size) {
+  fail("data/goal-defaults.json must include Korean echo set names");
+}
+
+const normalizeEchoSetNameSource = appSource.match(/function normalizeEchoSetName\([\s\S]*?\n}\n\nfunction getStatOption/)?.[0] ?? "";
+if (!normalizeEchoSetNameSource.includes("echoSet.name === name")) {
+  fail("normalizeEchoSetName must continue matching Korean echo set names");
+}
+if (!normalizeEchoSetNameSource.includes("echoSet.en === name")) {
+  fail("normalizeEchoSetName must continue matching English echo set names");
+}
+if (!normalizeEchoSetNameSource.includes("echoSet.aliases?.includes(name)")) {
+  fail("normalizeEchoSetName must match echo set aliases when aliases are present");
+}
+if (normalizeEchoSetNameSource.includes("echoSet.id === name")) {
+  fail("normalizeEchoSetName should not normalize echo set ids as stored names");
+}
+
+const getEchoSetIconSource = appSource.match(/function getEchoSetIcon\([\s\S]*?\n}\n\nfunction normalizeEchoSetName/)?.[0] ?? "";
+if (!getEchoSetIconSource.includes("echoSets.find")) {
+  fail("getEchoSetIcon must continue looking up icons from the loaded echoSets array");
+}
+if (!getEchoSetIconSource.includes("normalizeEchoSetName(name)")) {
+  fail("getEchoSetIcon must normalize names before looking up icons");
 }
 
 const versionSource = await readText("data/version.json");

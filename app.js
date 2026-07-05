@@ -2482,7 +2482,6 @@ function normalizeEchoSetName(name) {
     (echoSet) =>
       echoSet.name === name ||
       echoSet.en === name ||
-      echoSet.id === name ||
       echoSet.aliases?.includes(name),
   );
   return exact?.name ?? name;
