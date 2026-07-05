@@ -271,18 +271,35 @@ if (appSource.includes('label: "치유효과+"')) {
   fail("app.js should not use 치유효과+ as the displayed healing bonus label");
 }
 for (const requiredGoalEditSource of [
-  "에코 구성은 2개에서 7개까지 설정할 수 있습니다.",
+  "에코 구성은 2개에서 10개까지 설정할 수 있습니다.",
   "주옵은 1개에서 7개까지 설정할 수 있습니다.",
   "echoBuildAlt",
   "echo-build-or",
   "goal.echoStats.length <= 2",
+  "goal.echoStats.length >= 10",
   "goal.stats.length <= 1",
+  "updateRenderedStatPickerOption",
+  "updateRenderedGoalStatKey",
 ]) {
   if (!appSource.includes(requiredGoalEditSource)) {
     fail(`app.js missing goal edit behavior source: ${requiredGoalEditSource}`);
   }
 }
 const clearCurrentStatSource = appSource.match(/function clearCurrentStat\([\s\S]*?\n}\n\nfunction addGoalStat/)?.[0] ?? "";
+const updateGoalEchoStatKeySource = appSource.match(/function updateGoalEchoStatKey\([\s\S]*?\n}\n\nfunction updateGoalEchoStatField/)?.[0] ?? "";
+if (!updateGoalEchoStatKeySource.includes("updateRenderedStatPickerOption")) {
+  fail("updateGoalEchoStatKey must update the picker without a full card redraw");
+}
+if (updateGoalEchoStatKeySource.includes("rerenderFarmingCard(id)")) {
+  fail("updateGoalEchoStatKey should not rerender the whole farming card");
+}
+const updateGoalStatKeySource = appSource.match(/function updateGoalStatKey\([\s\S]*?\n}\n\nfunction updateRenderedStatPickerOption/)?.[0] ?? "";
+if (!updateGoalStatKeySource.includes("updateRenderedGoalStatKey")) {
+  fail("updateGoalStatKey must update the goal stat row without a full card redraw");
+}
+if (updateGoalStatKeySource.includes("rerenderFarmingCard(id)")) {
+  fail("updateGoalStatKey should not rerender the whole farming card");
+}
 if (!clearCurrentStatSource.includes("updateRenderedCurrentStatValues(id, key)")) {
   fail("clearCurrentStat must update rendered current stat values without a full card redraw");
 }
