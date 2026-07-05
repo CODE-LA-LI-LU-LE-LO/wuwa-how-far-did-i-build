@@ -165,163 +165,7 @@ const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];
 const echoSetPieceOptions = ["5 Set", "3 Set", "2 Set", "1 Set"];
 const echoSetJoinOptions = ["+", "OR"];
 
-const echoSets = [
-  {
-    en: "Freezing Frost",
-    name: "야밤의 서리",
-    icon: "assets/icons/echoes/set_1.webp",
-  },
-  {
-    en: "Molten Rift",
-    name: "솟구치는 용암",
-    icon: "assets/icons/echoes/set_2.webp",
-  },
-  {
-    en: "Void Thunder",
-    name: "울려퍼지는 뇌음",
-    icon: "assets/icons/echoes/set_3.webp",
-  },
-  {
-    en: "Sierra Gale",
-    name: "스쳐가는 바람",
-    icon: "assets/icons/echoes/set_4.webp",
-  },
-  {
-    en: "Celestial Light",
-    name: "빛나는 별",
-    icon: "assets/icons/echoes/set_5.webp",
-  },
-  {
-    en: "Havoc Eclipse",
-    name: "빛을 삼키는 해",
-    icon: "assets/icons/echoes/set_6.webp",
-  },
-  {
-    en: "Rejuvenating Glow",
-    name: "찬란한 광휘",
-    icon: "assets/icons/echoes/set_7.webp",
-  },
-  {
-    en: "Moonlit Clouds",
-    name: "떠오르는 구름",
-    icon: "assets/icons/echoes/set_8.webp",
-  },
-  {
-    en: "Lingering Tunes",
-    name: "끊임없는 잔향",
-    icon: "assets/icons/echoes/set_9.webp",
-  },
-  {
-    en: "Frosty Resolve",
-    name: "냉철한 결단",
-    icon: "assets/icons/echoes/set_10.webp",
-  },
-  {
-    en: "Eternal Radiance",
-    name: "영원의 광채",
-    icon: "assets/icons/echoes/set_11.webp",
-  },
-  {
-    en: "Midnight Veil",
-    name: "어둠의 장막",
-    icon: "assets/icons/echoes/set_12.webp",
-  },
-  {
-    en: "Empyrean Anthem",
-    name: "하늘의 합주곡",
-    icon: "assets/icons/echoes/set_13.webp",
-  },
-  {
-    en: "Tidebreaking Courage",
-    name: "파도에 맞선 용기",
-    icon: "assets/icons/echoes/set_14.webp",
-  },
-  {
-    en: "Gusts of Welkin",
-    name: "끝없는 하늘",
-    icon: "assets/icons/echoes/set_15.webp",
-  },
-  {
-    en: "Windward Pilgrimage",
-    name: "영광이 깃든 바람",
-    icon: "assets/icons/echoes/set_17.webp",
-  },
-  {
-    en: "Flaming Clawprint",
-    name: "울부짖는 늑대의 불꽃",
-    icon: "assets/icons/echoes/set_16.webp",
-  },
-  {
-    en: "Dream of the Lost",
-    name: "뒤틀린 피안의 꿈",
-    icon: "assets/icons/echoes/set_18.webp",
-  },
-  {
-    en: "Crown of Valor",
-    name: "영광의 칼날로 만들어진 왕관",
-    icon: "assets/icons/echoes/set_19.webp",
-  },
-  {
-    en: "Law of Harmony",
-    name: "만물의 숨결에 비롯된 울림",
-    icon: "assets/icons/echoes/set_20.webp",
-  },
-  {
-    en: "Flamewing's Shadow",
-    name: "불타는 깃털을 펼친 사냥꾼의 그림자",
-    icon: "assets/icons/echoes/set_21.webp",
-  },
-  {
-    en: "Thread of Severed Fate",
-    name: "운명을 붕괴시키는 현",
-    icon: "assets/icons/echoes/set_22.webp",
-  },
-  {
-    en: "Pact of Neonlight Leap",
-    name: "역광 속 눈부신 서약",
-    icon: "assets/icons/echoes/set_24.webp",
-  },
-  {
-    en: "Halo of Starry Radiance",
-    name: "빛을 쫓는 별의 고리",
-    icon: "assets/icons/echoes/set_23.webp",
-  },
-  {
-    en: "Rite of Gilded Revelation",
-    name: "흐르는 금빛 속 진리의 답",
-    icon: "assets/icons/echoes/set_25.webp",
-  },
-  {
-    en: "Trailblazing Star",
-    name: "긴 여정을 떠나는 별",
-    icon: "assets/icons/echoes/set_26.webp",
-  },
-  {
-    en: "Chromatic Foam",
-    name: "오색찬란한 거품",
-    icon: "assets/icons/echoes/set_27.webp",
-  },
-  {
-    en: "Sound of True Name",
-    name: "함의의 소리를 따라",
-    icon: "assets/icons/echoes/set_28.webp",
-  },
-  {
-    en: "Wishes of Quiet Snowfall",
-    name: "소리 없이 내려앉은 기도의 눈",
-    icon: "assets/icons/echoes/set_30.webp",
-  },
-  {
-    en: "Reel of Spliced Memories",
-    name: "마음을 엮은 꿈의 그림자",
-    icon: "assets/icons/echoes/set_29.webp",
-  },
-  {
-    en: "Shadow of Shattered Dreams",
-    name: "꿈을 깨뜨리는 망령의 악몽",
-    icon: "assets/icons/echoes/set_31.webp",
-  },
-];
+let echoSets = [];
 
 let characterSeed = [];
 
@@ -864,6 +708,37 @@ async function loadCharacterSeedData() {
     characterSeed = [];
     showSessionMessage("캐릭터 목록 불러오기 실패", "data/characters.json을 확인해주세요");
   }
+}
+
+
+async function loadEchoSetData() {
+  try {
+    const response = await fetch("data/echo-sets.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const sets = await response.json();
+    echoSets = Array.isArray(sets)
+      ? sets
+          .map(normalizeEchoSetDefinition)
+          .filter((echoSet) => echoSet.id && echoSet.name && echoSet.en && echoSet.icon)
+      : [];
+  } catch {
+    echoSets = [];
+    showSessionMessage("에코셋 목록 불러오기 실패", "data/echo-sets.json을 확인해주세요");
+  }
+}
+
+function normalizeEchoSetDefinition(echoSet = {}) {
+  const id = typeof echoSet.id === "string" ? echoSet.id.trim() : "";
+  const name = typeof echoSet.name === "string" ? echoSet.name.trim() : "";
+  const en = typeof echoSet.en === "string" ? echoSet.en.trim() : "";
+  const icon = typeof echoSet.icon === "string" ? echoSet.icon.trim() : "";
+  const aliases = Array.isArray(echoSet.aliases)
+    ? echoSet.aliases
+        .filter((alias) => typeof alias === "string")
+        .map((alias) => alias.trim())
+        .filter(Boolean)
+    : [];
+  return { id, name, en, icon, ...(aliases.length ? { aliases } : {}) };
 }
 
 function initializeState() {
@@ -2325,6 +2200,20 @@ function normalizeEchoSetInitialSearchValue(value) {
     .toLowerCase();
 }
 
+function getEchoSetSearchText(echoSet) {
+  return [echoSet.name, echoSet.en, echoSet.id, ...(echoSet.aliases ?? [])]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function getEchoSetInitialSearchText(echoSet) {
+  return [echoSet.name, ...(echoSet.aliases ?? [])]
+    .filter(Boolean)
+    .map(normalizeEchoSetInitialSearchValue)
+    .join(" ");
+}
+
 function renderEchoSetPicker(characterId, index, value, enabled) {
   const selectedValue = normalizeEchoSetName(value);
   const selectedEchoSet = echoSets.find((echoSet) => echoSet.name === selectedValue);
@@ -2366,7 +2255,7 @@ function renderEchoSetPicker(characterId, index, value, enabled) {
         ${echoSets
           .map(
             (echoSet) => `
-              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(echoSet.name.toLowerCase())}" data-echo-set-initials="${escapeHtml(normalizeEchoSetInitialSearchValue(echoSet.name))}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
+              <button type="button" data-echo-set-option data-echo-set-name="${escapeHtml(getEchoSetSearchText(echoSet))}" data-echo-set-initials="${escapeHtml(getEchoSetInitialSearchText(echoSet))}" data-character="${escapeHtml(characterId)}" data-index="${index}" data-value="${escapeHtml(echoSet.name)}" class="${echoSet.name === selectedValue ? "active" : ""}">
                 ${renderInlineIcon(echoSet.icon)}
                 <span>${escapeHtml(echoSet.name)}</span>
               </button>
@@ -2585,7 +2474,11 @@ function getEchoSetIcon(name) {
 function normalizeEchoSetName(name) {
   if (!name) return "";
   const exact = echoSets.find(
-    (echoSet) => echoSet.name === name || echoSet.en === name,
+    (echoSet) =>
+      echoSet.name === name ||
+      echoSet.en === name ||
+      echoSet.id === name ||
+      echoSet.aliases?.includes(name),
   );
   return exact?.name ?? name;
 }
@@ -4165,6 +4058,7 @@ initializeApp();
 async function initializeApp() {
   loadVersionData();
   await loadCharacterSeedData();
+  await loadEchoSetData();
   initializeState();
   await loadGoalDefaultsData().catch(() => {});
 

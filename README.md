@@ -28,6 +28,7 @@
 - 검색, 보유 상태 필터, 이름/등급/속성/무기 정렬 및 모바일 아이콘형 카테고리 필터
 - 캐릭터 직접 추가
 - `data/characters.json` 기반 기본 캐릭터 목록
+- `data/echo-sets.json` 기반 에코셋 목록
 - 브라우저 `localStorage` 자동 저장
 - JSON 백업/불러오기
 - Firebase 설정 시 Google 로그인 및 개인 기록 Firestore 동기화

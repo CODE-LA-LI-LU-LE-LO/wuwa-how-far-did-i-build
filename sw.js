@@ -15,6 +15,7 @@ const NETWORK_FIRST_PATHS = [
   "/app-config.js",
   "/data/characters.json",
   "/data/goal-defaults.json",
+  "/data/echo-sets.json",
   "/data/version.json",
 ];
 

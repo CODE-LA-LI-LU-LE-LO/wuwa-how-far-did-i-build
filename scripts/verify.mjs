@@ -112,6 +112,9 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
       if (String(url).endsWith("data/goal-defaults.json")) {
         return { ok: true, status: 200, json: async () => JSON.parse(goalDefaultsSource) };
       }
+      if (String(url).endsWith("data/echo-sets.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(echoSetsSource) };
+      }
       if (String(url).endsWith("data/version.json")) {
         return { ok: true, status: 200, json: async () => JSON.parse(versionSource) };
       }
@@ -148,6 +151,7 @@ const requiredRootFiles = [
   "sw.js",
   "data/characters.json",
   "data/goal-defaults.json",
+  "data/echo-sets.json",
   "data/version.json",
 ];
 
@@ -189,10 +193,37 @@ const html = await readText("index.html");
 const appSource = await readText("app.js");
 const stylesSource = await readText("styles.css");
 const goalDefaultsSource = await readText("data/goal-defaults.json");
+const echoSetsSource = await readText("data/echo-sets.json");
 try {
   JSON.parse(goalDefaultsSource);
 } catch (error) {
   fail(`data/goal-defaults.json must be valid JSON: ${error.message}`);
+}
+
+let echoSetsData;
+try {
+  echoSetsData = JSON.parse(echoSetsSource);
+  if (!Array.isArray(echoSetsData) || !echoSetsData.length) {
+    fail("data/echo-sets.json must include at least one echo set");
+  }
+  echoSetsData.forEach((echoSet, index) => {
+    for (const field of ["id", "name", "en", "icon"]) {
+      if (typeof echoSet?.[field] !== "string" || !echoSet[field].trim()) {
+        fail(`data/echo-sets.json item ${index} must include a non-empty ${field}`);
+      }
+    }
+    if (!/^set_\d+$/.test(echoSet.id)) {
+      fail(`data/echo-sets.json item ${index} id must use set_N format`);
+    }
+    if (echoSet.icon !== `assets/icons/echoes/${echoSet.id}.webp`) {
+      fail(`data/echo-sets.json item ${index} icon must match its id`);
+    }
+    if (echoSet.aliases !== undefined && (!Array.isArray(echoSet.aliases) || echoSet.aliases.some((alias) => typeof alias !== "string"))) {
+      fail(`data/echo-sets.json item ${index} aliases must be an array of strings`);
+    }
+  });
+} catch (error) {
+  fail(`data/echo-sets.json must be valid JSON: ${error.message}`);
 }
 
 const versionSource = await readText("data/version.json");
@@ -259,14 +290,18 @@ for (const requiredSource of [
   "card-backdrop-image",
   "card-select-surface",
   "normalizeEchoSetName",
-  "Lingering Tunes",
-  "끊임없는 잔향",
   "getInitialDetailPickerOptionIndex",
   'aria-haspopup="listbox"',
   "수치입력",
   "<span>속성</span>",
 ]) {
   if (!appSource.includes(requiredSource)) fail(`app.js missing ${requiredSource}`);
+}
+
+for (const requiredEchoSetSource of ["Lingering Tunes", "끊임없는 잔향"]) {
+  if (!echoSetsSource.includes(requiredEchoSetSource)) {
+    fail(`data/echo-sets.json missing ${requiredEchoSetSource}`);
+  }
 }
 
 const manifest = JSON.parse(await readText("manifest.webmanifest"));
@@ -391,11 +426,13 @@ for (const networkFirstPath of ["/index.html", "/app.js", "/styles.css"]) {
 if (!sw.includes("/app-config.js")) fail("service worker should network-first app-config.js");
 if (!sw.includes("/data/characters.json")) fail("service worker should network-first data/characters.json");
 if (!sw.includes("/data/goal-defaults.json")) fail("service worker should network-first data/goal-defaults.json");
+if (!sw.includes("/data/echo-sets.json")) fail("service worker should network-first data/echo-sets.json");
 if (!sw.includes("/data/version.json")) fail("service worker should network-first data/version.json");
 const appShell = sw.match(/const APP_SHELL = \[([\s\S]*?)\];/)?.[1] ?? "";
 if (appShell.includes("app-config.js")) fail("app-config.js should not be precached");
 if (appShell.includes("data/characters.json")) fail("data/characters.json should not be precached");
 if (appShell.includes("data/goal-defaults.json")) fail("data/goal-defaults.json should not be precached");
+if (appShell.includes("data/echo-sets.json")) fail("data/echo-sets.json should not be precached");
 if (appShell.includes("data/version.json")) fail("data/version.json should not be precached");
 
 const rules = await readText("firestore.rules");
