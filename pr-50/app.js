@@ -2281,7 +2281,7 @@ function setupEchoSetCombobox(combobox) {
   if (!input) return;
 
   let activeIndex = getInitialEchoSetOptionIndex(options);
-  let restoreValueOnBlur = combobox.dataset.value || "";
+  let restoreValueOnBlur = getEchoSetComboboxValue(combobox);
 
   const openOptions = () => {
     closeOpenPickers(combobox);
@@ -2295,7 +2295,7 @@ function setupEchoSetCombobox(combobox) {
   };
 
   const resetInputValue = () => {
-    input.value = combobox.dataset.value || restoreValueOnBlur;
+    input.value = getEchoSetComboboxValue(combobox, restoreValueOnBlur);
     filterEchoSetOptions(combobox, activeIndex);
   };
 
@@ -2314,7 +2314,7 @@ function setupEchoSetCombobox(combobox) {
   };
 
   input.addEventListener("focus", () => {
-    restoreValueOnBlur = combobox.dataset.value || "";
+    restoreValueOnBlur = getEchoSetComboboxValue(combobox);
     input.value = "";
     openOptions();
     activeIndex = filterEchoSetOptions(combobox, 0);
@@ -2384,6 +2384,12 @@ function setupEchoSetCombobox(combobox) {
   if (emptyOption) emptyOption.hidden = Boolean(input.value.trim());
   if (emptyResults) emptyResults.hidden = true;
   filterEchoSetOptions(combobox, activeIndex);
+}
+
+function getEchoSetComboboxValue(combobox, fallback = "") {
+  return Object.prototype.hasOwnProperty.call(combobox.dataset, "value")
+    ? combobox.dataset.value
+    : fallback;
 }
 
 function getInitialEchoSetOptionIndex(options) {
