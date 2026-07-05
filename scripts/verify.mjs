@@ -489,6 +489,12 @@ try {
       fail(`getEchoSetIcon must resolve ${input} through the loaded echoSets array`);
     }
   }
+  if (echoSetCompatibilitySandbox.getEchoSetComboboxValue({ dataset: { value: "" } }, firstEchoSet.name) !== "") {
+    fail("echo set combobox reset must preserve an intentionally empty stored value");
+  }
+  if (echoSetCompatibilitySandbox.getEchoSetComboboxValue({ dataset: {} }, firstEchoSet.name) !== firstEchoSet.name) {
+    fail("echo set combobox reset must fall back when no stored value exists");
+  }
 } catch (error) {
   fail(`app echo set compatibility smoke verification failed: ${error.message}`);
 }
