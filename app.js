@@ -1360,16 +1360,18 @@ function setupDetailPicker(picker) {
   if (!summary || !options.length) return;
 
   picker.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowDown") {
+    const navigationKeys = {
+      ArrowDown: activeIndex + 1,
+      ArrowUp: activeIndex - 1,
+      Home: 0,
+      End: options.length - 1,
+      PageDown: activeIndex + 5,
+      PageUp: activeIndex - 5,
+    };
+    if (event.key in navigationKeys) {
       event.preventDefault();
       openPicker();
-      updateActiveOption(activeIndex + 1);
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      openPicker();
-      updateActiveOption(activeIndex - 1);
+      updateActiveOption(navigationKeys[event.key]);
       return;
     }
     if (event.key === "Enter" && picker.open) {
@@ -1684,7 +1686,13 @@ function bindRosterInteractions(root = rosterList) {
 
   root.querySelectorAll("[data-goal-stat-field]").forEach((field) => {
     const eventName = field.tagName === "INPUT" ? "blur" : "change";
+    if (field.dataset.goalStatField === "target") {
+      preventSignedNumberInput(field);
+    }
     field.addEventListener(eventName, () => {
+      if (field.dataset.goalStatField === "target") {
+        field.value = sanitizeUnsignedNumberInput(field.value);
+      }
       if (
         field.dataset.goalStatField === "target" &&
         Number(field.value) < 0
@@ -1773,7 +1781,9 @@ function bindRosterInteractions(root = rosterList) {
   });
 
   root.querySelectorAll("[data-current-field]").forEach((field) => {
+    preventSignedNumberInput(field);
     field.addEventListener("blur", () => {
+      field.value = sanitizeUnsignedNumberInput(field.value);
       const normalizedValue = Math.max(0, Number(field.value) || 0);
       field.value = String(normalizedValue);
       updateCurrentStat(
@@ -1812,6 +1822,31 @@ function bindRosterInteractions(root = rosterList) {
         field.dataset.goalKey,
       );
     });
+  });
+}
+
+function sanitizeUnsignedNumberInput(value) {
+  return String(value).replace(/[+-]/g, "");
+}
+
+function preventSignedNumberInput(field) {
+  field.addEventListener("keydown", (event) => {
+    if (event.key === "+" || event.key === "-") {
+      event.preventDefault();
+    }
+  });
+
+  field.addEventListener("beforeinput", (event) => {
+    if (typeof event.data === "string" && /[+-]/.test(event.data)) {
+      event.preventDefault();
+    }
+  });
+
+  field.addEventListener("input", () => {
+    const sanitizedValue = sanitizeUnsignedNumberInput(field.value);
+    if (field.value !== sanitizedValue) {
+      field.value = sanitizedValue;
+    }
   });
 }
 
@@ -2158,8 +2193,8 @@ function renderStatRow(character, stat, index, canEditGoal) {
         options: valueStatOptions,
         dataAttribute: "data-stat-option",
       })}
-      <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${target}" ${targetDisabled} />
-      <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" value="${current}" ${inputDisabled} />
+      <input data-goal-stat-field="target" data-character="${character.id}" data-index="${index}" type="number" min="0" step="5" value="${target}" ${targetDisabled} />
+      <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" step="5" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
         <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${canEditCurrent ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
         ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
@@ -2346,16 +2381,18 @@ function setupEchoSetCombobox(combobox) {
 
   input.addEventListener("keydown", (event) => {
     const visibleOptions = getVisibleEchoSetOptions(options);
-    if (event.key === "ArrowDown") {
+    const navigationKeys = {
+      ArrowDown: activeIndex + 1,
+      ArrowUp: activeIndex - 1,
+      Home: 0,
+      End: visibleOptions.length - 1,
+      PageDown: activeIndex + 5,
+      PageUp: activeIndex - 5,
+    };
+    if (event.key in navigationKeys) {
       event.preventDefault();
       openOptions();
-      updateActiveOption(activeIndex + 1);
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      openOptions();
-      updateActiveOption(activeIndex - 1);
+      updateActiveOption(navigationKeys[event.key]);
       return;
     }
     if (event.key === "Enter" && combobox.classList.contains("open")) {
