@@ -1,0 +1,19 @@
+{
+  "name": "내가 어디까지 잘 키웠더라",
+  "short_name": "육성 기록장",
+  "description": "명조 캐릭터 보유 여부와 파밍 상태를 관리하는 반응형 웹앱",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#080b10",
+  "theme_color": "#080b10",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
