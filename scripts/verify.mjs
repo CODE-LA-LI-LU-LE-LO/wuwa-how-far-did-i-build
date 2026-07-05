@@ -194,8 +194,9 @@ const appSource = await readText("app.js");
 const stylesSource = await readText("styles.css");
 const goalDefaultsSource = await readText("data/goal-defaults.json");
 const echoSetsSource = await readText("data/echo-sets.json");
+let goalDefaults;
 try {
-  JSON.parse(goalDefaultsSource);
+  goalDefaults = JSON.parse(goalDefaultsSource);
 } catch (error) {
   fail(`data/goal-defaults.json must be valid JSON: ${error.message}`);
 }
@@ -224,6 +225,26 @@ try {
   });
 } catch (error) {
   fail(`data/echo-sets.json must be valid JSON: ${error.message}`);
+}
+
+const echoSetNames = new Set(echoSetsData.map((echoSet) => echoSet.name));
+const echoSetEnglishNames = new Set(echoSetsData.map((echoSet) => echoSet.en));
+const goalEchoSetNames = new Set();
+for (const [characterId, goal] of Object.entries(goalDefaults)) {
+  for (const [index, echoSet] of (goal?.echoSets ?? []).entries()) {
+    const name = echoSet?.name;
+    if (!name) continue;
+    goalEchoSetNames.add(name);
+    if (!echoSetNames.has(name)) {
+      fail(`data/goal-defaults.json ${characterId}.echoSets[${index}].name must use a Korean data/echo-sets.json name`);
+    }
+    if (echoSetEnglishNames.has(name)) {
+      fail(`data/goal-defaults.json ${characterId}.echoSets[${index}].name must not store English echo set names`);
+    }
+  }
+}
+if (!goalEchoSetNames.size) {
+  fail("data/goal-defaults.json must include Korean echo set names");
 }
 
 const versionSource = await readText("data/version.json");
@@ -451,14 +472,31 @@ for (const requiredRuleSource of [
 }
 
 try {
-  await smokeLoadApp({
+  const echoSetCompatibilitySandbox = await smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.json"),
     goalDefaultsSource,
     appSource,
   });
+  const [firstEchoSet] = echoSetsData;
+  const alias = "검증용 에코셋 별칭";
+  vm.runInContext(`echoSets[0] = { ...echoSets[0], aliases: [${JSON.stringify(alias)}] };`, echoSetCompatibilitySandbox);
+  for (const input of [firstEchoSet.name, firstEchoSet.en, firstEchoSet.id, alias]) {
+    if (echoSetCompatibilitySandbox.normalizeEchoSetName(input) !== firstEchoSet.name) {
+      fail(`normalizeEchoSetName must normalize ${input} to the Korean echo set name`);
+    }
+    if (echoSetCompatibilitySandbox.getEchoSetIcon(input) !== firstEchoSet.icon) {
+      fail(`getEchoSetIcon must resolve ${input} through the loaded echoSets array`);
+    }
+  }
+  if (echoSetCompatibilitySandbox.getEchoSetComboboxValue({ dataset: { value: "" } }, firstEchoSet.name) !== "") {
+    fail("echo set combobox reset must preserve an intentionally empty stored value");
+  }
+  if (echoSetCompatibilitySandbox.getEchoSetComboboxValue({ dataset: {} }, firstEchoSet.name) !== firstEchoSet.name) {
+    fail("echo set combobox reset must fall back when no stored value exists");
+  }
 } catch (error) {
-  fail(`app smoke load failed: ${error.message}`);
+  fail(`app echo set compatibility smoke verification failed: ${error.message}`);
 }
 
 try {
