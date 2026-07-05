@@ -844,12 +844,12 @@ async function loadVersionData() {
     const versionData = await response.json();
     const version =
       typeof versionData?.version === "string" ? versionData.version.trim() : "";
-    if (version) {
-      appVersionElement.textContent = version.startsWith("ver.")
-        ? version
-        : `ver.${version}`;
-    }
+    if (!version) throw new Error("missing version");
+    appVersionElement.textContent = version.startsWith("ver.")
+      ? version
+      : `ver.${version}`;
   } catch {
+    appVersionElement.textContent = "ver.unknown";
     showSessionMessage("버전 정보 불러오기 실패", "data/version.json을 확인해주세요");
   }
 }
@@ -4163,7 +4163,7 @@ let shouldRenderImmediately = true;
 initializeApp();
 
 async function initializeApp() {
-  await loadVersionData();
+  loadVersionData();
   await loadCharacterSeedData();
   initializeState();
   await loadGoalDefaultsData().catch(() => {});
