@@ -1684,7 +1684,13 @@ function bindRosterInteractions(root = rosterList) {
 
   root.querySelectorAll("[data-goal-stat-field]").forEach((field) => {
     const eventName = field.tagName === "INPUT" ? "blur" : "change";
+    if (field.dataset.goalStatField === "target") {
+      preventSignedNumberInput(field);
+    }
     field.addEventListener(eventName, () => {
+      if (field.dataset.goalStatField === "target") {
+        field.value = sanitizeUnsignedNumberInput(field.value);
+      }
       if (
         field.dataset.goalStatField === "target" &&
         Number(field.value) < 0
@@ -1773,7 +1779,9 @@ function bindRosterInteractions(root = rosterList) {
   });
 
   root.querySelectorAll("[data-current-field]").forEach((field) => {
+    preventSignedNumberInput(field);
     field.addEventListener("blur", () => {
+      field.value = sanitizeUnsignedNumberInput(field.value);
       const normalizedValue = Math.max(0, Number(field.value) || 0);
       field.value = String(normalizedValue);
       updateCurrentStat(
@@ -1812,6 +1820,31 @@ function bindRosterInteractions(root = rosterList) {
         field.dataset.goalKey,
       );
     });
+  });
+}
+
+function sanitizeUnsignedNumberInput(value) {
+  return String(value).replace(/[+-]/g, "");
+}
+
+function preventSignedNumberInput(field) {
+  field.addEventListener("keydown", (event) => {
+    if (event.key === "+" || event.key === "-") {
+      event.preventDefault();
+    }
+  });
+
+  field.addEventListener("beforeinput", (event) => {
+    if (typeof event.data === "string" && /[+-]/.test(event.data)) {
+      event.preventDefault();
+    }
+  });
+
+  field.addEventListener("input", () => {
+    const sanitizedValue = sanitizeUnsignedNumberInput(field.value);
+    if (field.value !== sanitizedValue) {
+      field.value = sanitizedValue;
+    }
   });
 }
 
