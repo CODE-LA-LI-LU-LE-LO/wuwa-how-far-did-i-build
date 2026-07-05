@@ -49,9 +49,9 @@
 
 GitHub Pages에 배포할 때는 이 폴더의 `index.html`, `styles.css`, `app.js`, `assets/`를 그대로 올리면 됩니다.
 
-`manifest.webmanifest`, `sw.js`, `.nojekyll`, `app-config.js`, `data/characters.json`, `data/goal-defaults.json`, `data/version.json`도 같은 루트에 함께 올려야 설치형 웹앱과 오프라인 캐시가 정상 동작합니다.
+`manifest.webmanifest`, `sw.js`, `.nojekyll`, `app-config.js`, `data/characters.json`, `data/echo-sets.json`, `data/goal-defaults.json`, `data/version.json`도 같은 루트에 함께 올려야 설치형 웹앱과 오프라인 캐시가 정상 동작합니다.
 
-`app-config.js`, `data/characters.json`, `data/goal-defaults.json`, `data/version.json`은 배포 후 갱신이 잦은 파일이라 서비스워커가 네트워크 우선으로 확인합니다. 캐릭터 기본 데이터는 `data/characters.json`, 관리자 목표 기본값은 `data/goal-defaults.json`에서 앱 시작 시 한 번 읽고, 헤더의 앱 버전은 `data/version.json`의 `version` 값으로 표시합니다.
+`app-config.js`, `data/characters.json`, `data/echo-sets.json`, `data/goal-defaults.json`, `data/version.json`은 배포 후 갱신이 잦은 파일이라 서비스워커가 네트워크 우선으로 확인합니다. 캐릭터 기본 데이터는 `data/characters.json`, 에코셋 목록은 `data/echo-sets.json`, 관리자 목표 기본값은 `data/goal-defaults.json`에서 앱 시작 시 한 번 읽고, 헤더의 앱 버전은 `data/version.json`의 `version` 값으로 표시합니다.
 
 ## GitHub Pages 배포
 
