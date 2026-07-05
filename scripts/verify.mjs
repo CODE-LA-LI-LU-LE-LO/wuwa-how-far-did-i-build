@@ -247,28 +247,6 @@ if (!goalEchoSetNames.size) {
   fail("data/goal-defaults.json must include Korean echo set names");
 }
 
-const normalizeEchoSetNameSource = appSource.match(/function normalizeEchoSetName\([\s\S]*?\n}\n\nfunction getStatOption/)?.[0] ?? "";
-if (!normalizeEchoSetNameSource.includes("echoSet.name === name")) {
-  fail("normalizeEchoSetName must continue matching Korean echo set names");
-}
-if (!normalizeEchoSetNameSource.includes("echoSet.en === name")) {
-  fail("normalizeEchoSetName must continue matching English echo set names");
-}
-if (!normalizeEchoSetNameSource.includes("echoSet.aliases?.includes(name)")) {
-  fail("normalizeEchoSetName must match echo set aliases when aliases are present");
-}
-if (normalizeEchoSetNameSource.includes("echoSet.id === name")) {
-  fail("normalizeEchoSetName should not normalize echo set ids as stored names");
-}
-
-const getEchoSetIconSource = appSource.match(/function getEchoSetIcon\([\s\S]*?\n}\n\nfunction normalizeEchoSetName/)?.[0] ?? "";
-if (!getEchoSetIconSource.includes("echoSets.find")) {
-  fail("getEchoSetIcon must continue looking up icons from the loaded echoSets array");
-}
-if (!getEchoSetIconSource.includes("normalizeEchoSetName(name)")) {
-  fail("getEchoSetIcon must normalize names before looking up icons");
-}
-
 const versionSource = await readText("data/version.json");
 try {
   const versionData = JSON.parse(versionSource);
@@ -494,14 +472,25 @@ for (const requiredRuleSource of [
 }
 
 try {
-  await smokeLoadApp({
+  const echoSetCompatibilitySandbox = await smokeLoadApp({
     configSource: await readText("app-config.js"),
     characterSource: await readText("data/characters.json"),
     goalDefaultsSource,
     appSource,
   });
+  const [firstEchoSet] = echoSetsData;
+  const alias = "검증용 에코셋 별칭";
+  vm.runInContext(`echoSets[0] = { ...echoSets[0], aliases: [${JSON.stringify(alias)}] };`, echoSetCompatibilitySandbox);
+  for (const input of [firstEchoSet.name, firstEchoSet.en, firstEchoSet.id, alias]) {
+    if (echoSetCompatibilitySandbox.normalizeEchoSetName(input) !== firstEchoSet.name) {
+      fail(`normalizeEchoSetName must normalize ${input} to the Korean echo set name`);
+    }
+    if (echoSetCompatibilitySandbox.getEchoSetIcon(input) !== firstEchoSet.icon) {
+      fail(`getEchoSetIcon must resolve ${input} through the loaded echoSets array`);
+    }
+  }
 } catch (error) {
-  fail(`app smoke load failed: ${error.message}`);
+  fail(`app echo set compatibility smoke verification failed: ${error.message}`);
 }
 
 try {
