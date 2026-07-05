@@ -282,6 +282,13 @@ for (const requiredGoalEditSource of [
     fail(`app.js missing goal edit behavior source: ${requiredGoalEditSource}`);
   }
 }
+const clearCurrentStatSource = appSource.match(/function clearCurrentStat\([\s\S]*?\n}\n\nfunction addGoalStat/)?.[0] ?? "";
+if (!clearCurrentStatSource.includes("updateRenderedCurrentStatValues(id, key)")) {
+  fail("clearCurrentStat must update rendered current stat values without a full card redraw");
+}
+if (clearCurrentStatSource.includes("rerenderFarmingCard(id)")) {
+  fail("clearCurrentStat should not rerender the whole farming card for simple value resets");
+}
 for (const icon of manifest.icons ?? []) {
   await mustExist(icon.src);
 }

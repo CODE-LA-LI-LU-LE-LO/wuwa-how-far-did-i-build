@@ -3157,6 +3157,8 @@ function updateRenderedStatRowState(id, index, row) {
 function clearCurrentStat(id, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
+
+  const wasComplete = isGoalComplete(character);
   updateCurrentStatValuesByAttribute(character, key, 0);
   character.currentStats.manualComplete = false;
   if (character.farm.priority === "done") character.farm.priority = "mid";
@@ -3164,8 +3166,29 @@ function clearCurrentStat(id, key) {
   saveState();
   renderStats();
   renderFocusStrip();
-  rerenderFarmingCard(id);
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  updateRenderedCurrentStatValues(id, key);
+  updateRenderedManualCompleteInput(id);
   if (id === selectedId) renderDetail();
+}
+
+function updateRenderedManualCompleteInput(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  document
+    .querySelectorAll(`[data-manual-complete="${CSS.escape(id)}"]`)
+    .forEach((input) => {
+      input.checked = character.currentStats.manualComplete;
+    });
 }
 
 function addGoalStat(id) {
