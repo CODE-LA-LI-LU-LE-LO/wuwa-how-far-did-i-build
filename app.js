@@ -710,20 +710,25 @@ async function loadCharacterSeedData() {
   }
 }
 
-
 async function loadEchoSetData() {
   try {
     const response = await fetch("data/echo-sets.json", { cache: "no-cache" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const sets = await response.json();
-    echoSets = Array.isArray(sets)
-      ? sets
-          .map(normalizeEchoSetDefinition)
-          .filter((echoSet) => echoSet.id && echoSet.name && echoSet.en && echoSet.icon)
-      : [];
+    if (!Array.isArray(sets)) throw new Error("invalid echo set data");
+
+    echoSets = sets
+      .map(normalizeEchoSetDefinition)
+      .filter(
+        (echoSet) =>
+          echoSet.id && echoSet.name && echoSet.en && echoSet.icon,
+      );
   } catch {
     echoSets = [];
-    showSessionMessage("에코셋 목록 불러오기 실패", "data/echo-sets.json을 확인해주세요");
+    showSessionMessage(
+      "에코셋 목록 불러오기 실패",
+      "data/echo-sets.json을 확인해주세요",
+    );
   }
 }
 
