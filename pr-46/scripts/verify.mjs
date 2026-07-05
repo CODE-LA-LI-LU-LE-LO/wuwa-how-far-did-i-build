@@ -79,7 +79,8 @@ function createDomStub() {
   };
 }
 
-async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, appSource }) {
+async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource, versionSource, appSource }) {
+  versionSource ??= '{"version":"ver.verify"}';
   const storage = new Map();
   const sandbox = {
     Blob: class {},
@@ -110,6 +111,9 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
       }
       if (String(url).endsWith("data/goal-defaults.json")) {
         return { ok: true, status: 200, json: async () => JSON.parse(goalDefaultsSource) };
+      }
+      if (String(url).endsWith("data/version.json")) {
+        return { ok: true, status: 200, json: async () => JSON.parse(versionSource) };
       }
       return { ok: false, status: 404, json: async () => ({}) };
     },
@@ -144,6 +148,7 @@ const requiredRootFiles = [
   "sw.js",
   "data/characters.json",
   "data/goal-defaults.json",
+  "data/version.json",
 ];
 
 const requiredIconFiles = [
@@ -188,6 +193,16 @@ try {
   JSON.parse(goalDefaultsSource);
 } catch (error) {
   fail(`data/goal-defaults.json must be valid JSON: ${error.message}`);
+}
+
+const versionSource = await readText("data/version.json");
+try {
+  const versionData = JSON.parse(versionSource);
+  if (typeof versionData.version !== "string" || !versionData.version.trim()) {
+    fail("data/version.json must include a non-empty version string");
+  }
+} catch (error) {
+  fail(`data/version.json must be valid JSON: ${error.message}`);
 }
 for (const ref of localReferences(html)) {
   await mustExist(ref);
@@ -338,6 +353,8 @@ for (const requiredAdminSource of [
   "adminSnapshot.data()?.enabled === true",
   "async function loadGoalDefaultsData()",
   `fetch("data/goal-defaults.json"`,
+  "async function loadVersionData()",
+  `fetch("data/version.json"`,
   "function getGoalDefaultsExportData()",
   "function offerCharactersJsonDownload()",
   "function downloadCharactersJson()",
@@ -374,10 +391,12 @@ for (const networkFirstPath of ["/index.html", "/app.js", "/styles.css"]) {
 if (!sw.includes("/app-config.js")) fail("service worker should network-first app-config.js");
 if (!sw.includes("/data/characters.json")) fail("service worker should network-first data/characters.json");
 if (!sw.includes("/data/goal-defaults.json")) fail("service worker should network-first data/goal-defaults.json");
+if (!sw.includes("/data/version.json")) fail("service worker should network-first data/version.json");
 const appShell = sw.match(/const APP_SHELL = \[([\s\S]*?)\];/)?.[1] ?? "";
 if (appShell.includes("app-config.js")) fail("app-config.js should not be precached");
 if (appShell.includes("data/characters.json")) fail("data/characters.json should not be precached");
 if (appShell.includes("data/goal-defaults.json")) fail("data/goal-defaults.json should not be precached");
+if (appShell.includes("data/version.json")) fail("data/version.json should not be precached");
 
 const rules = await readText("firestore.rules");
 if (!rules.includes("match /profiles/{userId}")) fail("firestore rules must protect profiles/{userId}");
