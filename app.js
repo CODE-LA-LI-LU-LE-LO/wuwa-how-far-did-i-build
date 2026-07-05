@@ -848,11 +848,20 @@ function normalizeCharacter(character, resetGoals = false) {
 
   delete merged.version;
 
+  const goals = normalizeGoals(character.goals, resetGoals, merged);
+  const savedAdminGoalBranches = normalizeAdminGoalBranches(character.adminGoalBranches);
+  const legacyAdminGoalBranches = getAdminGoalBranches(character.goals?.admin);
+  const adminGoalBranches = Object.keys(savedAdminGoalBranches).length
+    ? savedAdminGoalBranches
+    : legacyAdminGoalBranches;
+  applyAdminGoalBranches(goals.admin, adminGoalBranches);
+
   return {
     ...merged,
     farm: { ...defaultFarm, ...character.farm },
     goalMode: character.goalMode === "custom" ? "custom" : "admin",
-    goals: normalizeGoals(character.goals, resetGoals, merged),
+    goals,
+    adminGoalBranches,
     currentStats: normalizeCurrentStats(character.currentStats),
     isPublic: merged.isPublic !== false,
   };
@@ -887,6 +896,37 @@ function normalizeGoals(goals = {}, resetValueStats = false, character = {}) {
     admin: normalizeGoal(getAdminGoalDefault(character), false),
     custom: normalizeGoal(goals.custom, resetValueStats),
   };
+}
+
+function normalizeAdminGoalBranches(branches = {}) {
+  return Object.fromEntries(
+    Object.entries(branches ?? {})
+      .filter(([variant]) => statVariantOptions.includes(variant) && variant !== "-")
+      .map(([variant, checked]) => [variant, Boolean(checked)]),
+  );
+}
+
+function applyAdminGoalBranches(goal, branches = {}) {
+  if (!goal) return;
+  const normalizedBranches = normalizeAdminGoalBranches(branches);
+  goal.echoStats.forEach((stat) => {
+    if (stat.variant !== "-" && stat.variant in normalizedBranches) {
+      stat.branchChecked = normalizedBranches[stat.variant];
+    }
+  });
+}
+
+function getAdminGoalBranches(goal = {}) {
+  return Object.fromEntries(
+    (goal?.echoStats ?? [])
+      .filter((stat) => stat.variant && stat.variant !== "-")
+      .map((stat) => [stat.variant, Boolean(stat.branchChecked)]),
+  );
+}
+
+function syncAdminGoalBranches(character) {
+  if (!character || character.goalMode === "custom") return;
+  character.adminGoalBranches = getAdminGoalBranches(character.goals.admin);
 }
 
 function normalizeGoal(goal = {}, resetValueStats = false) {
@@ -1093,6 +1133,7 @@ function getUserCharacterData(character) {
     goals: {
       custom: character.goals.custom,
     },
+    adminGoalBranches: character.adminGoalBranches,
     currentStats: character.currentStats,
   };
 }
@@ -1188,6 +1229,7 @@ function getPortableState(options = {}) {
       goals: {
         custom: character.goals.custom,
       },
+      adminGoalBranches: character.adminGoalBranches,
     };
   });
 
@@ -2931,7 +2973,9 @@ function updateGoalEchoStatField(id, index, field, value) {
   if (!character) return;
   const isBranchCheck = field === "branchChecked";
   if (!isBranchCheck && !canEditActiveGoal(character)) return;
-  const stat = getActiveGoal(character).echoStats[Number(index)];
+  const goal = getActiveGoal(character);
+  const targetIndex = Number(index);
+  const stat = goal.echoStats[targetIndex];
   if (!stat) return;
 
   const wasComplete = isGoalComplete(character);
@@ -2943,19 +2987,30 @@ function updateGoalEchoStatField(id, index, field, value) {
   if (field === "variant") {
     const nextVariant = statVariantOptions.includes(value) ? value : "-";
     if (stat.variant === nextVariant) return;
+    const nextBranchChecked =
+      nextVariant !== "-" &&
+      goal.echoStats.some(
+        (echoStat, echoStatIndex) =>
+          echoStatIndex !== targetIndex &&
+          echoStat.variant === nextVariant &&
+          echoStat.branchChecked,
+      );
     stat.variant = nextVariant;
-    stat.branchChecked =
-      nextVariant !== "-" && isGoalBranchActive(getActiveGoal(character), nextVariant);
+    stat.branchChecked = nextBranchChecked;
   }
   if (field === "branchChecked") {
     const nextChecked = stat.variant !== "-" && Boolean(value);
-    const matchingStats = getActiveGoal(character).echoStats.filter(
+    const matchingStats = goal.echoStats.filter(
       (echoStat) => echoStat.variant === stat.variant,
     );
     if (matchingStats.every((echoStat) => echoStat.branchChecked === nextChecked)) return;
     matchingStats.forEach((echoStat) => {
       echoStat.branchChecked = nextChecked;
     });
+  }
+
+  if (field === "variant" || isBranchCheck) {
+    syncAdminGoalBranches(character);
   }
 
   saveGoalState(character);

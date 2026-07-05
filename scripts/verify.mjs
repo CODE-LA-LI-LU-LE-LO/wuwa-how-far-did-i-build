@@ -134,6 +134,10 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
   vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
   sandbox.__getState = vm.runInContext("() => state", sandbox);
+  sandbox.__setCustomGoalEditingId = vm.runInContext(
+    "(value) => { customGoalEditingId = value; }",
+    sandbox,
+  );
   await new Promise((resolve) => setTimeout(resolve, 0));
   return sandbox;
 }
@@ -587,6 +591,153 @@ try {
   }
 } catch (error) {
   fail(`app echo set initial search verification failed: ${error.message}`);
+}
+
+
+try {
+  const adminBranchSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const seedCharacter = JSON.parse(await readText("data/characters.json")).find(
+    (character) => character.en === "Aalto",
+  );
+  const normalizedState = adminBranchSandbox.normalizeState({
+    user: { role: "user" },
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "branch-saved-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        owned: true,
+        adminGoalBranches: { A: true, B: false },
+      },
+    ],
+  });
+  const normalizedCharacter = normalizedState.characters.find(
+    (item) => item.en === "Aalto",
+  );
+  const branchA = normalizedCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "A",
+  );
+  const branchB = normalizedCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "B",
+  );
+  if (branchA?.branchChecked !== true || branchB?.branchChecked !== false) {
+    fail("admin goal branch checkbox selections must persist separately from admin goal defaults");
+  }
+
+  const legacyNormalizedState = adminBranchSandbox.normalizeState({
+    user: { role: "user" },
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "legacy-branch-saved-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        owned: true,
+        goals: {
+          admin: {
+            echoStats: [
+              {
+                key: "crit",
+                label: "크리티컬",
+                cost: "COST 4",
+                variant: "A",
+                branchChecked: true,
+              },
+              {
+                key: "atk",
+                label: "공격력%",
+                cost: "COST 3",
+                variant: "B",
+                branchChecked: false,
+              },
+            ],
+          },
+        },
+      },
+    ],
+  });
+  const legacyCharacter = legacyNormalizedState.characters.find(
+    (item) => item.en === "Aalto",
+  );
+  const legacyBranchA = legacyCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "A",
+  );
+  const legacyBranchB = legacyCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "B",
+  );
+  if (
+    legacyCharacter?.adminGoalBranches?.A !== true ||
+    legacyCharacter?.adminGoalBranches?.B !== false ||
+    legacyBranchA?.branchChecked !== true ||
+    legacyBranchB?.branchChecked !== false
+  ) {
+    fail("legacy admin goal branch checkbox selections must migrate to adminGoalBranches");
+  }
+
+  const nullAdminGoalState = adminBranchSandbox.normalizeState({
+    user: { role: "user" },
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "null-admin-goal-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        owned: true,
+        goals: { admin: null },
+      },
+    ],
+  });
+  const nullAdminGoalCharacter = nullAdminGoalState.characters.find(
+    (item) => item.en === "Aalto",
+  );
+  if (
+    !nullAdminGoalCharacter ||
+    typeof nullAdminGoalCharacter.adminGoalBranches !== "object"
+  ) {
+    fail("null legacy admin goal data must normalize without crashing");
+  }
+
+  const variantChangeCharacter = adminBranchSandbox.createCharacter({
+    name: "분기 변경 테스트",
+    element: "미정",
+    weapon: "미정",
+  });
+  variantChangeCharacter.goalMode = "custom";
+  variantChangeCharacter.goals.custom.echoStats = [
+    {
+      key: "crit",
+      label: "크리티컬",
+      cost: "COST 4",
+      variant: "A",
+      branchChecked: true,
+    },
+    {
+      key: "atk",
+      label: "공격력%",
+      cost: "COST 3",
+      variant: "B",
+      branchChecked: false,
+    },
+  ];
+  adminBranchSandbox.__getState().characters = [variantChangeCharacter];
+  adminBranchSandbox.__setCustomGoalEditingId(variantChangeCharacter.id);
+  adminBranchSandbox.updateGoalEchoStatField(
+    variantChangeCharacter.id,
+    0,
+    "variant",
+    "C",
+  );
+  if (variantChangeCharacter.goals.custom.echoStats[0].branchChecked !== false) {
+    fail("variant changes must not carry the edited row's previous branch check into a new branch");
+  }
+} catch (error) {
+  fail(`app admin branch persistence verification failed: ${error.message}`);
 }
 
 try {
