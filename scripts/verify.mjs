@@ -90,6 +90,7 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
     atob: (value) => Buffer.from(value, "base64").toString("binary"),
     btoa: (value) => Buffer.from(value, "binary").toString("base64"),
     crypto: { randomUUID: () => "verify-id" },
+    CSS: { escape: (value) => String(value) },
     document: createDomStub(),
     history: { replaceState() {} },
     localStorage: {
@@ -125,6 +126,7 @@ async function smokeLoadApp({ configSource, characterSource, goalDefaultsSource,
   vm.createContext(sandbox);
   vm.runInContext(configSource, sandbox, { filename: "app-config.js" });
   vm.runInContext(appSource, sandbox, { filename: "app.js" });
+  sandbox.__getState = vm.runInContext("() => state", sandbox);
   await new Promise((resolve) => setTimeout(resolve, 0));
   return sandbox;
 }
@@ -446,6 +448,45 @@ try {
   }
 } catch (error) {
   fail(`app echo set initial search verification failed: ${error.message}`);
+}
+
+try {
+  const currentStatSyncSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const character = currentStatSyncSandbox.createCharacter({
+    name: "테스트",
+    element: "미정",
+    weapon: "미정",
+  });
+  character.goals.admin.stats = [
+    { key: "atk", label: "공격력", target: 2000, cost: "COST 1", variant: "A" },
+    { key: "atk", label: "공격력", target: 2000, cost: "COST 1", variant: "B" },
+    { key: "hp", label: "HP", target: 20000, cost: "COST 1", variant: "-" },
+  ];
+  currentStatSyncSandbox.__getState().characters = [character];
+  currentStatSyncSandbox.updateCurrentStat(character.id, "A:atk", 200);
+  if (
+    character.currentStats.values["A:atk"] !== 200 ||
+    character.currentStats.values["B:atk"] !== 200
+  ) {
+    fail("current stat inputs with the same attribute must sync across branch variants");
+  }
+  currentStatSyncSandbox.updateCurrentStat(character.id, "B:atk", 350);
+  if (
+    character.currentStats.values["A:atk"] !== 350 ||
+    character.currentStats.values["B:atk"] !== 350
+  ) {
+    fail("later current stat edits must overwrite matching attribute branch values");
+  }
+  if (character.currentStats.values.hp === 350) {
+    fail("current stat sync must not overwrite different attributes");
+  }
+} catch (error) {
+  fail(`app current stat sync verification failed: ${error.message}`);
 }
 
 if (failures.length > 0) {

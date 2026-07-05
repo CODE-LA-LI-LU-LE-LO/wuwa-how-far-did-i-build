@@ -2544,6 +2544,18 @@ function getCurrentStatValueKey(stat) {
     : stat.key;
 }
 
+function getCurrentStatBaseKey(valueKey = "") {
+  const [, variantStatKey] = String(valueKey).split(":");
+  return variantStatKey || String(valueKey);
+}
+
+function getMatchingCurrentStatKeys(character, valueKey) {
+  const baseKey = getCurrentStatBaseKey(valueKey);
+  return getActiveGoal(character).stats
+    .filter((stat) => stat.key === baseKey)
+    .map(getCurrentStatValueKey);
+}
+
 function getCurrentStatValue(character, stat) {
   return Number(character.currentStats.values[getCurrentStatValueKey(stat)] ?? 0);
 }
@@ -2694,7 +2706,7 @@ function updateCurrentStat(id, field, value) {
         ? "mid"
         : character.farm.priority;
   } else if (isCurrentValueField) {
-    character.currentStats.values[field] = Math.max(0, Number(value) || 0);
+    updateCurrentStatValuesByAttribute(character, field, value);
   } else {
     character.currentStats[field] = value;
   }
@@ -2711,10 +2723,43 @@ function updateCurrentStat(id, field, value) {
   }
 
   updateRenderedFarmingCardCompletionState(id, isComplete);
+  if (isCurrentValueField) {
+    updateRenderedCurrentStatValues(id, field);
+  }
   if (field === "manualComplete" || !isCurrentValueField) {
     rerenderFarmingCard(id);
     if (id === selectedId) renderDetail();
   }
+}
+
+function updateCurrentStatValuesByAttribute(character, field, value) {
+  const normalizedValue = Math.max(0, Number(value) || 0);
+  const matchingKeys = getMatchingCurrentStatKeys(character, field);
+  const keys = matchingKeys.length ? matchingKeys : [field];
+
+  keys.forEach((key) => {
+    character.currentStats.values[key] = normalizedValue;
+  });
+}
+
+function updateRenderedCurrentStatValues(id, field) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  const matchingKeys = new Set(getMatchingCurrentStatKeys(character, field));
+  if (!matchingKeys.size) matchingKeys.add(field);
+
+  document
+    .querySelectorAll(`[data-current-field][data-character="${CSS.escape(id)}"]`)
+    .forEach((input) => {
+      if (!matchingKeys.has(input.dataset.currentField)) return;
+      input.value = String(character.currentStats.values[input.dataset.currentField] ?? 0);
+      updateRenderedStatRowState(
+        id,
+        Number(input.dataset.index),
+        input.closest(".stat-row"),
+      );
+    });
 }
 
 function shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete) {
