@@ -1070,7 +1070,7 @@ function normalizeGoalEchoStats(goal = {}, fallbackStats = defaultGoal.echoStats
   const stats = rawStats
     .map((stat) => normalizeGoalEchoStat(stat))
     .filter(Boolean)
-    .slice(0, 7);
+    .slice(0, 10);
 
   while (stats.length < 2) {
     const nextOption =
@@ -2025,8 +2025,8 @@ function renderFarmingCard(character) {
             canEditGoal
               ? `
             <div class="stat-actions">
-              <button class="ghost-button" data-add-echo-stat="${character.id}" type="button" ${goal.echoStats.length < 7 ? "" : "disabled"}>에코 구성 추가</button>
-              <small>에코 구성은 2개에서 7개까지 설정할 수 있습니다.</small>
+              <button class="ghost-button" data-add-echo-stat="${character.id}" type="button" ${goal.echoStats.length < 10 ? "" : "disabled"}>에코 구성 추가</button>
+              <small>에코 구성은 2개에서 10개까지 설정할 수 있습니다.</small>
             </div>
           `
               : ""
@@ -2985,14 +2985,21 @@ function updateGoalEchoStatKey(id, index, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const option = getStatOption(key, statOptions);
-  const stat = getActiveGoal(character).echoStats[Number(index)];
+  const targetIndex = Number(index);
+  const stat = getActiveGoal(character).echoStats[targetIndex];
   if (!stat) return;
 
   stat.key = option.key;
   stat.label = option.label;
 
   saveGoalState(character);
-  rerenderFarmingCard(id);
+  updateRenderedStatPickerOption(
+    id,
+    targetIndex,
+    option.key,
+    "data-echo-stat-option",
+    statOptions,
+  );
 }
 
 function updateGoalEchoStatField(id, index, field, value) {
@@ -3157,6 +3164,8 @@ function updateRenderedStatRowState(id, index, row) {
 function clearCurrentStat(id, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
+
+  const wasComplete = isGoalComplete(character);
   updateCurrentStatValuesByAttribute(character, key, 0);
   character.currentStats.manualComplete = false;
   if (character.farm.priority === "done") character.farm.priority = "mid";
@@ -3164,8 +3173,29 @@ function clearCurrentStat(id, key) {
   saveState();
   renderStats();
   renderFocusStrip();
-  rerenderFarmingCard(id);
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  updateRenderedCurrentStatValues(id, key);
+  updateRenderedManualCompleteInput(id);
   if (id === selectedId) renderDetail();
+}
+
+function updateRenderedManualCompleteInput(id) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  document
+    .querySelectorAll(`[data-manual-complete="${CSS.escape(id)}"]`)
+    .forEach((input) => {
+      input.checked = character.currentStats.manualComplete;
+    });
 }
 
 function addGoalStat(id) {
@@ -3195,7 +3225,7 @@ function addGoalEchoStat(id) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.echoStats.length >= 7) return;
+  if (goal.echoStats.length >= 10) return;
 
   const option =
     statOptions.find(
@@ -3230,10 +3260,12 @@ function updateGoalStatKey(id, index, key) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  const stat = goal.stats[Number(index)];
+  const targetIndex = Number(index);
+  const stat = goal.stats[targetIndex];
   if (!stat) return;
   if (!isGoalBranchActive(goal, stat.variant) && !canEditActiveGoal(character)) return;
   const option = getStatOption(key, valueStatOptions);
+  const wasComplete = isGoalComplete(character);
 
   stat.key = option.key;
   stat.label = option.label;
@@ -3245,7 +3277,74 @@ function updateGoalStatKey(id, index, key) {
   saveGoalState(character);
   renderStats();
   renderFocusStrip();
-  rerenderFarmingCard(id);
+
+  const isComplete = isGoalComplete(character);
+  if (shouldRerenderFarmingCardAfterCompletionChange(wasComplete, isComplete)) {
+    renderRoster();
+    if (id === selectedId) renderDetail();
+    return;
+  }
+
+  updateRenderedFarmingCardCompletionState(id, isComplete);
+  updateRenderedStatPickerOption(
+    id,
+    targetIndex,
+    option.key,
+    "data-stat-option",
+    valueStatOptions,
+  );
+  updateRenderedGoalStatKey(id, targetIndex);
+  if (id === selectedId) renderDetail();
+}
+
+function updateRenderedStatPickerOption(
+  id,
+  index,
+  key,
+  dataAttribute,
+  options = statOptions,
+) {
+  const selector = `[${dataAttribute}][data-character="${CSS.escape(id)}"][data-index="${CSS.escape(String(index))}"]`;
+  const buttons = [...document.querySelectorAll(selector)];
+  if (!buttons.length) return;
+
+  const selectedOption = getStatOption(key, options);
+  const picker = buttons[0].closest(".stat-picker");
+  const summary = picker?.querySelector("summary.echo-picker-button");
+  if (summary) {
+    summary.innerHTML = `${renderInlineIcon(selectedOption.icon)}<span>${escapeHtml(selectedOption.label)}</span>`;
+  }
+
+  buttons.forEach((button) => {
+    const isSelected = button.dataset.value === selectedOption.key;
+    button.classList.toggle("active", isSelected);
+    button.setAttribute("aria-selected", String(isSelected));
+  });
+}
+
+function updateRenderedGoalStatKey(id, index) {
+  const character = state.characters.find((item) => item.id === id);
+  const stat = character ? getActiveGoal(character).stats[Number(index)] : null;
+  if (!character || !stat) return;
+
+  const row = document.querySelector(
+    `[data-stat-row="${CSS.escape(id)}"][data-index="${CSS.escape(String(index))}"]`,
+  );
+  if (!row) return;
+
+  const currentKey = getCurrentStatValueKey(stat);
+  const targetInput = row.querySelector("[data-goal-stat-field='target']");
+  const currentInput = row.querySelector("[data-current-field]");
+  const clearButton = row.querySelector("[data-clear-current]");
+
+  if (targetInput) targetInput.value = String(Number(stat.target ?? 0));
+  if (currentInput) {
+    currentInput.dataset.currentField = currentKey;
+    currentInput.value = String(getCurrentStatValue(character, stat));
+  }
+  if (clearButton) clearButton.dataset.statKey = currentKey;
+
+  updateRenderedStatRowState(id, Number(index), row);
 }
 
 function getRosterEmptyState() {
