@@ -849,7 +849,11 @@ function normalizeCharacter(character, resetGoals = false) {
   delete merged.version;
 
   const goals = normalizeGoals(character.goals, resetGoals, merged);
-  const adminGoalBranches = normalizeAdminGoalBranches(character.adminGoalBranches);
+  const savedAdminGoalBranches = normalizeAdminGoalBranches(character.adminGoalBranches);
+  const legacyAdminGoalBranches = getAdminGoalBranches(character.goals?.admin);
+  const adminGoalBranches = Object.keys(savedAdminGoalBranches).length
+    ? savedAdminGoalBranches
+    : legacyAdminGoalBranches;
   applyAdminGoalBranches(goals.admin, adminGoalBranches);
 
   return {
