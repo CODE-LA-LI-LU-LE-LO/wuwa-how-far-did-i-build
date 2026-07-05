@@ -589,6 +589,46 @@ try {
   fail(`app echo set initial search verification failed: ${error.message}`);
 }
 
+
+try {
+  const adminBranchSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const seedCharacter = JSON.parse(await readText("data/characters.json")).find(
+    (character) => character.en === "Aalto",
+  );
+  const normalizedState = adminBranchSandbox.normalizeState({
+    user: { role: "user" },
+    goalDefaultsVersion: 2,
+    characters: [
+      {
+        id: "branch-saved-id",
+        name: seedCharacter.name,
+        en: seedCharacter.en,
+        owned: true,
+        adminGoalBranches: { A: true, B: false },
+      },
+    ],
+  });
+  const normalizedCharacter = normalizedState.characters.find(
+    (item) => item.en === "Aalto",
+  );
+  const branchA = normalizedCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "A",
+  );
+  const branchB = normalizedCharacter?.goals.admin.echoStats.find(
+    (stat) => stat.variant === "B",
+  );
+  if (branchA?.branchChecked !== true || branchB?.branchChecked !== false) {
+    fail("admin goal branch checkbox selections must persist separately from admin goal defaults");
+  }
+} catch (error) {
+  fail(`app admin branch persistence verification failed: ${error.message}`);
+}
+
 try {
   const currentStatSyncSandbox = await smokeLoadApp({
     configSource: await readText("app-config.js"),

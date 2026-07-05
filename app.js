@@ -848,11 +848,16 @@ function normalizeCharacter(character, resetGoals = false) {
 
   delete merged.version;
 
+  const goals = normalizeGoals(character.goals, resetGoals, merged);
+  const adminGoalBranches = normalizeAdminGoalBranches(character.adminGoalBranches);
+  applyAdminGoalBranches(goals.admin, adminGoalBranches);
+
   return {
     ...merged,
     farm: { ...defaultFarm, ...character.farm },
     goalMode: character.goalMode === "custom" ? "custom" : "admin",
-    goals: normalizeGoals(character.goals, resetGoals, merged),
+    goals,
+    adminGoalBranches,
     currentStats: normalizeCurrentStats(character.currentStats),
     isPublic: merged.isPublic !== false,
   };
@@ -887,6 +892,37 @@ function normalizeGoals(goals = {}, resetValueStats = false, character = {}) {
     admin: normalizeGoal(getAdminGoalDefault(character), false),
     custom: normalizeGoal(goals.custom, resetValueStats),
   };
+}
+
+function normalizeAdminGoalBranches(branches = {}) {
+  return Object.fromEntries(
+    Object.entries(branches ?? {})
+      .filter(([variant]) => statVariantOptions.includes(variant) && variant !== "-")
+      .map(([variant, checked]) => [variant, Boolean(checked)]),
+  );
+}
+
+function applyAdminGoalBranches(goal, branches = {}) {
+  if (!goal) return;
+  const normalizedBranches = normalizeAdminGoalBranches(branches);
+  goal.echoStats.forEach((stat) => {
+    if (stat.variant !== "-" && stat.variant in normalizedBranches) {
+      stat.branchChecked = normalizedBranches[stat.variant];
+    }
+  });
+}
+
+function getAdminGoalBranches(goal = {}) {
+  return Object.fromEntries(
+    (goal.echoStats ?? [])
+      .filter((stat) => stat.variant && stat.variant !== "-")
+      .map((stat) => [stat.variant, Boolean(stat.branchChecked)]),
+  );
+}
+
+function syncAdminGoalBranches(character) {
+  if (!character || character.goalMode === "custom") return;
+  character.adminGoalBranches = getAdminGoalBranches(character.goals.admin);
 }
 
 function normalizeGoal(goal = {}, resetValueStats = false) {
@@ -1093,6 +1129,7 @@ function getUserCharacterData(character) {
     goals: {
       custom: character.goals.custom,
     },
+    adminGoalBranches: character.adminGoalBranches,
     currentStats: character.currentStats,
   };
 }
@@ -1188,6 +1225,7 @@ function getPortableState(options = {}) {
       goals: {
         custom: character.goals.custom,
       },
+      adminGoalBranches: character.adminGoalBranches,
     };
   });
 
@@ -2956,6 +2994,10 @@ function updateGoalEchoStatField(id, index, field, value) {
     matchingStats.forEach((echoStat) => {
       echoStat.branchChecked = nextChecked;
     });
+  }
+
+  if (field === "variant" || isBranchCheck) {
+    syncAdminGoalBranches(character);
   }
 
   saveGoalState(character);
