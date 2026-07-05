@@ -93,7 +93,7 @@ const statOptions = [
   },
   {
     key: "healingBonus",
-    label: "치유효과+",
+    label: "치료효과+",
     icon: "assets/icons/stats/heal.webp",
     defaultTarget: 0,
   },
@@ -341,6 +341,7 @@ const defaultGoal = {
   echoSets: [{ join: "+", name: "", pieces: "5 Set" }],
   mainEchoes: [{ join: "OR", name: "" }],
   echoBuild: "43311",
+  echoBuildAlt: "",
   mainEcho: "",
   note: "",
   echoStats: [
@@ -995,7 +996,7 @@ function normalizeGoal(goal = {}, resetValueStats = false) {
       : defaultGoal.stats;
   const stats = rawStats.map(normalizeGoalStat).filter(Boolean).slice(0, 7);
 
-  while (stats.length < 3) {
+  while (stats.length < 2) {
     const nextOption =
       valueStatOptions.find(
         (option) => !stats.some((stat) => stat.key === option.key),
@@ -1008,6 +1009,9 @@ function normalizeGoal(goal = {}, resetValueStats = false) {
     echoSets: normalizeGoalEchoSets(goal),
     mainEchoes: normalizeGoalMainEchoes(goal),
     echoBuild: String(goal.echoBuild ?? defaultGoal.echoBuild)
+      .replace(/\D/g, "")
+      .slice(0, 5),
+    echoBuildAlt: String(goal.echoBuildAlt ?? "")
       .replace(/\D/g, "")
       .slice(0, 5),
     mainEcho: goal.mainEcho ?? defaultGoal.mainEcho,
@@ -1068,7 +1072,7 @@ function normalizeGoalEchoStats(goal = {}, fallbackStats = defaultGoal.echoStats
     .filter(Boolean)
     .slice(0, 7);
 
-  while (stats.length < 3) {
+  while (stats.length < 2) {
     const nextOption =
       statOptions.find(
         (option) => !stats.some((stat) => stat.key === option.key),
@@ -1082,7 +1086,8 @@ function normalizeGoalEchoStats(goal = {}, fallbackStats = defaultGoal.echoStats
 function normalizeGoalEchoStat(stat = {}) {
   const option =
     statOptions.find((item) => item.key === stat.key) ??
-    statOptions.find((item) => item.label === stat.label);
+    statOptions.find((item) => item.label === stat.label) ??
+    getLegacyStatLabelOption(stat.label, statOptions);
   if (!option) return null;
   return {
     key: option.key,
@@ -1099,7 +1104,8 @@ function normalizeGoalEchoStat(stat = {}) {
 function normalizeGoalStat(stat = {}) {
   const option =
     valueStatOptions.find((item) => item.key === stat.key) ??
-    valueStatOptions.find((item) => item.label === stat.label);
+    valueStatOptions.find((item) => item.label === stat.label) ??
+    getLegacyStatLabelOption(stat.label, valueStatOptions);
   if (!option) return null;
   return {
     key: option.key,
@@ -1108,6 +1114,13 @@ function normalizeGoalStat(stat = {}) {
     cost: statCostOptions.includes(stat.cost) ? stat.cost : "COST 1",
     variant: statVariantOptions.includes(stat.variant) ? stat.variant : "-",
   };
+}
+
+function getLegacyStatLabelOption(label, options = statOptions) {
+  if (label === "치유효과+") {
+    return options.find((item) => item.key === "healingBonus") ?? null;
+  }
+  return null;
 }
 
 function normalizeCurrentStats(currentStats = {}) {
@@ -1801,7 +1814,7 @@ function bindRosterInteractions(root = rosterList) {
   });
 
   root.querySelectorAll("[data-goal-field]").forEach((field) => {
-    if (field.dataset.goalField === "echoBuild") {
+    if (field.dataset.goalField === "echoBuild" || field.dataset.goalField === "echoBuildAlt") {
       field.addEventListener("input", () => {
         field.value = field.value.replace(/\D/g, "").slice(0, 5);
         updateEchoBuildPreview(field);
@@ -1810,7 +1823,7 @@ function bindRosterInteractions(root = rosterList) {
 
     field.addEventListener("blur", () => {
       const value =
-        field.dataset.goalField === "echoBuild"
+        field.dataset.goalField === "echoBuild" || field.dataset.goalField === "echoBuildAlt"
           ? field.value.replace(/\D/g, "").slice(0, 5)
           : field.dataset.goalField === "note"
             ? field.value.trim()
@@ -2013,7 +2026,7 @@ function renderFarmingCard(character) {
               ? `
             <div class="stat-actions">
               <button class="ghost-button" data-add-echo-stat="${character.id}" type="button" ${goal.echoStats.length < 7 ? "" : "disabled"}>에코 구성 추가</button>
-              <small>에코 구성은 3개에서 7개까지 설정할 수 있습니다.</small>
+              <small>에코 구성은 2개에서 7개까지 설정할 수 있습니다.</small>
             </div>
           `
               : ""
@@ -2039,7 +2052,7 @@ function renderFarmingCard(character) {
               ? `
             <div class="stat-actions">
               <button class="ghost-button" data-add-stat="${character.id}" type="button" ${goal.stats.length < 7 ? "" : "disabled"}>주옵 추가</button>
-              <small>주옵은 3개에서 7개까지 설정할 수 있습니다.</small>
+              <small>주옵은 2개에서 7개까지 설정할 수 있습니다.</small>
             </div>
           `
               : ""
@@ -2067,7 +2080,36 @@ function renderFarmingCard(character) {
 }
 
 function renderEchoBuildInput(character, goal, canEditGoal) {
-  const value = String(goal.echoBuild ?? "").replace(/\D/g, "").slice(0, 5);
+  const primaryField = renderEchoBuildField(
+    character.id,
+    "echoBuild",
+    goal.echoBuild,
+    "에코셋 구성",
+    canEditGoal,
+  );
+  const secondaryValue = String(goal.echoBuildAlt ?? "")
+    .replace(/\D/g, "")
+    .slice(0, 5);
+
+  if (!canEditGoal && !secondaryValue) return primaryField;
+
+  return `
+    <span class="echo-build-group">
+      ${primaryField}
+      <span class="echo-build-or">OR</span>
+      ${renderEchoBuildField(
+        character.id,
+        "echoBuildAlt",
+        secondaryValue,
+        "대체 에코셋 구성",
+        canEditGoal,
+      )}
+    </span>
+  `;
+}
+
+function renderEchoBuildField(characterId, fieldName, rawValue, label, canEditGoal) {
+  const value = String(rawValue ?? "").replace(/\D/g, "").slice(0, 5);
   const displayValue = value || "43311";
   const digits = Array.from(displayValue.slice(0, 5));
   const digitCells = digits
@@ -2079,7 +2121,7 @@ function renderEchoBuildInput(character, goal, canEditGoal) {
   return `
     <span class="echo-build-field ${value ? "" : "is-placeholder"}">
       <span class="echo-build-highlight" aria-hidden="true">${digitCells}</span>
-      <input class="echo-build-input" data-goal-field="echoBuild" data-character="${character.id}" value="${escapeHtml(value)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="에코셋 구성" ${canEditGoal ? "" : "disabled"} />
+      <input class="echo-build-input" data-goal-field="${fieldName}" data-character="${characterId}" value="${escapeHtml(value)}" placeholder="43311" inputmode="numeric" maxlength="5" aria-label="${escapeHtml(label)}" ${canEditGoal ? "" : "disabled"} />
     </span>
   `;
 }
@@ -2150,7 +2192,7 @@ function renderEchoStatRow(character, stat, index, canEditGoal) {
         dataAttribute: "data-echo-stat-option",
       })}
       <span class="stat-row-actions">
-        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-echo-stat="${index}" type="button" ${getActiveGoal(character).echoStats.length > 3 ? "" : "disabled"} title="에코 구성 제거">-</button>` : ""}
+        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-echo-stat="${index}" type="button" ${getActiveGoal(character).echoStats.length > 2 ? "" : "disabled"} title="에코 구성 제거">-</button>` : ""}
       </span>
     </div>
   `;
@@ -2198,7 +2240,7 @@ function renderStatRow(character, stat, index, canEditGoal) {
       <input data-current-field="${currentKey}" data-character="${character.id}" data-index="${index}" type="number" min="0" step="5" value="${current}" ${inputDisabled} />
       <span class="stat-row-actions">
         <button class="current-clear" data-clear-current="${character.id}" data-stat-key="${currentKey}" type="button" ${canEditCurrent ? "" : "disabled"} title="내 캐릭터 입력값 초기화">↻</button>
-        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 3 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
+        ${canEditGoal ? `<button class="stat-remove" data-character="${character.id}" data-remove-stat="${index}" type="button" ${getActiveGoal(character).stats.length > 2 ? "" : "disabled"} title="주옵 제거">-</button>` : ""}
       </span>
     </div>
   `;
@@ -2845,7 +2887,7 @@ function updateGoal(id, field, value, statKey) {
   }
 
   saveGoalState(character);
-  if (field === "note" || field === "echoBuild") return;
+  if (field === "note" || field === "echoBuild" || field === "echoBuildAlt") return;
   updateGoalRenderStateAfterEdit(character, wasComplete);
 }
 
@@ -3057,7 +3099,7 @@ function removeGoalEchoStat(id, index) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.echoStats.length <= 3) return;
+  if (goal.echoStats.length <= 2) return;
 
   const targetIndex = Number(index);
   goal.echoStats.splice(targetIndex, 1);
@@ -3174,7 +3216,7 @@ function removeGoalStat(id, index) {
   const character = state.characters.find((item) => item.id === id);
   if (!character || !canEditActiveGoal(character)) return;
   const goal = getActiveGoal(character);
-  if (goal.stats.length <= 3) return;
+  if (goal.stats.length <= 2) return;
 
   const targetIndex = Number(index);
   goal.stats.splice(targetIndex, 1);

@@ -1415,6 +1415,20 @@ select option {
   text-align: right;
 }
 
+.echo-build-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.echo-build-or {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
 .echo-build-field {
   --echo-build-cell-width: 46px;
   position: relative;
