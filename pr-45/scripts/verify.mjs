@@ -261,6 +261,27 @@ if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) fail("manifes
 if (!appSource.includes('const statVariantOptions = ["-", "A", "B", "C", "D", "E", "F"];')) {
   fail("app.js must provide stat branch options from - through A-F");
 }
+if (!/const valueStatOptions = \[[\s\S]*"healingBonus"[\s\S]*\]\.map/.test(appSource)) {
+  fail("app.js value stat options must include healingBonus for numeric input attributes");
+}
+if (!appSource.includes('label: "치료효과+"')) {
+  fail("app.js healing bonus label must use 치료효과+");
+}
+if (appSource.includes('label: "치유효과+"')) {
+  fail("app.js should not use 치유효과+ as the displayed healing bonus label");
+}
+for (const requiredGoalEditSource of [
+  "에코 구성은 2개에서 7개까지 설정할 수 있습니다.",
+  "주옵은 1개에서 7개까지 설정할 수 있습니다.",
+  "echoBuildAlt",
+  "echo-build-or",
+  "goal.echoStats.length <= 2",
+  "goal.stats.length <= 1",
+]) {
+  if (!appSource.includes(requiredGoalEditSource)) {
+    fail(`app.js missing goal edit behavior source: ${requiredGoalEditSource}`);
+  }
+}
 for (const icon of manifest.icons ?? []) {
   await mustExist(icon.src);
 }
@@ -487,6 +508,40 @@ try {
   }
 } catch (error) {
   fail(`app current stat sync verification failed: ${error.message}`);
+}
+
+try {
+  const goalShapeSandbox = await smokeLoadApp({
+    configSource: await readText("app-config.js"),
+    characterSource: await readText("data/characters.json"),
+    goalDefaultsSource,
+    appSource,
+  });
+  const normalizedGoal = goalShapeSandbox.normalizeGoal({
+    echoBuild: "43311",
+    echoBuildAlt: "44111",
+    echoStats: [
+      { key: "critRate", label: "크리확률" },
+      { key: "critDamage", label: "크리피해" },
+    ],
+    stats: [
+      { key: "healingBonus", label: "치유효과+", target: 30 },
+    ],
+  });
+  if (normalizedGoal.echoBuildAlt !== "44111") {
+    fail("alternate echo build must be normalized and preserved");
+  }
+  if (normalizedGoal.echoStats.length !== 2) {
+    fail("echo stat normalization must allow a minimum of two rows");
+  }
+  if (normalizedGoal.stats.length !== 1) {
+    fail("goal stat normalization must allow a minimum of one row");
+  }
+  if (normalizedGoal.stats[0]?.label !== "치료효과+") {
+    fail("legacy healing bonus labels must normalize to 치료효과+");
+  }
+} catch (error) {
+  fail(`app goal shape verification failed: ${error.message}`);
 }
 
 if (failures.length > 0) {
