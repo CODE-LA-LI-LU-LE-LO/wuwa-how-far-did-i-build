@@ -834,6 +834,26 @@ googleButton.addEventListener("click", async () => {
   }
 });
 
+async function loadVersionData() {
+  const appVersionElement = document.querySelector("#appVersion");
+  if (!appVersionElement) return;
+
+  try {
+    const response = await fetch("data/version.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const versionData = await response.json();
+    const version =
+      typeof versionData?.version === "string" ? versionData.version.trim() : "";
+    if (version) {
+      appVersionElement.textContent = version.startsWith("ver.")
+        ? version
+        : `ver.${version}`;
+    }
+  } catch {
+    showSessionMessage("버전 정보 불러오기 실패", "data/version.json을 확인해주세요");
+  }
+}
+
 async function loadCharacterSeedData() {
   try {
     const response = await fetch("data/characters.json", { cache: "no-cache" });
@@ -4143,6 +4163,7 @@ let shouldRenderImmediately = true;
 initializeApp();
 
 async function initializeApp() {
+  await loadVersionData();
   await loadCharacterSeedData();
   initializeState();
   await loadGoalDefaultsData().catch(() => {});

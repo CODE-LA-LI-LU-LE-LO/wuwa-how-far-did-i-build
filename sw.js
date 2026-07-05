@@ -1,4 +1,4 @@
-const CACHE_NAME = "ww-farming-tracker-v5";
+const CACHE_NAME = "ww-farming-tracker-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const NETWORK_FIRST_PATHS = [
   "/app-config.js",
   "/data/characters.json",
   "/data/goal-defaults.json",
+  "/data/version.json",
 ];
 
 self.addEventListener("install", (event) => {
