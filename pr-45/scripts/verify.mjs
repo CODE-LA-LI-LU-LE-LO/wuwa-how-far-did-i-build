@@ -506,6 +506,17 @@ try {
   if (character.currentStats.values.hp === 350) {
     fail("current stat sync must not overwrite different attributes");
   }
+  character.currentStats.values.hp = 123;
+  currentStatSyncSandbox.clearCurrentStat(character.id, "A:atk");
+  if (
+    character.currentStats.values["A:atk"] !== 0 ||
+    character.currentStats.values["B:atk"] !== 0
+  ) {
+    fail("clearing a current stat must sync zero to matching branch values");
+  }
+  if (character.currentStats.values.hp === 0) {
+    fail("current stat clear sync must not overwrite different attributes");
+  }
 } catch (error) {
   fail(`app current stat sync verification failed: ${error.message}`);
 }
