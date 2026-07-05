@@ -429,7 +429,7 @@
     "weapon": "증폭기",
     "rarity": "5",
     "image": "assets/characters/suisui.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "쇄명",
@@ -492,7 +492,7 @@
     "weapon": "직검",
     "rarity": "5",
     "image": "assets/characters/yangyang-xuanling.webp",
-    "isPublic": true
+    "isPublic": false
   },
   {
     "name": "음림",
