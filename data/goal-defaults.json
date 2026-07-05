@@ -2340,6 +2340,13 @@
         "variant": "-"
       },
       {
+        "key": "energy",
+        "label": "공명효율",
+        "target": 100,
+        "cost": "COST 3",
+        "variant": "-"
+      },
+      {
         "key": "attack",
         "label": "공격력",
         "target": 2200,
