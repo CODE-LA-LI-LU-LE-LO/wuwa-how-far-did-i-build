@@ -14,7 +14,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -197,18 +197,23 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
-        "pieces": "5 Set"
+        "name": "영광의 칼날로 만들어진 왕관",
+        "pieces": "3 Set"
+      },
+      {
+        "join": "+",
+        "name": "울려퍼지는 뇌음",
+        "pieces": "2 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "거짓의 신왕"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "거짓의 신왕",
     "note": "",
     "echoStats": [
       {
@@ -219,22 +224,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -244,13 +242,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -265,30 +256,37 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 73,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 220,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 125,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2400,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2750,
+        "cost": "COST 1",
+        "variant": "B"
       }
     ]
   },
@@ -307,7 +305,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -493,7 +491,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -583,27 +581,20 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "울려퍼지는 뇌음",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 뇌운의 비늘"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 뇌운의 비늘",
     "note": "",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -612,15 +603,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -630,13 +621,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -651,7 +635,7 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 65,
         "cost": "COST 4",
         "variant": "-"
       },
@@ -665,7 +649,7 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -683,60 +667,53 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "빛을 삼키는 해",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 크라운리스"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 크라운리스",
     "note": "",
     "echoStats": [
       {
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "-",
+        "variant": "A",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 4",
-        "variant": "-",
+        "variant": "B",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "C",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 3",
-        "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
+        "variant": "D",
         "branchChecked": false
       },
       {
@@ -751,14 +728,14 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 65,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 280,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -772,7 +749,7 @@
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2450,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -783,18 +760,27 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "어둠의 장막",
+        "pieces": "5 Set"
+      },
+      {
+        "join": "+",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "로렐라이"
+      },
+      {
+        "join": "OR",
+        "name": "음험한 백로"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "로렐라이",
     "note": "",
     "echoStats": [
       {
@@ -805,22 +791,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -830,13 +809,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -858,21 +830,21 @@
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 280,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 1800,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -1134,27 +1106,35 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
-        "pieces": "5 Set"
+        "name": "운명을 붕괴시키는 현",
+        "pieces": "3 Set"
+      },
+      {
+        "join": "+",
+        "name": "빛을 삼키는 해",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "어둠의 장막",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "떠오르는 구름",
+        "pieces": "2 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "공명의 메아리 · 명식 · 레비아탄"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
-    "note": "",
+    "echoBuild": "43311",
+    "mainEcho": "공명의 메아리 · 명식 · 레비아탄",
+    "note": "- 떠오르는 구름 채용하여 공명효율 챙기는 것이 정신건강에 이로움",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -1163,15 +1143,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -1181,13 +1161,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -1202,7 +1175,7 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 80,
         "cost": "COST 4",
         "variant": "-"
       },
@@ -1216,16 +1189,23 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
+        "target": 2000,
+        "cost": "COST 1",
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
         "target": 2200,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "B"
       }
     ]
   },
@@ -1244,7 +1224,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -1441,7 +1421,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -1932,7 +1912,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -2149,7 +2129,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -2249,7 +2229,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -2349,7 +2329,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -2727,7 +2707,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -2827,7 +2807,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -3020,7 +3000,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -3120,7 +3100,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -3292,7 +3272,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -3392,7 +3372,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -3482,27 +3462,30 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
-        "pieces": "5 Set"
+        "name": "뒤틀린 피안의 꿈",
+        "pieces": "3 Set"
+      },
+      {
+        "join": "+",
+        "name": "빛을 삼키는 해",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "어둠의 장막",
+        "pieces": "2 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 헤카테"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 헤카테",
     "note": "",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -3511,15 +3494,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -3529,13 +3512,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -3557,14 +3533,14 @@
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 265,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 0,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -3573,7 +3549,14 @@
         "label": "공격력",
         "target": 2200,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2500,
+        "cost": "COST 1",
+        "variant": "B"
       }
     ]
   },
@@ -3592,7 +3575,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -3803,18 +3786,48 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
-        "pieces": "5 Set"
+        "name": "꿈을 깨뜨리는 망령의 악몽",
+        "pieces": "1 Set"
+      },
+      {
+        "join": "+",
+        "name": "울려퍼지는 뇌음",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "+",
+        "name": "끊임없는 잔향",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "마음을 엮은 꿈의 그림자",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "떠오르는 구름",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "하늘의 합주곡",
+        "pieces": "2 Set"
+      },
+      {
+        "join": "OR",
+        "name": "파도에 맞선 용기",
+        "pieces": "2 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "공명의 메아리 · 악몽 아담 · 스매셔"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "공명의 메아리 · 악몽 아담 · 스매셔",
     "note": "",
     "echoStats": [
       {
@@ -3825,22 +3838,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -3850,13 +3856,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -3878,23 +3877,30 @@
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 285,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 125,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2100,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2300,
+        "cost": "COST 1",
+        "variant": "B"
       }
     ]
   },
@@ -3903,60 +3909,62 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "어둠의 장막",
+        "pieces": "5 Set"
+      },
+      {
+        "join": "OR",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 음험한 백로"
+      },
+      {
+        "join": "OR",
+        "name": "음험한 백로"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
-    "note": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 음험한 백로",
+    "note": "- 구름 세트 장착 시 공명효율 요구치 120",
     "echoStats": [
       {
         "key": "critRate",
         "label": "크리확률",
         "cost": "COST 4",
-        "variant": "-",
+        "variant": "A",
         "branchChecked": false
       },
       {
         "key": "critDamage",
         "label": "크리피해",
         "cost": "COST 4",
-        "variant": "-",
+        "variant": "B",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
-        "variant": "A",
+        "variant": "C",
         "branchChecked": false
       },
       {
         "key": "attack",
         "label": "공격력%",
         "cost": "COST 3",
-        "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
+        "variant": "D",
         "branchChecked": false
       },
       {
@@ -3971,28 +3979,28 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 65,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 280,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 130,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2250,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -4118,7 +4126,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -4208,27 +4216,20 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "빛을 삼키는 해",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 크라운리스"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
-    "note": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 크라운리스",
+    "note": "- 6돌 + 상시직검 -> 크리피해 옵션에 집중",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -4237,15 +4238,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -4255,13 +4256,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -4276,14 +4270,14 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 65,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 270,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -4297,7 +4291,7 @@
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2000,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -4318,7 +4312,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -4418,7 +4412,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -4604,7 +4598,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -4704,7 +4698,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -4804,7 +4798,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -4904,7 +4898,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -5004,7 +4998,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -5094,27 +5088,20 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "울려퍼지는 뇌음",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 뇌운의 비늘"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 뇌운의 비늘",
     "note": "",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -5123,15 +5110,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -5141,13 +5128,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -5162,14 +5142,14 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 65,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 280,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -5204,7 +5184,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -5304,7 +5284,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -5394,27 +5374,29 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
+      },
+      {
+        "join": "+",
+        "name": "하늘의 합주곡",
+        "pieces": "2 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 천둥의 비늘"
+      },
+      {
+        "join": "OR",
+        "name": "음험한 백로"
       }
     ],
-    "echoBuild": "1",
-    "mainEcho": "",
-    "note": "",
+    "echoBuild": "43311",
+    "mainEcho": "악몽 · 천둥의 비늘",
+    "note": "- 2돌 이상 시 공명효율 요구치 감소",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -5423,15 +5405,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -5441,13 +5423,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -5462,14 +5437,14 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 80,
         "cost": "COST 4",
         "variant": "-"
       },
       {
         "key": "critDamage",
         "label": "크리피해",
-        "target": 260,
+        "target": 270,
         "cost": "COST 3",
         "variant": "-"
       },
@@ -5483,7 +5458,7 @@
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 1850,
         "cost": "COST 1",
         "variant": "-"
       }
@@ -5504,7 +5479,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -5604,7 +5579,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
@@ -5704,7 +5679,7 @@
         "name": ""
       }
     ],
-    "echoBuild": "1",
+    "echoBuild": "4",
     "mainEcho": "",
     "note": "",
     "echoStats": [
