@@ -5163,28 +5163,21 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "내려앉은 깃털의 노래",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "천괴중루"
       }
     ],
-    "echoBuild": "4",
+    "echoBuild": "43311",
     "echoBuildAlt": "",
-    "mainEcho": "",
+    "mainEcho": "천괴중루",
     "note": "",
     "echoStats": [
-      {
-        "key": "critRate",
-        "label": "크리확률",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
       {
         "key": "critDamage",
         "label": "크리피해",
@@ -5193,15 +5186,15 @@
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "havocDamage",
+        "label": "인멸피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -5211,13 +5204,6 @@
         "label": "공격력%",
         "cost": "COST 3",
         "variant": "B",
-        "branchChecked": false
-      },
-      {
-        "key": "energy",
-        "label": "공명효율",
-        "cost": "COST 3",
-        "variant": "-",
         "branchChecked": false
       },
       {
@@ -5232,7 +5218,7 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 70,
+        "target": 75,
         "cost": "COST 4",
         "variant": "-"
       },
@@ -5255,7 +5241,14 @@
         "label": "공격력",
         "target": 2200,
         "cost": "COST 1",
-        "variant": "-"
+        "variant": "A"
+      },
+      {
+        "key": "attack",
+        "label": "공격력",
+        "target": 2500,
+        "cost": "COST 1",
+        "variant": "B"
       }
     ]
   },
