@@ -4074,19 +4074,28 @@
     "echoSets": [
       {
         "join": "+",
-        "name": "",
+        "name": "울려퍼지는 뇌음",
+        "pieces": "5 Set"
+      },
+      {
+        "join": "OR",
+        "name": "떠오르는 구름",
         "pieces": "5 Set"
       }
     ],
     "mainEchoes": [
       {
         "join": "기준",
-        "name": ""
+        "name": "악몽 · 천둥의 비늘"
+      },
+      {
+        "join": "OR",
+        "name": "음험한 백로"
       }
     ],
-    "echoBuild": "4",
+    "echoBuild": "43311",
     "echoBuildAlt": "",
-    "mainEcho": "",
+    "mainEcho": "악몽 · 천둥의 비늘",
     "note": "",
     "echoStats": [
       {
@@ -4097,22 +4106,15 @@
         "branchChecked": false
       },
       {
-        "key": "critDamage",
-        "label": "크리피해",
-        "cost": "COST 4",
-        "variant": "-",
-        "branchChecked": false
-      },
-      {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "-",
         "branchChecked": false
       },
       {
-        "key": "aeroDamage",
-        "label": "기류피증",
+        "key": "electroDamage",
+        "label": "전도피증",
         "cost": "COST 3",
         "variant": "A",
         "branchChecked": false
@@ -4157,7 +4159,7 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 110,
         "cost": "COST 3",
         "variant": "-"
       },
