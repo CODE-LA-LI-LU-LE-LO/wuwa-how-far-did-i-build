@@ -384,7 +384,7 @@
     "weapon": "직검",
     "rarity": "5",
     "image": "assets/characters/rover-electro.webp",
-    "isPublic": false
+    "isPublic": true
   },
   {
     "name": "방랑자 · 인멸",
