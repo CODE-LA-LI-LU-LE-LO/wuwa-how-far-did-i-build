@@ -492,7 +492,7 @@
     "weapon": "직검",
     "rarity": "5",
     "image": "assets/characters/yangyang-xuanling.webp",
-    "isPublic": false
+    "isPublic": true
   },
   {
     "name": "음림",
