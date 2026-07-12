@@ -5220,7 +5220,7 @@
       {
         "key": "critRate",
         "label": "크리확률",
-        "target": 75,
+        "target": 70,
         "cost": "COST 4",
         "variant": "-"
       },
@@ -5234,21 +5234,21 @@
       {
         "key": "energy",
         "label": "공명효율",
-        "target": 120,
+        "target": 125,
         "cost": "COST 3",
         "variant": "-"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2200,
+        "target": 2100,
         "cost": "COST 1",
         "variant": "A"
       },
       {
         "key": "attack",
         "label": "공격력",
-        "target": 2500,
+        "target": 2400,
         "cost": "COST 1",
         "variant": "B"
       }
